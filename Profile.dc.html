@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -198,4 +198,37 @@ class Component extends DCLogic {
 }
 </script>
 </body>
+<script>
+(function() {
+  var SCROLL_SCRIPT = '<header-scroll-init>';
+  function init() {
+    var h = document.querySelector('header');
+    if (!h) { setTimeout(init, 150); return; }
+    if (h.dataset.scrollInit) return;
+    h.dataset.scrollInit = '1';
+    var lastY = 0, ticking = false;
+    window.addEventListener('scroll', function() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function() {
+        var y = Math.max(0, window.scrollY || 0);
+        var d = y - lastY;
+        if (y < 24 || d < 0) {
+          h.style.opacity = '1';
+          h.style.transform = 'translateY(0)';
+          h.style.pointerEvents = 'auto';
+          h.style.boxShadow = y > 16 ? '0 10px 30px rgba(22,54,30,0.08)' : 'none';
+        } else if (y > 96 && d > 0) {
+          h.style.opacity = '0';
+          h.style.transform = 'translateY(-100%)';
+          h.style.pointerEvents = 'none';
+        }
+        lastY = y;
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+  init();
+})();
+</script>
 </html>
