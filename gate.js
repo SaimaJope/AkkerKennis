@@ -28,6 +28,12 @@
   css.id = 'ak-gate-css';
   css.textContent = [
     'html.ak-locked, html.ak-locked body{overflow:hidden!important;height:100%!important;}',
+    // Hide the app entirely while locked (not just cover it) so no content can
+    // paint before unlock, and pre-paint the gate background on <html> so the
+    // moment before the overlay mounts is seamless rather than a content flash.
+    'html.ak-locked #dc-root, html.ak-locked x-dc{visibility:hidden!important;}',
+    'html.ak-locked{background:radial-gradient(1200px 600px at 50% -10%,#effbe7 0%,rgba(239,251,231,0) 60%),',
+    'linear-gradient(160deg,#e3fbd8 0%,#d4f4c6 100%)!important;}',
     '#ak-gate{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;',
     'justify-content:center;padding:24px;box-sizing:border-box;',
     "font-family:'Ubuntu',Arial,sans-serif;color:#16361e;-webkit-tap-highlight-color:transparent;",
