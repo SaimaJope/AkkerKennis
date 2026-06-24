@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  select{appearance:none;-webkit-appearance:none;}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="explore" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:1200px;margin:0 auto;padding:clamp(32px,4vw,56px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    <div style="margin-bottom:32px;">
+      <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.4vw,52px);color:#16361e;margin:0 0 10px;letter-spacing:-0.4px;">Explore Topics</h1>
+      <p style="font-size:18px;color:#33473b;margin:0;max-width:560px;">Browse practical discussions from arable farmers across the Netherlands. Filter by category, region, or what the community is talking about right now.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:268px 1fr;gap:28px;align-items:start;">
+      <!-- SIDEBAR -->
+      <aside style="display:flex;flex-direction:column;gap:20px;">
+        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:20px;">
+          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 14px;">Category</h3>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <sc-for list="{{ catList }}" as="c" hint-placeholder-count="7">
+              <button type="button" onClick="{{ c.onClick }}" style="{{ c.style }}">
+                <span>{{ c.name }}</span>
+                <span style="{{ c.countStyle }}">{{ c.count }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+            <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0;">Region</h3>
+            <div style="display:inline-flex;align-items:center;gap:3px;background:#e3fbd8;border:1px solid rgba(22,54,30,0.15);border-radius:999px;padding:3px;">
+              <button type="button" onClick="{{ showMapRegion }}" style="{{ mapToggleStyle }}">Map</button>
+              <button type="button" onClick="{{ showTextRegion }}" style="{{ textToggleStyle }}">Text</button>
+            </div>
+          </div>
+
+          <sc-if value="{{ regionMapVisible }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;justify-content:center;margin:2px 0 12px;">
+              <dc-import name="NLMap" selected="{{ mapSelected }}" interactive="true" showCaption="false" onSelect="{{ onMapRegion }}" hint-size="228px,260px"></dc-import>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:13px;line-height:1.4;color:#5a7060;">{{ regionHint }}</div>
+              <button type="button" onClick="{{ clearRegion }}" style="{{ allRegionsStyle }}">{{ allRegionsLabel }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ regionTextVisible }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;">
+              <select value="{{ region }}" onChange="{{ onRegion }}" style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;color:#16361e;background:#e3fbd8;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:13px 38px 13px 14px;cursor:pointer;">
+                <sc-for list="{{ regionOpts }}" as="r" hint-placeholder-count="6">
+                  <option value="{{ r.id }}">{{ r.name }}</option>
+                </sc-for>
+              </select>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+          </sc-if>
+        </div>
+
+        <a href="CreatePost.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;text-decoration:none;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border-radius:14px;transition:background .18s ease;" style-hover="background:#0f2716;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eafbe1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+          New topic
+        </a>
+      </aside>
+
+      <!-- MAIN -->
+      <div>
+        <!-- search -->
+        <div style="position:relative;margin-bottom:18px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+          <input type="text" value="{{ query }}" onInput="{{ onQuery }}" placeholder="Search topics, crops, methods..." style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.16);border-radius:14px;padding:16px 18px 16px 50px;" />
+        </div>
+
+        <!-- sort + count -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+          <span style="font-size:15px;color:#5a7060;">{{ resultLabel }}</span>
+          <div style="display:flex;gap:6px;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:999px;padding:5px;">
+            <sc-for list="{{ sortList }}" as="s" hint-placeholder-count="4">
+              <button type="button" onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.name }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- list -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{ topics }}" as="t" hint-placeholder-count="6">
+            <a href="Forum.dc.html" style="text-decoration:none;display:block;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:24px 26px;transition:transform .16s ease,border-color .16s ease;" style-hover="transform:translateY(-2px);border-color:rgba(22,54,30,0.28);">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                <span style="{{ t.statusStyle }}">{{ t.status }}</span>
+                <span style="font-size:13px;font-weight:600;color:#5a7060;">{{ t.category }}</span>
+                <span style="width:3px;height:3px;border-radius:50%;background:#b6cdac;display:inline-block;"></span>
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#5a7060;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+                  {{ t.region }}
+                </span>
+              </div>
+              <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:23px;line-height:1.25;color:#16361e;margin:0 0 8px;">{{ t.title }}</h3>
+              <p style="font-size:15px;line-height:1.55;color:#4a5a4f;margin:0 0 16px;">{{ t.summary }}</p>
+              <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;color:#33473b;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 20l1.4-4.2A8.5 8.5 0 1 1 21 11.5z"></path></svg>
+                  {{ t.replies }} replies
+                </span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#fe4c24;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fe4c24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l6 7h-4v9h-4v-9H6z"></path></svg>
+                  {{ t.boosts }} boosts
+                </span>
+                <span style="font-size:14px;color:#5a7060;margin-left:auto;">Last activity {{ t.activity }}</span>
+              </div>
+            </a>
+          </sc-for>
+          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#ffffff;border:1px dashed rgba(22,54,30,0.22);border-radius:18px;padding:52px 26px;text-align:center;">
+              <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:0 0 8px;">No topics found</h3>
+              <p style="font-size:15px;color:#5a7060;margin:0;">Try a different category, region, or search term.</p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { category: 'all', region: 'all', regionMode: 'map', sort: 'latest', query: '' };
+
+  ALL = [
+    { title: 'Reducing black-grass in winter wheat', summary: 'Black-grass pressure has crept up over three seasons despite stale seedbeds. Looking for rotation and stacking strategies that actually held it back.', category: 'Crop Management', region: 'groningen', regionName: 'Groningen', replies: 38, boosts: 45, hours: 2, status: 'High traction' },
+    { title: 'Irrigation strategy in dry springs', summary: 'With drier Aprils becoming normal, how are you scheduling the first irrigation pass without wasting water early?', category: 'Irrigation', region: 'flevoland', regionName: 'Flevoland', replies: 21, boosts: 21, hours: 5, status: 'Active' },
+    { title: 'Variable rate seeding in onions', summary: 'Trialled VR seeding based on soil-scan zones this year. Sharing the prescription map logic and what I would change next season.', category: 'Precision Agriculture', region: 'zeeland', regionName: 'Zeeland', replies: 16, boosts: 32, hours: 26, status: 'Project potential' },
+    { title: 'Best timing for fungicide in potatoes?', summary: 'Late blight risk models disagree this week. Curious how others weigh model output against what they actually see in the crop.', category: 'Pests & Diseases', region: 'drenthe', regionName: 'Drenthe', replies: 28, boosts: 23, hours: 3, status: 'Needs input' },
+    { title: 'Cover crops to improve soil structure', summary: 'Three years into a multi-species cover crop mix. Aggregate stability is clearly better - here are the species ratios that worked.', category: 'Soil Health', region: 'gelderland', regionName: 'Gelderland', replies: 12, boosts: 18, hours: 8, status: 'Active' },
+    { title: 'Experiences with autonomous weeding robots', summary: 'Considering a shared purchase with two neighbouring farms. Looking for honest hours-per-hectare numbers and reliability in wet soil.', category: 'New Technologies', region: 'noordbrabant', regionName: 'Noord-Brabant', replies: 9, boosts: 27, hours: 22, status: 'New' },
+    { title: 'Managing nitrogen leaching on sandy soils', summary: 'Split applications plus a catch crop brought our measured leaching down substantially. Sharing the full schedule and results.', category: 'Soil Health', region: 'noordbrabant', regionName: 'Noord-Brabant', replies: 31, boosts: 19, hours: 50, status: 'Solved' },
+    { title: 'Detecting late blight early with drones', summary: 'Multispectral flights every five days flagged infection before it was visible from the tramlines. Walkthrough of the workflow and costs.', category: 'Precision Agriculture', region: 'friesland', regionName: 'Friesland', replies: 14, boosts: 22, hours: 12, status: 'High traction' },
+  ];
+
+  CATS = ['Pests & Diseases', 'Irrigation', 'Soil Health', 'New Technologies', 'Precision Agriculture', 'Crop Management'];
+
+  REGIONS = [
+    { id: 'all', name: 'All regions' },
+    { id: 'groningen', name: 'Groningen' }, { id: 'friesland', name: 'Friesland' }, { id: 'drenthe', name: 'Drenthe' },
+    { id: 'noordholland', name: 'Noord-Holland' }, { id: 'flevoland', name: 'Flevoland' }, { id: 'overijssel', name: 'Overijssel' },
+    { id: 'utrecht', name: 'Utrecht' }, { id: 'gelderland', name: 'Gelderland' }, { id: 'zuidholland', name: 'Zuid-Holland' },
+    { id: 'zeeland', name: 'Zeeland' }, { id: 'noordbrabant', name: 'Noord-Brabant' }, { id: 'limburg', name: 'Limburg' },
+  ];
+
+  regionName(id) {
+    const found = this.REGIONS.find((r) => r.id === id);
+    return found ? found.name : 'All regions';
+  }
+
+  statusStyle(status) {
+    const base = 'display:inline-flex;align-items:center;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:0.3px;padding:5px 11px;border-radius:999px;';
+    const map = {
+      'New': 'background:#e3fbd8;color:#16361e;border:1px solid rgba(22,54,30,0.20);',
+      'Active': 'background:#ffffff;color:#16361e;border:1px solid rgba(22,54,30,0.28);',
+      'Needs input': 'background:#fde9e3;color:#c43a18;border:1px solid rgba(254,76,36,0.28);',
+      'High traction': 'background:#fe4c24;color:#ffffff;border:1px solid #fe4c24;',
+      'Solved': 'background:#16361e;color:#bff0a6;border:1px solid #16361e;',
+      'Project potential': 'background:#8ee05e;color:#0f2a16;border:1px solid #8ee05e;',
+    };
+    return base + (map[status] || map['Active']);
+  }
+
+  fmtActivity(h) {
+    if (h < 24) return h + 'h ago';
+    const d = Math.round(h / 24);
+    return d === 1 ? '1d ago' : d + 'd ago';
+  }
+
+  renderVals() {
+    const st = this.state;
+
+    const catCounts = {};
+    this.ALL.forEach((t) => { catCounts[t.category] = (catCounts[t.category] || 0) + 1; });
+
+    let list = this.ALL.filter((t) => {
+      if (st.category !== 'all' && t.category !== st.category) return false;
+      if (st.region !== 'all' && t.region !== st.region) return false;
+      if (st.query.trim()) {
+        const q = st.query.toLowerCase();
+        if (!(t.title.toLowerCase().includes(q) || t.summary.toLowerCase().includes(q) || t.category.toLowerCase().includes(q))) return false;
+      }
+      return true;
+    });
+
+    list = list.slice().sort((a, b) => {
+      if (st.sort === 'discussed') return b.replies - a.replies;
+      if (st.sort === 'boosted') return b.boosts - a.boosts;
+      if (st.sort === 'trending') return (b.boosts * 2 + b.replies) / b.hours - (a.boosts * 2 + a.replies) / a.hours;
+      return a.hours - b.hours;
+    });
+
+    const topics = list.map((t) => ({
+      ...t,
+      regionName: t.regionName,
+      region: t.regionName,
+      activity: this.fmtActivity(t.hours),
+      statusStyle: this.statusStyle(t.status),
+    }));
+
+    const chipBase = 'display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;font-family:\'Ubuntu\',Arial,sans-serif;font-size:15px;border:none;border-radius:11px;padding:11px 13px;cursor:pointer;transition:background .15s ease;';
+    const mkCat = (id, name, count) => {
+      const active = st.category === id;
+      return {
+        name, count,
+        style: chipBase + (active ? 'background:#16361e;color:#eafbe1;font-weight:600;' : 'background:transparent;color:#16361e;font-weight:500;'),
+        countStyle: 'font-size:13px;' + (active ? 'color:#9fd587;' : 'color:#8aa090;'),
+        onClick: () => this.setState({ category: id }),
+      };
+    };
+    const catList = [mkCat('all', 'All topics', this.ALL.length)].concat(this.CATS.map((c) => mkCat(c, c, catCounts[c] || 0)));
+
+    const sortBase = 'font-family:\'Ubuntu\',Arial,sans-serif;font-size:14px;font-weight:600;border:none;border-radius:999px;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:background .15s ease;';
+    const mkSort = (id, name) => {
+      const active = st.sort === id;
+      return { name, style: sortBase + (active ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#33473b;'), onClick: () => this.setState({ sort: id }) };
+    };
+    const sortList = [mkSort('latest', 'Latest'), mkSort('discussed', 'Most discussed'), mkSort('boosted', 'Most boosted'), mkSort('trending', 'Trending')];
+    const modeBase = 'font-family:\'Ubuntu\',Arial,sans-serif;font-size:12px;font-weight:700;border:none;border-radius:999px;padding:6px 10px;cursor:pointer;line-height:1;';
+    const mapMode = st.regionMode === 'map';
+    const selectedRegionName = this.regionName(st.region);
+    const regionSelected = st.region !== 'all';
+
+    return {
+      topics,
+      catList,
+      sortList,
+      regionOpts: this.REGIONS,
+      region: st.region,
+      mapSelected: st.region,
+      regionMapVisible: mapMode,
+      regionTextVisible: !mapMode,
+      mapToggleStyle: modeBase + (mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
+      textToggleStyle: modeBase + (!mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
+      regionHint: regionSelected ? 'Showing topics in ' + selectedRegionName + '.' : 'Tap a province to filter topics.',
+      allRegionsLabel: regionSelected ? 'Clear region: ' + selectedRegionName : 'All regions',
+      allRegionsStyle: 'width:100%;font-family:\'Ubuntu\',Arial,sans-serif;font-size:14px;font-weight:600;color:#16361e;background:' + (regionSelected ? '#ffffff' : '#e3fbd8') + ';border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:11px 13px;cursor:pointer;text-align:center;',
+      showMapRegion: () => this.setState({ regionMode: 'map' }),
+      showTextRegion: () => this.setState({ regionMode: 'text' }),
+      onMapRegion: (id) => this.setState({ region: id }),
+      clearRegion: () => this.setState({ region: 'all' }),
+      query: st.query,
+      onRegion: (e) => this.setState({ region: e.target.value }),
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      resultLabel: topics.length + (topics.length === 1 ? ' topic' : ' topics'),
+      isEmpty: topics.length === 0,
+    };
+  }
+}
+</script>
+</body>
+</html>
