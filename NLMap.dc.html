@@ -51,40 +51,45 @@ class Component extends DCLogic {
     if (typeof this.props.onSelect === 'function') this.props.onSelect(id);
   }
 
-  renderProvince(p, selected, hovered, interactive) {
+  renderProvince(p, selected, hovered, interactive, overlay) {
     const isSel = p.id === selected;
     const isHov = interactive && p.id === hovered && !isSel;
+    const live = interactive && !overlay;
     const style = {
       fill: isSel ? '#8ee05e' : isHov ? '#b9e896' : '#d8f1c9',
       stroke: isSel ? '#16361e' : 'rgba(22,54,30,0.30)',
       strokeWidth: isSel ? 2 : 1.15,
       strokeLinecap: 'round',
       strokeLinejoin: 'round',
-      cursor: interactive ? 'pointer' : 'default',
+      cursor: live ? 'pointer' : 'default',
       outline: 'none',
       transition: 'fill .18s ease, stroke .18s ease, stroke-width .18s ease',
+      // The overlay copy is drawn on top only to keep the highlight crisp; it
+      // must never intercept clicks or the base province couldn't be selected.
+      pointerEvents: overlay ? 'none' : undefined,
     };
 
     return React.createElement('path', {
-      key: p.id,
+      key: overlay ? p.id + '-top' : p.id,
       d: p.d,
-      role: interactive ? 'button' : undefined,
-      tabIndex: interactive ? 0 : undefined,
-      'aria-label': p.name,
-      'aria-pressed': interactive ? isSel : undefined,
+      role: live ? 'button' : undefined,
+      tabIndex: live ? 0 : undefined,
+      'aria-label': overlay ? undefined : p.name,
+      'aria-hidden': overlay ? true : undefined,
+      'aria-pressed': live ? isSel : undefined,
       style,
       vectorEffect: 'non-scaling-stroke',
-      onClick: interactive ? () => this.select(p.id) : undefined,
-      onKeyDown: interactive ? (e) => {
+      onClick: live ? () => this.select(p.id) : undefined,
+      onKeyDown: live ? (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           this.select(p.id);
         }
       } : undefined,
-      onMouseEnter: interactive ? () => this.setState({ hovered: p.id }) : undefined,
-      onMouseLeave: interactive ? () => this.setState({ hovered: null }) : undefined,
-      onFocus: interactive ? () => this.setState({ hovered: p.id }) : undefined,
-      onBlur: interactive ? () => this.setState({ hovered: null }) : undefined,
+      onMouseEnter: live ? () => this.setState({ hovered: p.id }) : undefined,
+      onMouseLeave: live ? () => this.setState({ hovered: null }) : undefined,
+      onFocus: live ? () => this.setState({ hovered: p.id }) : undefined,
+      onBlur: live ? () => this.setState({ hovered: null }) : undefined,
     });
   }
 
@@ -94,11 +99,14 @@ class Component extends DCLogic {
     const rawSelected = hasSelectedProp ? this.props.selected : (this.state.selected !== undefined ? this.state.selected : 'drenthe');
     const selected = rawSelected === 'all' ? null : rawSelected;
     const hovered = this.state.hovered;
-    const ordered = this.PROVS.slice().sort((a, b) => {
-      const aw = a.id === selected ? 2 : a.id === hovered ? 1 : 0;
-      const bw = b.id === selected ? 2 : b.id === hovered ? 1 : 0;
-      return aw - bw;
-    });
+    // Fixed paint order — never reordered on hover. Re-sorting the SVG nodes on
+    // hover made React reshuffle the DOM mid-interaction, which swallowed the
+    // click that triggered the hover (the "needs two clicks" bug). The selected
+    // province is lifted by a non-interactive overlay drawn last instead, so its
+    // highlight stays on top without moving any clickable node.
+    const base = this.PROVS.map((p) => this.renderProvince(p, selected, hovered, interactive, false));
+    const sel = selected ? this.PROVS.find((p) => p.id === selected) : null;
+    const paths = sel ? base.concat(this.renderProvince(sel, selected, hovered, interactive, true)) : base;
 
     const mapEl = React.createElement(
       'svg',
@@ -114,7 +122,7 @@ class Component extends DCLogic {
           overflow: 'visible',
         },
       },
-      ordered.map((p) => this.renderProvince(p, selected, hovered, interactive))
+      paths
     );
 
     const found = this.PROVS.find((p) => p.id === selected);
