@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  select{appearance:none;-webkit-appearance:none;}
+  textarea,input{font-family:'Ubuntu',Arial,sans-serif;}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="forum" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:760px;margin:0 auto;padding:clamp(28px,3vw,44px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    <a href="Explore.dc.html" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-bottom:20px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+      Explore Topics
+    </a>
+
+    <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.8vw,44px);color:#16361e;margin:0 0 8px;letter-spacing:-0.4px;">Start a new topic</h1>
+    <p style="font-size:17px;color:#33473b;margin:0 0 30px;max-width:560px;">A clear, specific post gets better answers. Tell colleagues what you are dealing with, where, and what you have already tried.</p>
+
+    <!-- POST TYPE -->
+    <div style="margin-bottom:24px;">
+      <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:10px;">Post type</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+        <sc-for list="{{ types }}" as="t" hint-placeholder-count="5">
+          <button type="button" onClick="{{ t.onClick }}" style="{{ t.style }}">
+            <span style="{{ t.iconWrap }}">{{ t.iconEl }}</span>
+            {{ t.name }}
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:22px;">
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Title</span>
+        <input type="text" placeholder="e.g. Best timing for fungicide in potatoes?" style="width:100%;font-size:16px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        <span style="display:block;font-size:13px;color:#8aa090;margin-top:6px;">Ask one clear question or describe one specific problem.</span>
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Category</span>
+          <div style="position:relative;">
+            <select style="width:100%;font-size:15px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 38px 14px 14px;cursor:pointer;">
+              <option>Pests &amp; Diseases</option><option>Irrigation</option><option>Soil Health</option><option>New Technologies</option><option>Precision Agriculture</option><option>Crop Management</option>
+            </select>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+          </div>
+        </label>
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Crop</span>
+          <input type="text" placeholder="e.g. Seed potatoes" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+      </div>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Region</span>
+        <div style="position:relative;">
+          <select style="width:100%;font-size:15px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 38px 14px 14px;cursor:pointer;">
+            <option>Groningen</option><option>Friesland</option><option>Drenthe</option><option>Noord-Holland</option><option>Flevoland</option><option>Overijssel</option><option>Utrecht</option><option>Gelderland</option><option>Zuid-Holland</option><option>Zeeland</option><option>Noord-Brabant</option><option>Limburg</option>
+          </select>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+        </div>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Description</span>
+        <textarea rows="5" placeholder="Describe the situation: soil type, conditions, what you are seeing, and what a good answer would help you decide." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">What have you tried? <span style="color:#8aa090;font-weight:500;">(optional, but recommended)</span></span>
+        <textarea rows="3" placeholder="List the approaches you have already used and how they worked out." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Photos &amp; documents</span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px;background:#f6fcf0;border:1px dashed rgba(22,54,30,0.28);border-radius:12px;text-align:center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
+          <span style="font-size:15px;color:#33473b;">Drag files here or <span style="color:#16361e;font-weight:600;">browse</span></span>
+          <span style="font-size:13px;color:#8aa090;">Field photos help colleagues give precise advice.</span>
+        </div>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Tags</span>
+        <input type="text" placeholder="e.g. lateblight, potatoes, fungicide" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+      </label>
+
+      <label style="display:flex;align-items:flex-start;gap:12px;padding:16px;background:#e3fbd8;border:1px solid rgba(22,54,30,0.14);border-radius:12px;cursor:pointer;">
+        <input type="checkbox" style="width:22px;height:22px;margin-top:1px;accent-color:#16361e;cursor:pointer;flex:0 0 auto;" />
+        <span style="font-size:15px;line-height:1.5;color:#16361e;">I am interested in this becoming a working group or pilot project.</span>
+      </label>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;">
+      <button type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:14px;cursor:pointer;transition:background .15s ease;" style-hover="background:#0f2716;">Publish topic</button>
+      <button type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 26px;font-size:16px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.24);border-radius:14px;cursor:pointer;">Save draft</button>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { type: 'Question' };
+
+  icon(name) {
+    const c = { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round' };
+    const m = {
+      Question: [React.createElement('circle',{key:1,cx:12,cy:12,r:9}), React.createElement('path',{key:2,d:'M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.6-2 1.9-2 3'}), React.createElement('path',{key:3,d:'M12 16.5h0'})],
+      Problem: [React.createElement('path',{key:1,d:'M12 3l9 16H3z'}), React.createElement('path',{key:2,d:'M12 10v4M12 17h0'})],
+      Idea: [React.createElement('path',{key:1,d:'M9 18h6M10 21h4'}), React.createElement('path',{key:2,d:'M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.2 1 2.5h6c0-1.3.3-1.8 1-2.5A6 6 0 0 0 12 3z'})],
+      Method: [React.createElement('path',{key:1,d:'M4 7h16M4 12h16M4 17h10'})],
+      Article: [React.createElement('path',{key:1,d:'M6 3h9l3 3v15H6z'}), React.createElement('path',{key:2,d:'M9 9h6M9 13h6M9 17h4'})],
+    };
+    return React.createElement('svg', c, m[name] || []);
+  }
+
+  renderVals() {
+    const defs = [
+      { id: 'Question', name: 'Question' },
+      { id: 'Problem', name: 'Field problem' },
+      { id: 'Idea', name: 'Idea' },
+      { id: 'Method', name: 'Method' },
+      { id: 'Article', name: 'Article / resource' },
+    ];
+    const types = defs.map((d) => {
+      const active = this.state.type === d.id;
+      return {
+        name: d.name,
+        iconEl: this.icon(d.id),
+        iconWrap: 'display:flex;align-items:center;justify-content:center;margin-bottom:8px;' + (active ? 'color:#8ee05e;' : 'color:#16361e;'),
+        style: 'display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0;font-family:\'Ubuntu\',Arial,sans-serif;font-size:14px;font-weight:600;padding:16px 10px;border-radius:14px;cursor:pointer;transition:all .15s ease;'
+          + (active ? 'background:#16361e;color:#eafbe1;border:1.5px solid #16361e;' : 'background:#ffffff;color:#16361e;border:1.5px solid rgba(22,54,30,0.16);'),
+        onClick: () => this.setState({ type: d.id }),
+      };
+    });
+    return { types };
+  }
+}
+</script>
+</body>
+</html>

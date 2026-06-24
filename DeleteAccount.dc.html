@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  input{font-family:'Ubuntu',Arial,sans-serif;}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="profile" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:620px;margin:0 auto;padding:clamp(28px,3vw,48px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    {{ progressEl }}
+    <p style="font-size:13px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;color:#5a7060;margin:0 0 18px;">{{ stepLabel }}</p>
+    <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:22px;padding:clamp(26px,3vw,40px);">
+      {{ stepContentEl }}
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { step: 1, confirmText: '' };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  icon(name, size = 18) {
+    const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true };
+    const paths = {
+      warning: [this.h('path', { key: 1, d: 'M12 9v4M12 17h0' }), this.h('path', { key: 2, d: 'M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z' })],
+      check: [this.h('path', { key: 1, d: 'M5 12l5 5 9-11' })],
+      download: [this.h('path', { key: 1, d: 'M12 16V4M7 9l5-5 5 5' }), this.h('path', { key: 2, d: 'M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3' })],
+    };
+    return this.h('svg', common, ...(paths[name] || []));
+  }
+
+  buttonStyle(kind, disabled = false) {
+    const base = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 52, padding: '0 26px', fontSize: 16, fontWeight: 600, borderRadius: 13, cursor: disabled ? 'not-allowed' : 'pointer', textDecoration: 'none', border: '1.5px solid rgba(22,54,30,0.24)' };
+    const styles = {
+      neutral: { color: '#16361e', background: 'transparent' },
+      danger: { color: '#c43a18', background: '#fde9e3', border: '1.5px solid rgba(254,76,36,0.3)' },
+      delete: disabled ? { color: '#c99', background: '#f3dcd5', border: '1.5px solid #f0cfc6' } : { color: '#fff', background: '#fe4c24', border: '1.5px solid #fe4c24' },
+      primary: { color: '#eafbe1', background: '#16361e', border: '1.5px solid #16361e' },
+    };
+    return { ...base, ...(styles[kind] || styles.neutral) };
+  }
+
+  progressEl(step) {
+    return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28 } },
+      ...[1, 2, 3, 4].map((n) => this.h('div', {
+        key: n,
+        style: { flex: '1 1 auto', height: 6, borderRadius: 999, background: n <= step ? (step === 4 ? '#8ee05e' : '#16361e') : 'rgba(22,54,30,0.14)' },
+      }))
+    );
+  }
+
+  title(text) {
+    return this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 30, color: '#16361e', margin: '0 0 12px', letterSpacing: '-0.3px' } }, text);
+  }
+
+  copy(text, margin = '0 0 22px') {
+    return this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#33473b', margin } }, text);
+  }
+
+  actionRow(...children) {
+    return this.h('div', { style: { display: 'flex', gap: 12, flexWrap: 'wrap' } }, ...children);
+  }
+
+  step1() {
+    const outcomes = [
+      'Your account is deactivated immediately and you are signed out.',
+      'Your personal profile data is permanently removed.',
+      'Your posts may be anonymised if they are needed for discussion continuity.',
+      'You can request a full export of your data before deleting.',
+    ];
+
+    return this.h(React.Fragment, null,
+      this.h('div', { style: { width: 52, height: 52, borderRadius: 14, background: '#fde9e3', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, color: '#c43a18' } }, this.icon('warning', 26)),
+      this.title('Before you delete your account'),
+      this.copy('Deleting your account is permanent. Please read what happens to your information and contributions.'),
+      this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 } },
+        ...outcomes.map((text) => this.h('div', { key: text, style: { display: 'flex', alignItems: 'flex-start', gap: 12 } },
+          this.h('span', { style: { flex: '0 0 auto', width: 22, height: 22, borderRadius: '50%', background: '#e3fbd8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1, color: '#16361e' } }, this.icon('check', 13)),
+          this.h('span', { style: { fontSize: 15, lineHeight: 1.55, color: '#26352c' } }, text)
+        ))
+      ),
+      this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 11, padding: '14px 16px', borderRadius: 12, background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.14)', marginBottom: 26, color: '#16361e' } },
+        this.icon('download', 18),
+        this.h('span', { style: { fontSize: 14, lineHeight: 1.5, color: '#33473b' } },
+          'Want a copy first? ',
+          this.h('a', { href: '#', style: { color: '#16361e', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid #8ee05e' } }, 'Download my data'),
+          ' before continuing.'
+        )
+      ),
+      this.actionRow(
+        this.h('a', { href: 'Profile.dc.html', style: this.buttonStyle('neutral') }, 'Keep my account'),
+        this.h('button', { type: 'button', onClick: () => this.next(), style: this.buttonStyle('danger') }, 'Continue to delete')
+      )
+    );
+  }
+
+  step2() {
+    return this.h(React.Fragment, null,
+      this.title('Confirm it is you'),
+      this.copy('For your security, enter your password to continue with deleting your account.', '0 0 24px'),
+      this.h('label', { style: { display: 'block', marginBottom: 20 } },
+        this.h('span', { style: { display: 'block', fontSize: 14, fontWeight: 600, color: '#16361e', marginBottom: 7 } }, 'Password'),
+        this.h('input', { type: 'password', placeholder: '********', style: { width: '100%', fontSize: 16, color: '#08100d', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.18)', borderRadius: 12, padding: '15px 16px' } })
+      ),
+      this.h('label', { style: { display: 'flex', alignItems: 'flex-start', gap: 11, marginBottom: 28, cursor: 'pointer' } },
+        this.h('input', { type: 'checkbox', style: { width: 22, height: 22, marginTop: 1, accentColor: '#c43a18', cursor: 'pointer', flex: '0 0 auto' } }),
+        this.h('span', { style: { fontSize: 15, lineHeight: 1.55, color: '#33473b' } }, 'I understand my account will be deactivated immediately and my personal data deleted or anonymised after 7 days.')
+      ),
+      this.actionRow(
+        this.h('button', { type: 'button', onClick: () => this.back(), style: this.buttonStyle('neutral') }, 'Back'),
+        this.h('button', { type: 'button', onClick: () => this.next(), style: this.buttonStyle('danger') }, 'Continue')
+      )
+    );
+  }
+
+  step3() {
+    const canDelete = this.state.confirmText.trim().toUpperCase() === 'DELETE';
+    return this.h(React.Fragment, null,
+      this.title('Final confirmation'),
+      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#33473b', margin: '0 0 22px' } }, 'This is the last step. To confirm, type ', this.h('strong', { style: { color: '#c43a18' } }, 'DELETE'), ' in the box below.'),
+      this.h('input', { type: 'text', value: this.state.confirmText, onInput: (e) => this.setState({ confirmText: e.target.value }), placeholder: 'Type DELETE', style: { width: '100%', fontSize: 16, letterSpacing: 1, color: '#08100d', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.18)', borderRadius: 12, padding: '15px 16px', marginBottom: 24 } }),
+      this.actionRow(
+        this.h('button', { type: 'button', onClick: () => this.back(), style: this.buttonStyle('neutral') }, 'Back'),
+        this.h('button', { type: 'button', onClick: () => this.next(), style: this.buttonStyle('delete', !canDelete) }, 'Delete my account')
+      )
+    );
+  }
+
+  step4() {
+    return this.h(React.Fragment, null,
+      this.h('div', { style: { width: 52, height: 52, borderRadius: 14, background: '#16361e', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, color: '#8ee05e' } }, this.icon('check', 26)),
+      this.title('Your account has been deactivated'),
+      this.copy('You have been signed out. Here is what happens next.'),
+      this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 0, border: '1px solid rgba(22,54,30,0.12)', borderRadius: 14, overflow: 'hidden', marginBottom: 26 } },
+        this.timelineRow('Now', 'Your profile is hidden and you can no longer sign in.', true),
+        this.timelineRow('7 days', 'Your personal data is permanently deleted or anonymised automatically. Posts kept for discussion continuity are anonymised.', false)
+      ),
+      this.h('p', { style: { fontSize: 14, color: '#5a7060', margin: '0 0 24px', lineHeight: 1.55 } }, 'Changed your mind? Sign back in within 7 days to cancel the deletion and restore your account.'),
+      this.h('a', { href: 'Home.dc.html', style: this.buttonStyle('primary') }, 'Return to home')
+    );
+  }
+
+  timelineRow(label, text, first) {
+    return this.h('div', { style: { display: 'flex', alignItems: 'flex-start', gap: 13, padding: 16, background: first ? '#f6fcf0' : '#ffffff', borderTop: first ? 'none' : '1px solid rgba(22,54,30,0.10)' } },
+      this.h('span', { style: { flex: '0 0 auto', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 15, fontWeight: 700, color: '#16361e', width: 54 } }, label),
+      this.h('span', { style: { fontSize: 15, lineHeight: 1.55, color: '#26352c' } }, text)
+    );
+  }
+
+  next() {
+    if (this.state.step === 3 && this.state.confirmText.trim().toUpperCase() !== 'DELETE') return;
+    this.setState((s) => ({ step: Math.min(4, s.step + 1) }));
+  }
+
+  back() {
+    this.setState((s) => ({ step: Math.max(1, s.step - 1) }));
+  }
+
+  stepContent(step) {
+    if (step === 1) return this.step1();
+    if (step === 2) return this.step2();
+    if (step === 3) return this.step3();
+    return this.step4();
+  }
+
+  renderVals() {
+    const step = this.state.step;
+    return {
+      progressEl: this.progressEl(step),
+      stepLabel: 'Step ' + step + ' of 4 - Delete account',
+      stepContentEl: this.stepContent(step),
+    };
+  }
+}
+</script>
+</body>
+</html>

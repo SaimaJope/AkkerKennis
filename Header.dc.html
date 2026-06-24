@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<header style="{{ headerStyle }}">
+  <div style="max-width:1200px;margin:0 auto;padding:14px clamp(20px,4vw,40px);display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <a href="Home.dc.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto;">
+      <img src="assets/logo.png" alt="AkkerKennis" width="40" height="40" style="display:block;width:40px;height:40px;border-radius:50%;" />
+      <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:23px;font-weight:700;color:#16361e;letter-spacing:0.2px;">AkkerKennis</span>
+    </a>
+
+    <nav style="display:flex;align-items:center;gap:clamp(14px,2.4vw,34px);flex:1 1 auto;flex-wrap:wrap;">
+      <a href="Home.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        Home
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
+      <a href="About.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        About
+        <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
+      <a href="Explore.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        Explore Topics
+        <sc-if value="{{ isExplore }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
+      <a href="Forum.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        Forum
+        <sc-if value="{{ isForum }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
+      <a href="Contact.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        Contact
+        <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
+    </nav>
+
+    <div style="display:flex;align-items:center;gap:12px;flex:0 0 auto;">
+      <a href="SignIn.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 20px;white-space:nowrap;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:600;color:#16361e;border:1.5px solid rgba(22,54,30,0.22);border-radius:999px;background:transparent;transition:border-color .18s ease,background .18s ease;" style-hover="background:#e3fbd8;border-color:#16361e;">Sign in</a>
+      <a href="SignUp.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;white-space:nowrap;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border:1.5px solid #16361e;border-radius:999px;transition:transform .18s ease,background .18s ease;" style-hover="background:#0f2716;transform:translateY(-1px);">Create account</a>
+    </div>
+  </div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:80},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;about&quot;,&quot;explore&quot;,&quot;forum&quot;,&quot;contact&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { hidden: false, elevated: false };
+
+  componentDidMount() {
+    this.lastScrollY = window.scrollY || 0;
+    this.ticking = false;
+    this.onScroll = () => {
+      if (this.ticking) return;
+      this.ticking = true;
+      window.requestAnimationFrame(() => {
+        this.updateHeaderVisibility();
+        this.ticking = false;
+      });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.updateHeaderVisibility();
+  }
+
+  componentWillUnmount() {
+    if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+  }
+
+  updateHeaderVisibility() {
+    const y = Math.max(0, window.scrollY || 0);
+    const delta = y - (this.lastScrollY || 0);
+    const current = this.state || {};
+    let hidden = current.hidden === true;
+
+    if (y < 24 || delta < 0) hidden = false;
+    else if (y > 96 && delta > 0) hidden = true;
+
+    const elevated = y > 16 && !hidden;
+    if (hidden !== current.hidden || elevated !== current.elevated) this.setState({ hidden, elevated });
+
+    this.lastScrollY = y;
+  }
+
+  headerStyle() {
+    const hidden = this.state.hidden === true;
+    const elevated = this.state.elevated === true;
+    return {
+      position: 'sticky',
+      top: 0,
+      zIndex: 50,
+      background: '#effbe7',
+      borderBottom: '1px solid rgba(22,54,30,0.12)',
+      backdropFilter: 'saturate(1.1) blur(6px)',
+      WebkitBackdropFilter: 'saturate(1.1) blur(6px)',
+      opacity: hidden ? 0 : 1,
+      transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
+      pointerEvents: hidden ? 'none' : 'auto',
+      boxShadow: elevated ? '0 10px 30px rgba(22,54,30,0.08)' : 'none',
+      transition: 'opacity .28s ease, transform .28s ease, box-shadow .28s ease',
+      willChange: 'opacity, transform',
+    };
+  }
+
+  renderVals() {
+    const a = this.props.active || 'home';
+    return {
+      headerStyle: this.headerStyle(),
+      isHome: a === 'home',
+      isAbout: a === 'about',
+      isExplore: a === 'explore',
+      isForum: a === 'forum',
+      isContact: a === 'contact',
+    };
+  }
+}
+</script>
+</body>
+</html>
