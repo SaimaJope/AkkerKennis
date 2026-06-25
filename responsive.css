@@ -4,8 +4,31 @@
 @media (max-width: 900px) {
   html,
   body {
+    height: auto !important;
     max-width: 100%;
+  }
+
+  html {
+    overflow-x: visible;
+  }
+
+  body {
     overflow-x: hidden;
+  }
+
+  body {
+    min-height: 100%;
+  }
+
+  #dc-root {
+    max-width: 100%;
+  }
+
+  #dc-root,
+  #dc-root > .sc-host {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: visible !important;
   }
 
   *,
