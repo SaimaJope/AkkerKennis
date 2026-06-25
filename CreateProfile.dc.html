@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/Favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="assets/Favicon/favicon.svg" />
+<link rel="shortcut icon" href="assets/Favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/Favicon/apple-touch-icon.png" />
+<link rel="manifest" href="assets/Favicon/site.webmanifest" />
+<script src="./gate.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  input,textarea,select{font-family:'Ubuntu',Arial,sans-serif;}
+  select{appearance:none;-webkit-appearance:none;}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="profile" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:1120px;margin:0 auto;padding:clamp(28px,3vw,48px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-bottom:24px;">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(22,54,30,0.16);border-radius:999px;background:rgba(255,255,255,0.62);margin-bottom:14px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#8ee05e;display:inline-block;"></span>
+          <span style="font-size:13px;font-weight:700;color:#16361e;">Profile setup</span>
+        </div>
+        <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.2vw,52px);line-height:1.05;color:#16361e;margin:0 0 10px;">Create your farmer profile</h1>
+        <p style="font-size:17px;line-height:1.6;color:#33473b;margin:0;max-width:640px;">Help other farmers understand your region, crops, and experience before you start posting.</p>
+      </div>
+      <a href="Profile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 20px;text-decoration:none;font-size:15px;font-weight:700;color:#16361e;background:#ffffff;border:1.5px solid rgba(22,54,30,0.20);border-radius:999px;">View current profile</a>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start;">
+      <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:24px;padding:clamp(24px,3vw,38px);">
+        <div style="display:grid;grid-template-columns:140px 1fr;gap:26px;align-items:start;margin-bottom:28px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="width:112px;height:112px;border-radius:50%;background:#16361e;color:#bff0a6;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:700;overflow:hidden;">
+              {{ avatarEl }}
+            </div>
+            <label style="display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;font-size:13px;font-weight:700;color:#16361e;background:#f6fcf0;border:1.5px solid rgba(22,54,30,0.18);border-radius:999px;cursor:pointer;">
+              Upload photo
+              <input type="file" accept="image/*" onchange="{{ onPhoto }}" style="display:none;" />
+            </label>
+          </div>
+
+          <div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+              <label style="display:block;">
+                <span style="display:block;font-size:14px;font-weight:700;color:#16361e;margin-bottom:7px;">Full name</span>
+                <input type="text" value="{{ name }}" oninput="{{ onName }}" placeholder="Jan Dekker" style="width:100%;font-size:16px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+              </label>
+              <label style="display:block;">
+                <span style="display:block;font-size:14px;font-weight:700;color:#16361e;margin-bottom:7px;">Role</span>
+                <input type="text" value="{{ role }}" oninput="{{ onRole }}" placeholder="Arable farmer" style="width:100%;font-size:16px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+              </label>
+            </div>
+
+            <label style="display:block;margin-bottom:16px;">
+              <span style="display:block;font-size:14px;font-weight:700;color:#16361e;margin-bottom:7px;">Farm / organisation</span>
+              <input type="text" value="{{ farm }}" oninput="{{ onFarm }}" placeholder="Dekker Akkerbouw" style="width:100%;font-size:16px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+            </label>
+
+            <label style="display:block;">
+              <span style="display:block;font-size:14px;font-weight:700;color:#16361e;margin-bottom:7px;">About you</span>
+              <textarea value="{{ bio }}" oninput="{{ onBio }}" rows="5" placeholder="Share your farm type, soil, crops, and what kind of practical knowledge you want to exchange." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+            </label>
+          </div>
+        </div>
+
+        <div style="height:1px;background:rgba(22,54,30,0.10);margin:0 0 26px;"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:26px;">
+          <div>
+            <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:20px;color:#16361e;margin:0 0 10px;">Main crops</h2>
+            <div style="display:flex;gap:9px;flex-wrap:wrap;">
+              {{ cropChipsEl }}
+            </div>
+          </div>
+          <div>
+            <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:20px;color:#16361e;margin:0 0 10px;">Experience</h2>
+            <div style="position:relative;">
+              <select value="{{ experience }}" onchange="{{ onExperience }}" style="width:100%;font-size:16px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 42px 14px 16px;cursor:pointer;">
+                <option value="first">First season farming</option>
+                <option value="2-5">2-5 years</option>
+                <option value="6-15">6-15 years</option>
+                <option value="16+">16+ years</option>
+              </select>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:15px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:4px;">
+          <span style="font-size:14px;line-height:1.5;color:#5a7060;">You can edit this later from your profile settings.</span>
+          <a href="Profile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 28px;text-decoration:none;font-size:16px;font-weight:700;color:#eafbe1;background:#16361e;border-radius:13px;">Create profile</a>
+        </div>
+      </div>
+
+      <aside style="display:flex;flex-direction:column;gap:18px;">
+        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:24px;">
+          <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:0 0 4px;">Your region</h2>
+          <p style="font-size:14px;color:#5a7060;margin:0 0 16px;">Pick a province so local discussions and farmers surface first.</p>
+          <dc-import name="NLMap" selected="{{ province }}" interactive="true" onSelect="{{ onSelectProvince }}" hint-size="100%,300px"></dc-import>
+          <div style="display:flex;align-items:center;gap:9px;margin-top:16px;padding:12px 16px;border-radius:12px;background:#e3fbd8;border:1px solid rgba(22,54,30,0.12);">
+            <span style="width:11px;height:11px;border-radius:50%;background:#8ee05e;display:inline-block;flex:0 0 auto;"></span>
+            <span style="font-size:15px;font-weight:700;color:#16361e;">Active in {{ provinceName }}</span>
+          </div>
+        </div>
+
+        <div style="background:#16361e;border-radius:20px;padding:24px;color:#dbeede;">
+          <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#ffffff;margin:0 0 10px;">Why it matters</h2>
+          <p style="font-size:15px;line-height:1.6;color:#b8d1bd;margin:0;">Profiles make replies more useful: soil type, crop focus, and local conditions help farmers judge which advice fits their fields.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = {
+    name: 'Jan Dekker',
+    role: 'Arable farmer',
+    farm: 'Dekker Akkerbouw',
+    bio: '',
+    province: 'drenthe',
+    experience: '6-15',
+    photoName: '',
+    crops: ['Potatoes', 'Sugar beet', 'Winter wheat'],
+  };
+
+  NAMES = {
+    groningen: 'Groningen', friesland: 'Friesland', drenthe: 'Drenthe', noordholland: 'Noord-Holland',
+    flevoland: 'Flevoland', overijssel: 'Overijssel', utrecht: 'Utrecht', gelderland: 'Gelderland',
+    zuidholland: 'Zuid-Holland', zeeland: 'Zeeland', noordbrabant: 'Noord-Brabant', limburg: 'Limburg',
+  };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  initials() {
+    return this.state.name.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('') || 'AK';
+  }
+
+  cropChipsEl() {
+    const all = ['Potatoes', 'Sugar beet', 'Winter wheat', 'Onions', 'Maize', 'Cover crops'];
+    return this.h(React.Fragment, null, ...all.map((crop) => {
+      const active = this.state.crops.includes(crop);
+      return this.h('button', {
+        key: crop,
+        type: 'button',
+        onClick: () => this.setState((s) => ({ crops: s.crops.includes(crop) ? s.crops.filter((c) => c !== crop) : s.crops.concat(crop) })),
+        style: {
+          display: 'inline-flex',
+          alignItems: 'center',
+          minHeight: 36,
+          padding: '0 13px',
+          fontSize: 14,
+          fontWeight: 700,
+          color: active ? '#eafbe1' : '#16361e',
+          background: active ? '#16361e' : '#f6fcf0',
+          border: active ? '1px solid #16361e' : '1px solid rgba(22,54,30,0.18)',
+          borderRadius: 999,
+          cursor: 'pointer',
+        },
+      }, crop);
+    }));
+  }
+
+  renderVals() {
+    return {
+      name: this.state.name,
+      role: this.state.role,
+      farm: this.state.farm,
+      bio: this.state.bio,
+      province: this.state.province,
+      provinceName: this.NAMES[this.state.province] || '-',
+      experience: this.state.experience,
+      avatarEl: this.state.photoName ? this.state.photoName.slice(0, 1).toUpperCase() : this.initials(),
+      cropChipsEl: this.cropChipsEl(),
+      onName: (e) => this.setState({ name: e.target.value }),
+      onRole: (e) => this.setState({ role: e.target.value }),
+      onFarm: (e) => this.setState({ farm: e.target.value }),
+      onBio: (e) => this.setState({ bio: e.target.value }),
+      onExperience: (e) => this.setState({ experience: e.target.value }),
+      onSelectProvince: (id) => this.setState({ province: id }),
+      onPhoto: (e) => {
+        const file = e.target.files && e.target.files[0];
+        this.setState({ photoName: file ? file.name : '' });
+        e.target.value = '';
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

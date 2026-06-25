@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -21,136 +21,22 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   ::selection{background:#8ee05e;color:#08100d;}
-  textarea{font-family:'Ubuntu',Arial,sans-serif;}
-  .forum-cta-primary:hover{background:#7bd24c;}
-  .forum-cta-outline:hover{border-color:#eafbe1;}
-  .forum-related-link:hover{color:#3d6b48;}
+  .ak-board{color:#2f5a3a;text-decoration:none;transition:color .12s ease;}
+  .ak-board:hover{color:#fe4c24;text-decoration:underline;}
+  .ak-link{color:#16361e;}
+  .ak-link:hover{color:#fe4c24;}
+  .ak-x:hover{color:#ffffff;}
+  .ak-filter-toggle:hover{color:#ffffff;}
 </style>
 </helmet>
 
 <div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
   <dc-import name="Header" active="forum" hint-size="100%,72px"></dc-import>
 
-  <!-- viewing-as bar -->
-  <div style="background:#16361e;">
-    {{ viewingBarEl }}
-  </div>
-
-  <section style="max-width:1120px;margin:0 auto;padding:clamp(24px,3vw,36px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
-    <a href="Explore.dc.html" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-bottom:22px;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
-      Explore Topics
-    </a>
-
-    <div style="display:grid;grid-template-columns:1fr 312px;gap:32px;align-items:start;">
-      <!-- MAIN THREAD -->
-      <div>
-        <!-- meta row -->
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-          <span style="display:inline-flex;align-items:center;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:0.3px;padding:5px 11px;border-radius:999px;background:#fe4c24;color:#fff;">High traction</span>
-          <span style="font-size:13px;font-weight:600;color:#5a7060;">Crop Management</span>
-          <span style="width:3px;height:3px;border-radius:50%;background:#b6cdac;display:inline-block;"></span>
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#5a7060;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
-            Groningen
-          </span>
-        </div>
-
-        <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.8vw,44px);line-height:1.12;color:#16361e;margin:0 0 18px;letter-spacing:-0.4px;">Reducing black-grass in winter wheat</h1>
-
-        <!-- author -->
-        <div style="display:flex;align-items:center;gap:13px;margin-bottom:20px;">
-          <span style="flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:#16361e;color:#bff0a6;display:flex;align-items:center;justify-content:center;font-family:'Ubuntu',Arial,sans-serif;font-size:18px;">PB</span>
-          <div>
-            <div style="font-size:16px;font-weight:600;color:#16361e;">Pieter Bakker</div>
-            <div style="font-size:14px;color:#5a7060;">Arable farmer, Groningen &middot; Posted 12 March 2026</div>
-          </div>
-        </div>
-
-        <!-- tags -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
-          {{ tagsEl }}
-        </div>
-
-        <!-- post body -->
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(24px,3vw,36px);">
-          <p style="font-size:17px;line-height:1.7;color:#26352c;margin:0 0 18px;">Black-grass pressure has crept up over three seasons on our heavier fields, despite stale seedbeds and delayed drilling. We are now seeing patches that clearly knock yield, and I want to get ahead of it before it becomes unmanageable.</p>
-          <p style="font-size:17px;line-height:1.7;color:#26352c;margin:0 0 18px;">My main question: for those of you on similar clay soils in the north, what combination of cultural controls actually held the population back &mdash; and over how many seasons did you see a real difference?</p>
-
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:21px;color:#16361e;margin:28px 0 12px;">What I have tried</h3>
-          <ul style="font-size:17px;line-height:1.7;color:#26352c;margin:0;padding-left:22px;">
-            <li style="margin-bottom:8px;">Delayed drilling to mid-October, which helped but cost us establishment in the wet autumn.</li>
-            <li style="margin-bottom:8px;">A spring crop in the rotation every third year.</li>
-            <li>Higher seed rates to improve crop competition.</li>
-          </ul>
-        </div>
-
-        <!-- action bar -->
-        {{ actionBarEl }}
-
-        {{ promptEl }}
-
-        <!-- high-traction panel -->
-        <div style="background:#16361e;border-radius:22px;padding:clamp(24px,3vw,34px);margin-bottom:36px;color:#dbeede;">
-          <div style="display:inline-flex;align-items:center;gap:9px;padding:6px 13px;border-radius:999px;background:rgba(142,224,94,0.18);margin-bottom:16px;">
-            <span style="width:8px;height:8px;border-radius:50%;background:#8ee05e;display:inline-block;"></span>
-            <span style="font-size:12px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#bff0a6;">Strong community interest</span>
-          </div>
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:26px;color:#ffffff;margin:0 0 10px;line-height:1.2;">This topic has strong community interest.</h3>
-          <p style="font-size:16px;line-height:1.65;color:#aecdb4;margin:0 0 22px;max-width:560px;">Farmers can continue the discussion in a dedicated working group, or request access to an optional WhatsApp group. Promising threads can be developed into a pilot project with partners.</p>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <button class="forum-cta-primary" type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#0f2a16;background:#8ee05e;border:none;border-radius:12px;cursor:pointer;transition:background .15s ease;">Join extended discussion</button>
-            <button class="forum-cta-outline" type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#eafbe1;background:transparent;border:1.5px solid rgba(255,255,255,0.35);border-radius:12px;cursor:pointer;transition:border-color .15s ease;">Request WhatsApp group access</button>
-            <button type="button" style="display:inline-flex;align-items:center;min-height:50px;padding:0 8px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#bff0a6;background:transparent;border:none;cursor:pointer;">Explore project opportunity &rarr;</button>
-          </div>
-        </div>
-
-        <!-- replies -->
-        {{ repliesSectionEl }}
-
-        <!-- reply input / logged-out prompt -->
-        {{ replyGateEl }}
-      </div>
-
-      <!-- SIDEBAR -->
-      <aside style="display:flex;flex-direction:column;gap:18px;">
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:22px;">
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 16px;">About the author</h3>
-          <div style="display:flex;align-items:center;gap:13px;margin-bottom:14px;">
-            <span style="flex:0 0 auto;width:52px;height:52px;border-radius:50%;background:#16361e;color:#bff0a6;display:flex;align-items:center;justify-content:center;font-family:'Ubuntu',Arial,sans-serif;font-size:20px;">PB</span>
-            <div>
-              <div style="font-size:16px;font-weight:600;color:#16361e;">Pieter Bakker</div>
-              <div style="font-size:14px;color:#5a7060;">Arable farmer, Groningen</div>
-            </div>
-          </div>
-          <div style="display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:5px 12px;border-radius:999px;background:#fbf3df;border:1px solid #e6d3a3;">
-            <span style="width:9px;height:9px;border-radius:50%;background:#c9a24a;display:inline-block;"></span>
-            <span style="font-size:13px;font-weight:600;color:#7a5e1f;">Gold contributor</span>
-          </div>
-          <a href="Profile.dc.html" style="display:block;text-align:center;text-decoration:none;font-size:14px;font-weight:600;color:#16361e;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;padding:11px;margin-top:16px;">View profile</a>
-        </div>
-
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:22px;">
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 16px;">Topic details</h3>
-          <div style="display:flex;flex-direction:column;gap:13px;">
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Category</span><span style="color:#16361e;font-weight:600;">Crop Management</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Region</span><span style="color:#16361e;font-weight:600;">Groningen</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Posted</span><span style="color:#16361e;font-weight:600;">12 Mar 2026</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Participants</span><span style="color:#16361e;font-weight:600;">19 farmers</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Status</span><span style="color:#fe4c24;font-weight:600;">High traction</span></div>
-          </div>
-        </div>
-
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:22px;">
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 14px;">Related topics</h3>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <a class="forum-related-link" href="Forum.dc.html" style="text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;line-height:1.3;color:#16361e;">Spring cropping to break grass-weed cycles</a>
-            <a class="forum-related-link" href="Forum.dc.html" style="text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;line-height:1.3;color:#16361e;">Stale seedbed timing on heavy clay</a>
-            <a class="forum-related-link" href="Forum.dc.html" style="text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;line-height:1.3;color:#16361e;">Higher seed rates: does competition pay?</a>
-          </div>
-        </div>
-      </aside>
-    </div>
+  <section style="max-width:1080px;margin:0 auto;padding:clamp(22px,3vw,40px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    {{ heroEl }}
+    {{ introEl }}
+    {{ boardsEl }}
   </section>
 
   <dc-import name="Footer" hint-size="100%,320px"></dc-import>
@@ -158,201 +44,120 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null };
+  state = { introOpen: true, filterOpen: false, filter: '' };
 
   h(type, props, ...children) {
     return React.createElement(type, props, ...children);
   }
 
-  icon(name, size = 16) {
-    const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true };
-    const paths = {
-      boost: [this.h('path', { key: 1, d: 'M12 4l6 7h-4v9h-4v-9H6z' })],
-      shield: [this.h('path', { key: 1, d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' })],
-      flag: [this.h('path', { key: 1, d: 'M4 21V4h12l-1.5 4L16 12H4' })],
-      alert: [this.h('circle', { key: 1, cx: 12, cy: 12, r: 9 }), this.h('path', { key: 2, d: 'M12 8v5M12 16h0' })],
-      image: [this.h('rect', { key: 1, x: 4, y: 5, width: 16, height: 14, rx: 2 }), this.h('circle', { key: 2, cx: 9, cy: 10, r: 1.6 }), this.h('path', { key: 3, d: 'M20 15l-4.5-4.5L7 19' })],
-      close: [this.h('path', { key: 1, d: 'M18 6L6 18M6 6l12 12' })],
-    };
-    return this.h('svg', common, ...(paths[name] || []));
+  COLUMNS = [
+    [
+      { title: 'Crops', boards: ['Cereals & Wheat', 'Potatoes', 'Sugar Beet', 'Onions & Alliums', 'Maize & Forage', 'Field Vegetables', 'Seed & Varieties', 'Grassland & Fodder'] },
+      { title: 'Regions', boards: ['Groningen', 'Friesland', 'Drenthe', 'Flevoland', 'Overijssel', 'Gelderland', 'Zeeland', 'Noord-Brabant'] },
+    ],
+    [
+      { title: 'Soil & Nutrition', boards: ['Soil Health', 'Fertilisation', 'Organic Matter', 'Liming & pH', 'Cover Crops', 'Drainage & Structure', 'Soil Sampling'] },
+      { title: 'Water & Weather', boards: ['Irrigation', 'Drought Strategy', 'Weather & Models', 'Water Quality', 'Flooding & Salinity'] },
+    ],
+    [
+      { title: 'Crop Protection', boards: ['Pests & Insects', 'Diseases & Fungi', 'Weeds & Herbicides', 'Integrated Pest Mgmt', 'Biological Control', 'Spray Technique', 'Resistance Management'] },
+    ],
+    [
+      { title: 'Technology', boards: ['Precision Agriculture', 'GPS & Auto-steer', 'Drones & Sensors', 'Autonomous Robots', 'Machinery & Repair', 'Farm Data & Software'] },
+      { title: 'Business & Policy', boards: ['Markets & Prices', 'Subsidies & GLB', 'Regulations & Permits', 'Cooperatives', 'Sustainability', 'Succession & Land'] },
+    ],
+    [
+      { title: 'Community', boards: ['Introductions', 'The Field - Random', 'Cafe / Off-topic', 'Meetups & Events', 'Marketplace', 'Site Feedback'] },
+    ],
+  ];
+
+  heroEl() {
+    return this.h('div', { style: { textAlign: 'center', margin: '2px 0 24px' } },
+      this.h('img', { src: 'assets/logo.png', alt: '', width: 46, height: 46, style: { width: 46, height: 46, borderRadius: '50%', display: 'inline-block', marginBottom: 10 } }),
+      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(26px,3.4vw,36px)', color: '#16361e', margin: '0 0 6px', letterSpacing: '-0.4px' } }, 'Community Boards'),
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: 0 } }, 'Pick a board and jump into the discussion.')
+    );
   }
 
-  guarded(fn) {
-    return () => {
-      if (!this.state.loggedIn) { this.setState({ prompt: true }); return; }
-      fn();
-    };
-  }
-
-  rankStyle(rank) {
-    const base = { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 11, fontWeight: 700, letterSpacing: 0.3, padding: '2px 9px', borderRadius: 999 };
-    const map = {
-      Bronze: { background: '#f3e4d3', color: '#8a5a2b', border: '1px solid #ddb98c' },
-      Silver: { background: '#eceef0', color: '#5c6670', border: '1px solid #c4ccd4' },
-      Gold: { background: '#fbf3df', color: '#7a5e1f', border: '1px solid #e6d3a3' },
-    };
-    return { ...base, ...(map[rank] || map.Bronze) };
-  }
-
-  actionButtonStyle(active, activeStyle = {}) {
-    return {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 8,
-      whiteSpace: 'nowrap',
-      fontFamily: "'Ubuntu',Arial,sans-serif",
-      fontSize: 14,
-      fontWeight: 600,
-      borderRadius: 11,
-      padding: '11px 16px',
-      cursor: 'pointer',
-      transition: 'all .15s ease',
-      background: '#ffffff',
-      color: '#16361e',
-      border: '1.5px solid rgba(22,54,30,0.22)',
-      ...(active ? activeStyle : {}),
-    };
-  }
-
-  replies() {
-    return [
-      { name: 'Henk de Vries', rank: 'Gold', initials: 'HV', avatarBg: '#3d6b48', boosts: 18, meta: 'Arable farmer, Groningen - 1h ago', body: 'On similar clay I only saw a real drop after committing to two spring crops in the rotation back to back. Year one barely moved; by year three the head counts were visibly lower. Delayed drilling alone was not enough for us.' },
-      { name: 'Marieke Jansen', rank: 'Silver', initials: 'MJ', avatarBg: '#7a5e1f', boosts: 11, meta: 'Agronomist, Flevoland - 3h ago', body: 'Worth mapping the worst patches and treating them as no-wheat zones for a season. Targeted spring cropping on just those blocks gave us most of the benefit without taking the whole field out of wheat.' },
-      { name: 'Kees van Dijk', rank: 'Bronze', initials: 'KD', avatarBg: '#16361e', boosts: 6, meta: 'Arable farmer, Zeeland - 6h ago', body: 'Higher seed rates plus a competitive variety made a noticeable difference for us, but only alongside the cultural controls. On its own it just thickened the crop without holding the grass back.' },
-    ];
-  }
-
-  viewingBarEl(st) {
-    return this.h('div', { style: { maxWidth: 1120, margin: '0 auto', padding: '11px clamp(20px,4vw,40px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' } },
-      this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 9, fontSize: 14, color: '#cfe6d2' } },
-        this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: st.loggedIn ? '#8ee05e' : '#c9a24a', display: 'inline-block' } }),
-        st.loggedIn ? 'Viewing as Jan Dekker - Bronze member' : 'You are browsing as a guest - read freely, sign up to take part'
+  box(title, control, body) {
+    return this.h('div', { style: { border: '1px solid rgba(22,54,30,0.18)', borderRadius: 12, overflow: 'hidden', background: '#ffffff', marginBottom: 20 } },
+      this.h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, background: '#16361e', color: '#eafbe1', padding: '10px 16px' } },
+        this.h('span', { style: { fontSize: 15, fontWeight: 700, letterSpacing: 0.3 } }, title),
+        control
       ),
-      this.h('button', {
-        type: 'button',
-        onClick: () => this.setState((s) => ({ loggedIn: !s.loggedIn, prompt: false })),
-        style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 13, fontWeight: 600, color: '#16361e', background: '#8ee05e', border: 'none', borderRadius: 999, padding: '7px 15px', cursor: 'pointer' },
-      }, st.loggedIn ? 'Switch to guest view' : 'Switch to member view')
+      body
     );
   }
 
-  actionBarEl(st) {
-    const onBoost = this.guarded(() => this.setState((s) => ({ boosted: !s.boosted, boostCount: s.boostCount + (s.boosted ? -1 : 1) })));
-    const onIssue = this.guarded(() => this.setState((s) => ({ hasIssue: !s.hasIssue, issueCount: s.issueCount + (s.hasIssue ? -1 : 1) })));
-    const onFollow = this.guarded(() => this.setState((s) => ({ follow: !s.follow })));
-    const onSave = this.guarded(() => this.setState((s) => ({ save: !s.save })));
-
-    return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '22px 0' } },
-      this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(st.boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea - ' + st.boostCount),
-      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(st.hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too - ' + st.issueCount),
-      this.h('button', { type: 'button', onClick: onFollow, style: this.actionButtonStyle(st.follow, { background: '#8ee05e', color: '#0f2a16', border: '1.5px solid #8ee05e' }) }, st.follow ? 'Following' : 'Follow topic'),
-      this.h('button', { type: 'button', onClick: onSave, style: this.actionButtonStyle(st.save, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, st.save ? 'Saved' : 'Save'),
-      this.h('button', { type: 'button', onClick: this.guarded(() => {}), style: { marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 500, color: '#8a7a6f', background: 'transparent', border: 'none', cursor: 'pointer' } }, this.icon('flag', 15), 'Report')
+  introEl(st) {
+    if (!st.introOpen) return null;
+    const xBtn = this.h('button', {
+      type: 'button', className: 'ak-x', 'aria-label': 'Dismiss', onClick: () => this.setState({ introOpen: false }),
+      style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, color: '#bcd9c0', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontSize: 20, lineHeight: 1 },
+    }, 'x');
+    const body = this.h('div', { style: { padding: '18px 20px', fontSize: 15, lineHeight: 1.7, color: '#2c3f33' } },
+      this.h('p', { style: { margin: '0 0 12px' } }, 'AkkerKennis is a knowledge board for arable farmers in the Netherlands. Pick a board below and jump into practical, field-tested discussion, everything from soil and crop protection to machinery, water, and markets. No hidden advertising, just real experience from the field.'),
+      this.h('p', { style: { margin: 0 } }, 'New here? Read the ',
+        this.h('a', { href: 'About.dc.html', className: 'ak-link', style: { color: '#16361e', fontWeight: 600 } }, 'community guidelines'),
+        ' before posting, or visit the ',
+        this.h('a', { href: 'Contact.dc.html', className: 'ak-link', style: { color: '#16361e', fontWeight: 600 } }, 'help & FAQ'),
+        ' to learn how it works.')
     );
+    return this.box('What is AkkerKennis?', xBtn, body);
   }
 
-  promptEl(st) {
-    if (!st.prompt || st.loggedIn) return null;
-    return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 12, padding: '12px 16px', marginBottom: 18, fontSize: 14, color: '#c43a18' } },
-      this.icon('alert', 16),
-      'Create a free account to boost ideas, reply, and follow topics.'
-    );
+  filteredColumns(filter) {
+    const f = filter.trim().toLowerCase();
+    return this.COLUMNS
+      .map((col) => col
+        .map((g) => ({ title: g.title, boards: f ? g.boards.filter((b) => b.toLowerCase().includes(f)) : g.boards }))
+        .filter((g) => g.boards.length))
+      .filter((col) => col.length);
   }
 
-  replyCard(r) {
-    return this.h('div', { key: r.name, style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: '22px 24px' } },
-      this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 } },
-        this.h('span', { style: { flex: '0 0 auto', width: 40, height: 40, borderRadius: '50%', background: r.avatarBg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16 } }, r.initials),
-        this.h('div', { style: { flex: '1 1 auto' } },
-          this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } },
-            this.h('span', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, r.name),
-            this.h('span', { style: this.rankStyle(r.rank) }, r.rank)
-          ),
-          this.h('div', { style: { fontSize: 13, color: '#5a7060' } }, r.meta)
-        ),
-        this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: '#fe4c24' } }, this.icon('boost', 15), r.boosts)
-      ),
-      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#26352c', margin: 0 } }, r.body)
+  boardsEl(st) {
+    const toggle = this.h('button', {
+      type: 'button', className: 'ak-filter-toggle', onClick: () => this.setState((s) => ({ filterOpen: !s.filterOpen })),
+      style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 13, fontWeight: 600, color: '#bcd9c0', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 },
+    }, 'filter', this.h('span', { style: { fontSize: 10 } }, st.filterOpen ? '^' : 'v'));
+
+    const cols = this.filteredColumns(st.filter);
+
+    const grid = this.h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(168px,1fr))', gap: '22px 26px' } },
+      ...cols.map((col, ci) => this.h('div', { key: ci, style: { display: 'flex', flexDirection: 'column', gap: 18 } },
+        ...col.map((g, gi) => this.h('div', { key: gi },
+          this.h('div', { style: { fontSize: 14, fontWeight: 700, color: '#16361e', textDecoration: 'underline', marginBottom: 7 } }, g.title),
+          this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 3 } },
+            ...g.boards.map((b) => this.h('a', { key: b, href: 'Thread.dc.html', className: 'ak-board', style: { fontSize: 13.5, lineHeight: 1.5, color: '#2f5a3a', textDecoration: 'none' } }, b))
+          )
+        ))
+      ))
     );
-  }
 
-  repliesSectionEl(replies) {
-    return this.h(React.Fragment, null,
-      this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 20px' } }, replies.length + ' replies'),
-      this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 32 } }, ...replies.map((r) => this.replyCard(r)))
+    const empty = this.h('div', { style: { padding: '6px 2px 2px', fontSize: 14, color: '#5a7060' } }, 'No boards match "' + st.filter + '".');
+
+    const filterRow = st.filterOpen ? this.h('div', { style: { marginBottom: 16 } },
+      this.h('input', {
+        type: 'text', value: st.filter, autoFocus: true, placeholder: 'Filter boards...',
+        onInput: (e) => this.setState({ filter: e.target.value }),
+        style: { width: '100%', maxWidth: 320, fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, color: '#16361e', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.18)', borderRadius: 10, padding: '9px 12px' },
+      })
+    ) : null;
+
+    const body = this.h('div', { style: { padding: '18px 20px 22px' } },
+      filterRow,
+      cols.length ? grid : empty
     );
-  }
 
-  replyGateEl(st) {
-    if (st.loggedIn) {
-      return this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: '22px 24px' } },
-        this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 } },
-          this.h('span', { style: { flex: '0 0 auto', width: 40, height: 40, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16 } }, 'JD'),
-          this.h('span', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, 'Write a reply')
-        ),
-        this.h('textarea', { value: st.replyText, onInput: (e) => this.setState({ replyText: e.target.value }), placeholder: 'Share your practical experience...', rows: 4, style: { width: '100%', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16, lineHeight: 1.6, color: '#08100d', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 12, padding: '14px 16px', resize: 'vertical' } }),
-        this.h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 14, flexWrap: 'wrap' } },
-          this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' } },
-            this.h('label', { style: { display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 42, padding: '0 14px', fontSize: 14, fontWeight: 600, color: '#16361e', background: '#f6fcf0', border: '1.5px solid rgba(22,54,30,0.18)', borderRadius: 12, cursor: 'pointer' } },
-              this.icon('image', 17),
-              'Add picture',
-              this.h('input', {
-                type: 'file',
-                accept: 'image/*',
-                onChange: (e) => {
-                  const file = e.target.files && e.target.files[0];
-                  this.setState({ replyImageName: file ? file.name : null });
-                  e.target.value = '';
-                },
-                style: { display: 'none' },
-              })
-            ),
-            st.replyImageName ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: 260, minHeight: 42, padding: '0 10px 0 12px', fontSize: 13, fontWeight: 600, color: '#16361e', background: '#e3fbd8', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 12 } },
-              this.h('span', { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, st.replyImageName),
-              this.h('button', { type: 'button', onClick: () => this.setState({ replyImageName: null }), 'aria-label': 'Remove selected picture', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, flex: '0 0 auto', color: '#5a7060', background: 'transparent', border: 'none', borderRadius: 999, cursor: 'pointer', padding: 0 } }, this.icon('close', 14))
-            ) : null
-          ),
-          this.h('button', { type: 'button', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', fontSize: 15, fontWeight: 600, color: '#eafbe1', background: '#16361e', border: 'none', borderRadius: 12, cursor: 'pointer' } }, 'Post reply')
-        ),
-        this.h('div', { style: { marginTop: 10, fontSize: 13, color: '#5a7060' } }, 'Be respectful and practical. No hidden advertising.')
-      );
-    }
-
-    return this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 18, padding: 'clamp(26px,3vw,38px)', textAlign: 'center' } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 24, color: '#16361e', margin: '0 0 8px' } }, 'Sign up to reply, ask questions, and boost useful ideas.'),
-      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'You can read every discussion freely. Create a free account to join the conversation.'),
-      this.h('div', { style: { display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' } },
-        this.h('a', { href: 'SignUp.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 16, fontWeight: 600, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'Create account'),
-        this.h('a', { href: 'SignIn.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 16, fontWeight: 600, color: '#16361e', background: 'transparent', border: '1.5px solid rgba(22,54,30,0.3)', borderRadius: 12 } }, 'Sign in')
-      )
-    );
-  }
-
-  tagsEl() {
-    const tags = ['#winterwheat', '#blackgrass', '#rotation', '#heavyclay'];
-    const style = {
-      fontSize: 13,
-      color: '#16361e',
-      background: '#ffffff',
-      border: '1px solid rgba(22,54,30,0.16)',
-      borderRadius: 999,
-      padding: '5px 12px',
-    };
-
-    return this.h(React.Fragment, null, ...tags.map((tag) => this.h('span', { key: tag, style }, tag)));
+    return this.box('Boards', toggle, body);
   }
 
   renderVals() {
     const st = this.state;
-    const replies = this.replies();
-
     return {
-      tagsEl: this.tagsEl(),
-      viewingBarEl: this.viewingBarEl(st),
-      actionBarEl: this.actionBarEl(st),
-      promptEl: this.promptEl(st),
-      repliesSectionEl: this.repliesSectionEl(replies),
-      replyGateEl: this.replyGateEl(st),
+      heroEl: this.heroEl(),
+      introEl: this.introEl(st),
+      boardsEl: this.boardsEl(st),
     };
   }
 }

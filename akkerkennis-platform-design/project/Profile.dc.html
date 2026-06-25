@@ -46,7 +46,8 @@
         </div>
       </div>
       <div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;flex:0 0 auto;align-self:center;">
-        <button type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:11px;cursor:pointer;white-space:nowrap;">Edit profile</button>
+        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:700;color:#eafbe1;background:#16361e;border:none;border-radius:11px;cursor:pointer;white-space:nowrap;">Create profile</a>
+        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;cursor:pointer;white-space:nowrap;">Edit profile</a>
         <button type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;cursor:pointer;white-space:nowrap;">Change picture</button>
       </div>
     </div>
@@ -181,7 +182,8 @@ class Component extends DCLogic {
 
     const rowBase = 'display:flex;align-items:center;justify-content:space-between;text-decoration:none;font-family:\'Ubuntu\',Arial,sans-serif;font-size:15px;font-weight:600;padding:14px 16px;border-radius:11px;transition:background .15s ease;';
     const settings = [
-      { label: 'Edit profile', href: '#', danger: false },
+      { label: 'Create profile', href: 'CreateProfile.dc.html', danger: false },
+      { label: 'Edit profile', href: 'CreateProfile.dc.html', danger: false },
       { label: 'Change profile picture', href: '#', danger: false },
       { label: 'Change password', href: '#', danger: false },
       { label: 'Download my data', href: '#', danger: false },

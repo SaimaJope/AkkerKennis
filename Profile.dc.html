@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -52,7 +52,8 @@
         </div>
       </div>
       <div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;flex:0 0 auto;align-self:center;">
-        <button type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:11px;cursor:pointer;white-space:nowrap;">Edit profile</button>
+        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:700;color:#eafbe1;background:#16361e;border:none;border-radius:11px;cursor:pointer;white-space:nowrap;">Create profile</a>
+        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;cursor:pointer;white-space:nowrap;">Edit profile</a>
         <button type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;cursor:pointer;white-space:nowrap;">Change picture</button>
       </div>
     </div>
@@ -84,7 +85,7 @@
           <div style="display:flex;flex-direction:column;">
             <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
               <sc-if value="{{ a.notFirst }}" hint-placeholder-val="{{ false }}"><div style="height:1px;background:rgba(22,54,30,0.10);"></div></sc-if>
-              <a href="Forum.dc.html" style="text-decoration:none;display:flex;align-items:center;gap:14px;padding:15px 0;transition:opacity .15s ease;" style-hover="opacity:0.7;">
+              <a href="Thread.dc.html" style="text-decoration:none;display:flex;align-items:center;gap:14px;padding:15px 0;transition:opacity .15s ease;" style-hover="opacity:0.7;">
                 <span style="{{ a.tagStyle }}">{{ a.type }}</span>
                 <span style="flex:1 1 auto;font-family:'Ubuntu',Arial,sans-serif;font-size:17px;color:#16361e;line-height:1.3;">{{ a.title }}</span>
                 <span style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#fe4c24;white-space:nowrap;">
@@ -187,7 +188,8 @@ class Component extends DCLogic {
 
     const rowBase = 'display:flex;align-items:center;justify-content:space-between;text-decoration:none;font-family:\'Ubuntu\',Arial,sans-serif;font-size:15px;font-weight:600;padding:14px 16px;border-radius:11px;transition:background .15s ease;';
     const settings = [
-      { label: 'Edit profile', href: '#', danger: false },
+      { label: 'Create profile', href: 'CreateProfile.dc.html', danger: false },
+      { label: 'Edit profile', href: 'CreateProfile.dc.html', danger: false },
       { label: 'Change profile picture', href: '#', danger: false },
       { label: 'Change password', href: '#', danger: false },
       { label: 'Download my data', href: '#', danger: false },

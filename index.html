@@ -126,7 +126,7 @@
     <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;overflow:hidden;">
       <sc-for list="{{ trending }}" as="r" hint-placeholder-count="3">
         <sc-if value="{{ r.notFirst }}" hint-placeholder-val="{{ false }}"><div style="height:1px;background:rgba(22,54,30,0.10);"></div></sc-if>
-        <a href="Forum.dc.html" style="text-decoration:none;display:flex;align-items:center;gap:20px;padding:22px 26px;transition:background .15s ease;" style-hover="background:#f4fcec;">
+        <a href="Thread.dc.html" style="text-decoration:none;display:flex;align-items:center;gap:20px;padding:22px 26px;transition:background .15s ease;" style-hover="background:#f4fcec;">
           <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:26px;color:#bcd3b3;width:30px;flex:0 0 auto;">{{ r.rank }}</span>
           <span style="flex:1 1 auto;">
             <span style="display:block;font-family:'Ubuntu',Arial,sans-serif;font-size:20px;color:#16361e;line-height:1.25;margin-bottom:5px;">{{ r.t }}</span>
