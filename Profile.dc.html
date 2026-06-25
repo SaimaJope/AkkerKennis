@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/Favicon/apple-touch-icon.png" />
 <link rel="manifest" href="assets/Favicon/site.webmanifest" />
 <script src="./gate.js"></script>
+<script src="./theme.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -133,7 +134,7 @@
         <!-- SETTINGS -->
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:10px 8px;">
           <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:14px 16px 8px;">Account settings</h2>
-          <sc-for list="{{ settings }}" as="o" hint-placeholder-count="5">
+          <sc-for list="{{ settings }}" as="o" hint-placeholder-count="6">
             <a href="{{ o.href }}" style="{{ o.style }}" style-hover="background:#f4fcec;">
               <span>{{ o.label }}</span>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>

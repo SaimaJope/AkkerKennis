@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/Favicon/apple-touch-icon.png" />
 <link rel="manifest" href="assets/Favicon/site.webmanifest" />
 <script src="./gate.js"></script>
+<script src="./theme.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -209,4 +210,22 @@ class Component extends DCLogic {
 }
 </script>
 </body>
+<style>
+header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
+html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;pointer-events:none!important;}
+</style>
+<script>
+(function(){
+  var root=document.documentElement,lastY=0,ticking=false;
+  window.addEventListener('scroll',function(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var y=Math.max(0,window.scrollY||0),d=y-lastY;
+      if(y<24||d<0)root.classList.remove('hdr-off');
+      else if(y>96&&d>0)root.classList.add('hdr-off');
+      lastY=y;ticking=false;
+    });
+  },{passive:true});
+})();
+</script>
 </html>
