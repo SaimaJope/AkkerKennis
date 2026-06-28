@@ -20,7 +20,8 @@ service cloud.firestore {
     }
 
     match /replies/{replyId} {
-      allow read: if signedIn();
+      // Public read — guests browse freely, like the rest of the site.
+      allow read: if true;
 
       // Create only as yourself, starting with an empty vote list.
       allow create: if signedIn()
@@ -34,9 +35,8 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.authorUid == request.auth.uid;
     }
 
-    // Optional: topics created by testers (for when you wire CreatePost).
     match /topics/{topicId} {
-      allow read: if signedIn();
+      allow read: if true; // public read
       allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
       allow update, delete: if signedIn() && resource.data.authorUid == request.auth.uid;
     }
