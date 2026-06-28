@@ -119,7 +119,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false, topic: null, topicId: '', topicLoading: false, threadId: 'blackgrass-winter-wheat', threadStats: { boosts: [], issues: [] }, editingId: null, editText: '' };
+  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false, topic: null, topicId: '', topicLoading: false, threadId: 'blackgrass-winter-wheat', threadStats: { boosts: [], issues: [] }, editingId: null, editText: '', showOriginal: {} };
 
   // The default demo topic id; a ?id= in the URL (a created post) overrides it.
   THREAD_ID = 'blackgrass-winter-wheat';
@@ -277,6 +277,8 @@ class Component extends DCLogic {
         count: r.votes.length,
         voted: !!(uid && r.votes.indexOf(uid) !== -1),
         mine: !!(uid && r.authorUid === uid),
+        edited: r.edited,
+        originalBody: r.originalBody,
         onVote: this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
       }));
     }
@@ -292,6 +294,7 @@ class Component extends DCLogic {
     });
   }
 
+  toggleOriginal(id) { this.setState((s) => ({ showOriginal: { ...s.showOriginal, [id]: !s.showOriginal[id] } })); }
   startEdit(r) { this.setState({ editingId: r.id, editText: r.body, postError: '' }); }
   cancelEdit() { this.setState({ editingId: null, editText: '' }); }
   saveEdit() {
@@ -481,8 +484,19 @@ class Component extends DCLogic {
         )
       );
     }
+    const showing = !!this.state.showOriginal[r.id];
+    const editedRow = r.edited ? this.h('div', { style: { marginTop: 8 } },
+      this.h('span', { style: { fontSize: 12, color: '#8aa090', fontStyle: 'italic' } }, 'edited'),
+      this.h('button', { type: 'button', onClick: () => this.toggleOriginal(r.id), style: { marginLeft: 10, fontSize: 12, fontWeight: 600, color: '#5a7060', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' } }, showing ? 'Hide original' : 'Show original'),
+      showing ? this.h('div', { style: { marginTop: 8, padding: '10px 12px', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.12)', borderRadius: 10 } },
+        this.h('span', { style: { display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', color: '#8aa090', marginBottom: 4 } }, 'Original'),
+        this.h('span', { style: { fontSize: 14, lineHeight: 1.55, color: '#5a7060' } }, r.originalBody || '(empty)')
+      ) : null
+    ) : null;
+
     return this.h(React.Fragment, null,
       this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#26352c', margin: 0 } }, r.body),
+      editedRow,
       r.mine ? this.h('div', { style: { display: 'flex', gap: 16, marginTop: 12 } },
         this.h('button', { type: 'button', onClick: () => this.startEdit(r), style: this.replyActionStyle() }, 'Edit'),
         this.h('button', { type: 'button', onClick: () => this.removeReply(r), style: this.replyActionStyle('#c43a18') }, 'Delete')

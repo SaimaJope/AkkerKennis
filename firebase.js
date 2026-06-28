@@ -134,6 +134,8 @@
                 authorName: data.authorName,
                 authorInitials: data.authorInitials || initials(data.authorName),
                 votes: data.votes || [],
+                edited: !!data.edited,
+                originalBody: data.originalBody || '',
                 createdAt: data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : 0,
               };
             });
@@ -241,7 +243,16 @@
     editReply: function (replyId, body) {
       return ready.then(function (ctx) {
         if (!ctx || !ctx.auth.currentUser) throw new Error('Sign in to edit');
-        return ctx.db.collection('replies').doc(replyId).update({ body: String(body || '').trim() });
+        var ref = ctx.db.collection('replies').doc(replyId);
+        return ctx.db.runTransaction(function (tx) {
+          return tx.get(ref).then(function (snap) {
+            var data = snap.data() || {};
+            var patch = { body: String(body || '').trim(), edited: true };
+            // Preserve the very first version so anyone can see the original.
+            if (!data.originalBody) patch.originalBody = data.body || '';
+            tx.update(ref, patch);
+          });
+        });
       });
     },
     deleteReply: function (replyId) {
