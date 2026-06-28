@@ -223,6 +223,122 @@
       });
     },
 
+    // ── Events ────────────────────────────────────────────────────────────────
+    // Realtime list of all events, newest first.
+    watchEvents: function (cb) {
+      var unsub = function () {};
+      ready.then(function (ctx) {
+        if (!ctx) { cb(null); return; }
+        unsub = ctx.db.collection('events').onSnapshot(function (snap) {
+          var rows = snap.docs.map(function (d) {
+            var data = d.data();
+            return Object.assign({ id: d.id }, data, {
+              createdAt: data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : 0,
+            });
+          });
+          rows.sort(function (a, b) { return b.createdAt - a.createdAt; });
+          cb(rows, null);
+        }, function (err) { console.error('[AK] watchEvents:', err); cb(null, (err && err.message) || 'Could not load events'); });
+      });
+      return function () { unsub(); };
+    },
+    getEvent: function (eventId) {
+      return ready.then(function (ctx) {
+        if (!ctx) return null;
+        return ctx.db.collection('events').doc(eventId).get().then(function (d) {
+          return d.exists ? Object.assign({ id: d.id }, d.data()) : null;
+        });
+      });
+    },
+    addEvent: function (data) {
+      return ready.then(function (ctx) {
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to add an event');
+        var who = shapeUser(u);
+        return ctx.db.collection('events').add({
+          title: String(data.title || '').trim(),
+          type: data.type || 'Workshop',
+          date: String(data.date || '').trim(),
+          time: String(data.time || '').trim(),
+          location: String(data.location || '').trim(),
+          region: data.region || '',
+          regionId: data.regionId || '',
+          organiser: String(data.organiser || who.name).trim(),
+          organiserRole: String(data.organiserRole || '').trim(),
+          organiserInitials: initials(String(data.organiser || who.name)),
+          host: String(data.host || '').trim(),
+          capacity: String(data.capacity || '').trim(),
+          cost: String(data.cost || '').trim(),
+          whatsappUrl: String(data.whatsappUrl || '').trim(),
+          summary: String(data.summary || '').trim(),
+          description: String(data.description || '').trim(),
+          agenda: String(data.agenda || '').trim(),
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          authorUid: u.uid,
+          authorName: who.name,
+          authorInitials: who.initials,
+          createdAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
+        }).then(function (ref) { return ref.id; });
+      });
+    },
+
+    // ── Projects ──────────────────────────────────────────────────────────────
+    // Realtime list of all projects, newest first.
+    watchProjects: function (cb) {
+      var unsub = function () {};
+      ready.then(function (ctx) {
+        if (!ctx) { cb(null); return; }
+        unsub = ctx.db.collection('projects').onSnapshot(function (snap) {
+          var rows = snap.docs.map(function (d) {
+            var data = d.data();
+            return Object.assign({ id: d.id }, data, {
+              createdAt: data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : 0,
+            });
+          });
+          rows.sort(function (a, b) { return b.createdAt - a.createdAt; });
+          cb(rows, null);
+        }, function (err) { console.error('[AK] watchProjects:', err); cb(null, (err && err.message) || 'Could not load projects'); });
+      });
+      return function () { unsub(); };
+    },
+    getProject: function (projectId) {
+      return ready.then(function (ctx) {
+        if (!ctx) return null;
+        return ctx.db.collection('projects').doc(projectId).get().then(function (d) {
+          return d.exists ? Object.assign({ id: d.id }, d.data()) : null;
+        });
+      });
+    },
+    addProject: function (data) {
+      return ready.then(function (ctx) {
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to add a project');
+        var who = shapeUser(u);
+        return ctx.db.collection('projects').add({
+          title: String(data.title || '').trim(),
+          status: data.status === 'past' ? 'past' : 'ongoing',
+          manager: String(data.manager || who.name).trim(),
+          managerRole: String(data.managerRole || '').trim(),
+          managerInitials: initials(String(data.manager || who.name)),
+          originator: String(data.originator || '').trim(),
+          funder: String(data.funder || '').trim(),
+          region: data.region || '',
+          regionId: data.regionId || '',
+          timeline: String(data.timeline || '').trim(),
+          participants: String(data.participants || '').trim(),
+          whatsappUrl: String(data.whatsappUrl || '').trim(),
+          summary: String(data.summary || '').trim(),
+          overview: String(data.overview || '').trim(),
+          milestones: String(data.milestones || '').trim(),
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          authorUid: u.uid,
+          authorName: who.name,
+          authorInitials: who.initials,
+          createdAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
+        }).then(function (ref) { return ref.id; });
+      });
+    },
+
     // Toggle the current user's upvote on a reply (atomic, race-safe).
     toggleReplyVote: function (replyId) {
       return ready.then(function (ctx) {

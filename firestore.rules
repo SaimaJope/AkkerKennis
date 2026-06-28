@@ -41,6 +41,20 @@ service cloud.firestore {
       allow update, delete: if signedIn() && resource.data.authorUid == request.auth.uid;
     }
 
+    // Member-created events — same model as topics (public read, owner-gated write).
+    match /events/{eventId} {
+      allow read: if true; // public read
+      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    // Member-led projects — same model as topics (public read, owner-gated write).
+    match /projects/{projectId} {
+      allow read: if true; // public read
+      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
     // Shared per-thread reaction counts ("Boost idea" / "I have this issue too").
     match /threadStats/{threadId} {
       allow read: if true;

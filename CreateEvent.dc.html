@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/Favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="assets/Favicon/favicon.svg" />
+<link rel="shortcut icon" href="assets/Favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/Favicon/apple-touch-icon.png" />
+<link rel="manifest" href="assets/Favicon/site.webmanifest" />
+<script src="./gate.js"></script>
+<script src="./theme.js"></script>
+<script src="./firebase.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  select{appearance:none;-webkit-appearance:none;}
+  textarea,input{font-family:'Ubuntu',Arial,sans-serif;}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="events" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:760px;margin:0 auto;padding:clamp(28px,3vw,44px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    <a href="Events.dc.html" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-bottom:20px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+      Events
+    </a>
+
+    <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.8vw,44px);color:#16361e;margin:0 0 8px;letter-spacing:-0.4px;">Create an event</h1>
+    <p style="font-size:17px;color:#33473b;margin:0 0 30px;max-width:560px;">Workshops, field days, expeditions and meetups. Give farmers the practical details — what, when, where — and link a WhatsApp group so they can join and ask questions.</p>
+
+    <!-- EVENT TYPE -->
+    <div style="margin-bottom:24px;">
+      <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:10px;">Event type</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+        <sc-for list="{{ types }}" as="t" hint-placeholder-count="4">
+          <button type="button" onClick="{{ t.onClick }}" style="{{ t.style }}">
+            <span style="{{ t.iconWrap }}">{{ t.iconEl }}</span>
+            {{ t.name }}
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:22px;">
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Event title</span>
+        <input type="text" value="{{ title }}" onInput="{{ onTitle }}" placeholder="e.g. Soil Health Workshop" style="width:100%;font-size:16px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Date</span>
+          <input type="text" value="{{ date }}" onInput="{{ onDate }}" placeholder="e.g. 18 July 2026" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Time <span style="color:#8aa090;font-weight:500;">(optional)</span></span>
+          <input type="text" value="{{ time }}" onInput="{{ onTime }}" placeholder="e.g. 10:00 – 15:30" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Location</span>
+          <input type="text" value="{{ location }}" onInput="{{ onLocation }}" placeholder="e.g. Oldambt, Groningen" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Region</span>
+          <div style="position:relative;">
+            <select value="{{ region }}" onChange="{{ onRegion }}" style="width:100%;font-size:15px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 38px 14px 14px;cursor:pointer;">
+              <option>Groningen</option><option>Friesland</option><option>Drenthe</option><option>Noord-Holland</option><option>Flevoland</option><option>Overijssel</option><option>Utrecht</option><option>Gelderland</option><option>Zuid-Holland</option><option>Zeeland</option><option>Noord-Brabant</option><option>Limburg</option>
+            </select>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+          </div>
+        </label>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Organiser</span>
+          <input type="text" value="{{ organiser }}" onInput="{{ onOrganiser }}" placeholder="Who runs this event" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Organiser role <span style="color:#8aa090;font-weight:500;">(optional)</span></span>
+          <input type="text" value="{{ organiserRole }}" onInput="{{ onOrganiserRole }}" placeholder="e.g. Soil adviser · AkkerBooster" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Host <span style="color:#8aa090;font-weight:500;">(optional)</span></span>
+          <input type="text" value="{{ host }}" onInput="{{ onHost }}" placeholder="Working group" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Capacity <span style="color:#8aa090;font-weight:500;">(optional)</span></span>
+          <input type="text" value="{{ capacity }}" onInput="{{ onCapacity }}" placeholder="e.g. 25 farmers" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Cost <span style="color:#8aa090;font-weight:500;">(optional)</span></span>
+          <input type="text" value="{{ cost }}" onInput="{{ onCost }}" placeholder="e.g. Free for members" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        </label>
+      </div>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Short summary</span>
+        <textarea rows="2" value="{{ summary }}" onInput="{{ onSummary }}" placeholder="One or two sentences shown on the event card." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Full description</span>
+        <textarea rows="5" value="{{ description }}" onInput="{{ onDescription }}" placeholder="Describe the event in full: what it covers, who it is for, and what farmers will take away. Leave a blank line between paragraphs." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">What to expect <span style="color:#8aa090;font-weight:500;">(optional — one item per line)</span></span>
+        <textarea rows="4" value="{{ agenda }}" onInput="{{ onAgenda }}" placeholder="Spade diagnostics in the field&#10;Cover crop selection for clay&#10;Open clinic: bring a soil problem" style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">WhatsApp group link <span style="color:#8aa090;font-weight:500;">(optional)</span></span>
+        <input type="text" value="{{ whatsappUrl }}" onInput="{{ onWhatsapp }}" placeholder="https://chat.whatsapp.com/..." style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        <span style="display:block;font-size:13px;color:#8aa090;margin-top:6px;">Shown on the event page so farmers can join, confirm and ask questions.</span>
+      </label>
+
+      <label style="display:block;">
+        <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Tags <span style="color:#8aa090;font-weight:500;">(optional, comma separated)</span></span>
+        <input type="text" value="{{ tags }}" onInput="{{ onTags }}" placeholder="e.g. soilhealth, covercrops, clay" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+      </label>
+    </div>
+
+    {{ statusEl }}
+
+    <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;">
+      <button type="button" onClick="{{ onPublish }}" style="{{ publishStyle }}" style-hover="background:#0f2716;">{{ publishLabel }}</button>
+      <a href="Events.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 26px;text-decoration:none;font-size:16px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.24);border-radius:14px;cursor:pointer;">Cancel</a>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { type: 'Workshop', title: '', date: '', time: '', location: '', region: 'Groningen', organiser: '', organiserRole: '', host: '', capacity: '', cost: '', summary: '', description: '', agenda: '', whatsappUrl: '', tags: '', busy: false, error: '', configured: false, me: null };
+
+  REGION_IDS = {
+    'Groningen': 'groningen', 'Friesland': 'friesland', 'Drenthe': 'drenthe', 'Noord-Holland': 'noordholland',
+    'Flevoland': 'flevoland', 'Overijssel': 'overijssel', 'Utrecht': 'utrecht', 'Gelderland': 'gelderland',
+    'Zuid-Holland': 'zuidholland', 'Zeeland': 'zeeland', 'Noord-Brabant': 'noordbrabant', 'Limburg': 'limburg',
+  };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  componentDidMount() {
+    const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
+    this.setState({ configured });
+    if (configured) window.AK.onAuth((u) => this.setState({ me: u, organiser: this.state.organiser || (u ? u.name : '') }));
+  }
+
+  parseTags(s) {
+    return String(s || '').split(',').map((t) => t.trim().replace(/^#/, '')).filter(Boolean).map((t) => '#' + t);
+  }
+
+  publish() {
+    const st = this.state;
+    if (st.busy) return;
+    if (!st.configured) { this.setState({ error: 'Backend not configured yet (see SETUP_FIREBASE.md).' }); return; }
+    if (!st.me) { window.location.href = 'SignIn.dc.html'; return; }
+    if (!st.title.trim()) { this.setState({ error: 'Give your event a title.' }); return; }
+    if (!st.date.trim()) { this.setState({ error: 'Add a date so farmers know when it is.' }); return; }
+    if (!st.location.trim()) { this.setState({ error: 'Add a location.' }); return; }
+    if (!st.summary.trim() && !st.description.trim()) { this.setState({ error: 'Add a short summary or description.' }); return; }
+
+    this.setState({ busy: true, error: '' });
+    const summary = (st.summary.trim() || st.description.trim()).slice(0, 200);
+    window.AK.addEvent({
+      title: st.title, type: st.type, date: st.date, time: st.time,
+      location: st.location, region: st.region, regionId: this.REGION_IDS[st.region] || '',
+      organiser: st.organiser, organiserRole: st.organiserRole, host: st.host,
+      capacity: st.capacity, cost: st.cost, whatsappUrl: st.whatsappUrl,
+      summary, description: st.description, agenda: st.agenda, tags: this.parseTags(st.tags),
+    })
+      .then((id) => { window.location.href = 'Event.dc.html?id=' + encodeURIComponent(id); })
+      .catch((e) => { console.error(e); this.setState({ busy: false, error: (e && e.message) || 'Could not publish. Try again.' }); });
+  }
+
+  icon(name) {
+    const c = { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round' };
+    const m = {
+      Workshop: [React.createElement('path', { key: 1, d: 'M3 21h18M5 21V10l7-5 7 5v11' }), React.createElement('path', { key: 2, d: 'M9 21v-6h6v6' })],
+      'Field day': [React.createElement('path', { key: 1, d: 'M3 17c3-4 6-4 9 0s6 4 9 0' }), React.createElement('path', { key: 2, d: 'M3 12c3-4 6-4 9 0s6 4 9 0' }), React.createElement('path', { key: 3, d: 'M3 7c3-4 6-4 9 0s6 4 9 0' })],
+      Expedition: [React.createElement('path', { key: 1, d: 'M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z' }), React.createElement('circle', { key: 2, cx: 12, cy: 10, r: 2.4 })],
+      Meetup: [React.createElement('circle', { key: 1, cx: 9, cy: 8, r: 3 }), React.createElement('path', { key: 2, d: 'M3 20c0-3 3-5 6-5s6 2 6 5' }), React.createElement('path', { key: 3, d: 'M16 6a3 3 0 0 1 0 6M21 20c0-2-1.4-3.6-3.5-4.3' })],
+    };
+    return React.createElement('svg', c, m[name] || []);
+  }
+
+  renderVals() {
+    const defs = ['Workshop', 'Field day', 'Expedition', 'Meetup'];
+    const types = defs.map((d) => {
+      const active = this.state.type === d;
+      return {
+        name: d,
+        iconEl: this.icon(d),
+        iconWrap: 'display:flex;align-items:center;justify-content:center;margin-bottom:8px;' + (active ? 'color:#8ee05e;' : 'color:#16361e;'),
+        style: 'display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0;font-family:\'Ubuntu\',Arial,sans-serif;font-size:14px;font-weight:600;padding:16px 10px;border-radius:14px;cursor:pointer;transition:all .15s ease;'
+          + (active ? 'background:#16361e;color:#eafbe1;border:1.5px solid #16361e;' : 'background:#ffffff;color:#16361e;border:1.5px solid rgba(22,54,30,0.16);'),
+        onClick: () => this.setState({ type: d }),
+      };
+    });
+
+    const st = this.state;
+    const notSignedIn = st.configured && !st.me;
+    return {
+      types,
+      title: st.title, date: st.date, time: st.time, location: st.location, region: st.region,
+      organiser: st.organiser, organiserRole: st.organiserRole, host: st.host, capacity: st.capacity,
+      cost: st.cost, summary: st.summary, description: st.description, agenda: st.agenda,
+      whatsappUrl: st.whatsappUrl, tags: st.tags,
+      onTitle: (e) => this.setState({ title: e.target.value }),
+      onDate: (e) => this.setState({ date: e.target.value }),
+      onTime: (e) => this.setState({ time: e.target.value }),
+      onLocation: (e) => this.setState({ location: e.target.value }),
+      onRegion: (e) => this.setState({ region: e.target.value }),
+      onOrganiser: (e) => this.setState({ organiser: e.target.value }),
+      onOrganiserRole: (e) => this.setState({ organiserRole: e.target.value }),
+      onHost: (e) => this.setState({ host: e.target.value }),
+      onCapacity: (e) => this.setState({ capacity: e.target.value }),
+      onCost: (e) => this.setState({ cost: e.target.value }),
+      onSummary: (e) => this.setState({ summary: e.target.value }),
+      onDescription: (e) => this.setState({ description: e.target.value }),
+      onAgenda: (e) => this.setState({ agenda: e.target.value }),
+      onWhatsapp: (e) => this.setState({ whatsappUrl: e.target.value }),
+      onTags: (e) => this.setState({ tags: e.target.value }),
+      onPublish: () => this.publish(),
+      publishLabel: st.busy ? 'Publishing…' : 'Publish event',
+      publishStyle: 'display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:14px;cursor:' + (st.busy ? 'default' : 'pointer') + ';opacity:' + (st.busy ? '0.7' : '1') + ';transition:background .15s ease;',
+      statusEl: st.error
+        ? this.h('div', { style: { marginTop: 18, display: 'flex', alignItems: 'center', gap: 9, background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 12, padding: '12px 14px', fontSize: 14, color: '#c43a18' } }, st.error)
+        : (notSignedIn
+            ? this.h('div', { style: { marginTop: 18, background: '#16361e', borderRadius: 12, padding: '12px 14px', fontSize: 14, color: '#cfe6d2' } }, 'You are not signed in — publishing will take you to the sign-in page first.')
+            : null),
+    };
+  }
+}
+</script>
+</body>
+<style>
+header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
+html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;pointer-events:none!important;}
+</style>
+<script>
+(function(){
+  var root=document.documentElement,lastY=0,ticking=false;
+  window.addEventListener('scroll',function(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var y=Math.max(0,window.scrollY||0),d=y-lastY;
+      if(y<24||d<0)root.classList.remove('hdr-off');
+      else if(y>96&&d>0)root.classList.add('hdr-off');
+      lastY=y;ticking=false;
+    });
+  },{passive:true});
+})();
+</script>
+</html>
