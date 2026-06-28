@@ -233,7 +233,8 @@ class Component extends DCLogic {
 
   renderVals() {
     const loading = this.state.remoteTopics === null;
-    const topics = this.state.remoteTopics || []; // watchTopics returns newest-first
+    const all = this.state.remoteTopics || []; // watchTopics returns newest-first
+    const topics = all.filter((t) => !t.deleted); // homepage shows live discussions only
 
     // Recent discussion card
     const recent = topics[0] || null;

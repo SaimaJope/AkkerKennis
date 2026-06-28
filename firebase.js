@@ -254,6 +254,10 @@
               images: data.images || [],
               tags: data.tags || [],
               seekingProject: !!data.seekingProject,
+              deleted: !!data.deleted,
+              archived: !!data.archived,
+              deletedAt: data.deletedAt && data.deletedAt.toMillis ? data.deletedAt.toMillis() : 0,
+              authorUid: data.authorUid || '',
               authorName: data.authorName,
               authorInitials: data.authorInitials || initials(data.authorName),
               createdAt: data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : 0,
@@ -298,6 +302,38 @@
           authorInitials: who.initials,
           createdAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
         }).then(function (ref) { return ref.id; });
+      });
+    },
+    // Reddit-style soft delete (owner only): blank the post + photos, keep the
+    // replies. Stays visible as [deleted] for 24h, then clients hide it unless
+    // it has been archived. Rules already restrict topic updates to the author.
+    softDeleteTopic: function (topicId) {
+      return ready.then(function (ctx) {
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to delete');
+        return ctx.db.collection('topics').doc(topicId).update({
+          deleted: true,
+          deletedAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
+          archived: false,
+          title: '[deleted]',
+          summary: '',
+          body: '',
+          tried: '',
+          crop: '',
+          images: [],
+          tags: [],
+          seekingProject: false,
+          authorName: '[deleted]',
+          authorInitials: '–',
+        });
+      });
+    },
+    // Archive a deleted topic so the 24h auto-hide skips it (owner only).
+    setTopicArchived: function (topicId, archived) {
+      return ready.then(function (ctx) {
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in');
+        return ctx.db.collection('topics').doc(topicId).update({ archived: !!archived });
       });
     },
 

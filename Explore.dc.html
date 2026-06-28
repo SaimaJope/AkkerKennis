@@ -171,7 +171,18 @@ class Component extends DCLogic {
     return this.h('svg', { width: 13, height: 13, viewBox: '0 0 24 24', fill: 'none', stroke: '#5a7060', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z' }), this.h('circle', { cx: 12, cy: 10, r: 2.4 }));
   }
 
+  deletedCard(t) {
+    return this.h('a', { key: t.id, href: 'Thread.dc.html?id=' + encodeURIComponent(t.id), className: 'ak-topic-card', style: { textDecoration: 'none', display: 'block', background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '22px 26px', transition: 'transform .16s ease,border-color .16s ease' } },
+      this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 } },
+        this.h('span', { style: { display: 'inline-flex', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, background: '#eef3ec', color: '#8aa090', border: '1px solid rgba(22,54,30,0.12)' } }, 'Deleted')
+      ),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20, lineHeight: 1.25, color: '#8aa090', margin: '0 0 6px', fontStyle: 'italic' } }, '[deleted]'),
+      this.h('p', { style: { fontSize: 14, color: '#8aa090', margin: 0 } }, 'This topic was deleted by its author — the discussion is still available.')
+    );
+  }
+
   topicCard(t) {
+    if (t.deleted) return this.deletedCard(t);
     const dot = this.h('span', { style: { width: 3, height: 3, borderRadius: '50%', background: '#b6cdac', display: 'inline-block' } });
     const metaRow = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 } },
       this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, background: '#e3fbd8', color: '#16361e', border: '1px solid rgba(22,54,30,0.18)' } }, t.type || 'Question'),
@@ -236,12 +247,15 @@ class Component extends DCLogic {
 
   renderVals() {
     const st = this.state;
-    const source = this.topics().map((r) => ({
-      id: r.id, title: r.title, summary: r.summary,
-      category: r.category || 'General', region: r.regionId || '', regionName: r.region || '—',
-      type: r.type, images: r.images || [], tags: r.tags || [], seekingProject: r.seekingProject,
-      authorName: r.authorName, createdAt: r.createdAt || 0,
-    }));
+    const DAY = 86400000;
+    const source = this.topics()
+      .filter((r) => !(r.deleted && !r.archived && r.deletedAt && (Date.now() - r.deletedAt > DAY)))
+      .map((r) => ({
+        id: r.id, title: r.title, summary: r.summary,
+        category: r.category || 'General', region: r.regionId || '', regionName: r.region || '—',
+        type: r.type, images: r.images || [], tags: r.tags || [], seekingProject: r.seekingProject,
+        deleted: !!r.deleted, authorName: r.authorName, createdAt: r.createdAt || 0,
+      }));
 
     const catCounts = {};
     source.forEach((t) => { catCounts[t.category] = (catCounts[t.category] || 0) + 1; });

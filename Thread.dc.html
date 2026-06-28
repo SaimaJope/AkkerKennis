@@ -194,7 +194,62 @@ class Component extends DCLogic {
     );
   }
 
+  DAY = 86400000;
+
+  deletedMs(t) { const x = t.deletedAt; if (x && x.toMillis) return x.toMillis(); return typeof x === 'number' ? x : 0; }
+  topicHidden(t) { return !!(t && t.deleted && !t.archived && this.deletedMs(t) && (Date.now() - this.deletedMs(t) > this.DAY)); }
+  hoursLeft(t) { const ms = this.deletedMs(t); if (!ms) return 24; return Math.max(0, Math.round(24 - (Date.now() - ms) / 3600000)); }
+  isMine(t) { const me = this.state.me; return !!(me && t && t.authorUid && t.authorUid === me.uid); }
+
+  reloadTopic() { window.AK.getTopic(this.state.topicId).then((t) => this.setState({ topic: t })).catch((e) => console.error(e)); }
+  deleteTopic() {
+    if (!window.confirm('Delete this topic? The title and photos are removed; the comments stay. It disappears from the site after 24 hours unless you archive it.')) return;
+    window.AK.softDeleteTopic(this.state.topicId).then(() => this.reloadTopic()).catch((e) => { console.error(e); window.alert((e && e.message) || 'Could not delete.'); });
+  }
+  archiveTopic() {
+    window.AK.setTopicArchived(this.state.topicId, true).then(() => this.reloadTopic()).catch((e) => { console.error(e); window.alert((e && e.message) || 'Could not archive.'); });
+  }
+
+  renderDeletedTopic(t) {
+    const badge = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 } },
+      this.h('span', { style: { display: 'inline-flex', fontSize: 12, fontWeight: 700, padding: '5px 11px', borderRadius: 999, background: '#eef3ec', color: '#8aa090', border: '1px solid rgba(22,54,30,0.12)' } }, 'Deleted'));
+    const title = this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(28px,3.6vw,40px)', lineHeight: 1.12, color: '#8aa090', margin: '0 0 18px', fontStyle: 'italic' } }, '[deleted]');
+    const author = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13, marginBottom: 20 } },
+      this.h('span', { style: { flex: '0 0 auto', width: 46, height: 46, borderRadius: '50%', background: '#cfe0c8', color: '#5a7060', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 18 } }, '–'),
+      this.h('div', null,
+        this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#8aa090' } }, '[deleted]'),
+        this.h('div', { style: { fontSize: 14, color: '#8aa090' } }, 'Posted ' + this.fmtTopicDate(t.createdAt))
+      ));
+    const bodyCard = this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 20, padding: 'clamp(24px,3vw,36px)' } },
+      this.h('p', { style: { fontSize: 16, lineHeight: 1.7, color: '#8aa090', margin: 0 } }, 'This topic was deleted by its author. The comments below are kept.'));
+    return this.h(React.Fragment, null, badge, title, author, bodyCard);
+  }
+
+  ownerBarEl(t) {
+    if (!this.isMine(t)) return null;
+    if (!t.deleted) {
+      return this.h('div', { style: { margin: '18px 0' } },
+        this.h('button', { type: 'button', onClick: () => this.deleteTopic(), style: { display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44, padding: '0 18px', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, color: '#c43a18', background: '#ffffff', border: '1.5px solid rgba(254,76,36,0.32)', borderRadius: 11, cursor: 'pointer' } },
+          this.h('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13' })), 'Delete topic'));
+    }
+    if (t.archived) {
+      return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 9, margin: '18px 0', padding: '12px 16px', background: '#e3fbd8', border: '1px solid rgba(22,54,30,0.14)', borderRadius: 12, fontSize: 14, color: '#16361e' } }, 'Archived — this discussion is kept permanently.');
+    }
+    const hrs = this.hoursLeft(t);
+    return this.h('div', { style: { margin: '18px 0', padding: '16px 18px', background: '#16361e', borderRadius: 14, color: '#dbeede' } },
+      this.h('div', { style: { fontSize: 14, lineHeight: 1.55, marginBottom: 12 } }, 'You deleted this topic. It and its comments will be removed from the site ' + (hrs > 0 ? ('in about ' + hrs + ' hour' + (hrs === 1 ? '' : 's')) : 'shortly') + ' — unless you archive it.'),
+      this.h('button', { type: 'button', onClick: () => this.archiveTopic(), style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 44, padding: '0 20px', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', border: 'none', borderRadius: 11, cursor: 'pointer' } }, 'Archive to keep the discussion'));
+  }
+
+  removedEl() {
+    return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
+      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Topic removed'),
+      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This topic was deleted by its author and is no longer available.'),
+      this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all topics'));
+  }
+
   renderTopic(t) {
+    if (t.deleted) return this.renderDeletedTopic(t);
     const dot = this.h('span', { style: { width: 3, height: 3, borderRadius: '50%', background: '#b6cdac', display: 'inline-block' } });
     const metaRow = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 } },
       this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, background: '#8ee05e', color: '#0f2a16' } }, t.type || 'Question'),
@@ -444,13 +499,15 @@ class Component extends DCLogic {
     if (st.topicLoading) return this.h('div', { style: { padding: '30px 0', fontSize: 16, color: '#5a7060' } }, 'Loading topic…');
     const t = st.topic;
     if (!t) return this.notFoundEl();
+    if (this.topicHidden(t)) return this.removedEl();
     return this.h('div', { className: 'ak-detail-grid', style: { display: 'grid', gridTemplateColumns: '1fr 312px', gap: 32, alignItems: 'start' } },
       this.h('div', null,
         this.renderTopic(t),
-        this.actionBarEl(t),
+        this.ownerBarEl(t),
+        t.deleted ? null : this.actionBarEl(t),
         this.promptEl(),
-        this.h('div', { style: { height: 24 } }),
-        this.projectPanelEl(t),
+        t.deleted ? null : this.h('div', { style: { height: 24 } }),
+        t.deleted ? null : this.projectPanelEl(t),
         this.repliesSectionEl(),
         this.replyGateEl()
       ),
