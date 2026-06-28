@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -13,6 +13,7 @@
 <link rel="manifest" href="assets/Favicon/site.webmanifest" />
 <script src="./gate.js"></script>
 <script src="./theme.js"></script>
+<script src="./firebase.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -22,6 +23,7 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   ::selection{background:#8ee05e;color:#08100d;}
+  .ak-recent-card:hover{transform:translateY(-2px);border-color:rgba(22,54,30,0.28);}
 </style>
 </helmet>
 
@@ -39,41 +41,34 @@
       <p style="font-size:19px;line-height:1.6;color:#33473b;max-width:520px;margin:0 0 34px;">AkkerBooster is the knowledge-sharing platform for arable farmers in the Netherlands. Exchange practical knowledge, solve challenges, and shape the future of our fields.</p>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
         <a href="Explore.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#eafbe1;background:#16361e;border:1.5px solid #16361e;border-radius:999px;transition:transform .18s ease,background .18s ease;" style-hover="background:#0f2716;transform:translateY(-1px);">Topics</a>
-        <a href="SignUp.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.30);border-radius:999px;transition:border-color .18s ease,background .18s ease;" style-hover="background:rgba(255,255,255,0.55);border-color:#16361e;">Create account</a>
+        <a href="{{ heroCtaHref }}" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.30);border-radius:999px;transition:border-color .18s ease,background .18s ease;" style-hover="background:rgba(255,255,255,0.55);border-color:#16361e;">{{ heroCtaLabel }}</a>
       </div>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:18px;">
-      <!-- discussion preview card -->
-      <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:24px 26px;">
+      <!-- recent discussion card (live: newest topic) -->
+      <a href="{{ recentHref }}" class="ak-recent-card" style="text-decoration:none;display:block;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:24px 26px;transition:transform .16s ease,border-color .16s ease;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
           <span style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;">Recent discussion</span>
         </div>
-        <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:24px;line-height:1.25;color:#16361e;margin:0 0 16px;">Best timing for fungicide in potatoes?</h3>
-        <div style="display:flex;align-items:center;gap:18px;">
-          <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:#33473b;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 20l1.4-4.2A8.5 8.5 0 1 1 21 11.5z"></path></svg>
-            28 replies
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:#fe4c24;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fe4c24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l6 7h-4v9h-4v-9H6z"></path></svg>
-            23 boosts
-          </span>
+        <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:24px;line-height:1.25;color:#16361e;margin:0 0 16px;">{{ recentTitle }}</h3>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          {{ recentMetaEl }}
         </div>
-      </div>
+      </a>
 
-      <!-- map panel -->
+      <!-- map panel (live: most active region) -->
       <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:22px 26px;display:flex;align-items:center;gap:22px;">
         <div style="flex:1 1 auto;">
           <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin-bottom:8px;">Region-based</div>
           <p style="margin:0 0 12px;font-size:15px;line-height:1.55;color:#33473b;">Knowledge organised by province, so advice fits your soil and climate.</p>
           <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:999px;background:#e3fbd8;border:1px solid rgba(22,54,30,0.14);">
             <span style="width:9px;height:9px;border-radius:50%;background:#8ee05e;display:inline-block;"></span>
-            <span style="font-size:13px;font-weight:600;color:#16361e;">Most active: Drenthe</span>
+            <span style="font-size:13px;font-weight:600;color:#16361e;">{{ activeRegionLabel }}</span>
           </div>
         </div>
         <div style="flex:0 0 128px;width:128px;">
-          <dc-import name="NLMap" selected="drenthe" interactive="false" hint-size="128px,150px"></dc-import>
+          <dc-import name="NLMap" selected="{{ activeRegionId }}" interactive="false" hint-size="128px,150px"></dc-import>
         </div>
       </div>
     </div>
@@ -86,7 +81,7 @@
       <a href="Explore.dc.html" style="text-decoration:none;font-size:16px;font-weight:600;color:#16361e;border-bottom:2px solid #8ee05e;padding-bottom:2px;">View all topics</a>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
-      <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6">
+      <sc-for list="{{ cats }}" as="c" hint-placeholder-count="8">
         <a href="Explore.dc.html" style="text-decoration:none;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:26px;display:flex;align-items:center;gap:18px;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:rgba(22,54,30,0.30);">
           <span style="flex:0 0 auto;width:52px;height:52px;border-radius:14px;background:#e3fbd8;border:1px solid rgba(22,54,30,0.12);display:flex;align-items:center;justify-content:center;">{{ c.iconEl }}</span>
           <span>
@@ -118,25 +113,22 @@
     </div>
   </section>
 
-  <!-- TRENDING TOPICS -->
+  <!-- RECENT TOPICS -->
   <section style="max-width:1000px;margin:0 auto;padding:clamp(44px,5vw,80px) clamp(20px,4vw,40px);">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:24px;">
-      <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(28px,3.4vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">Trending topics</h2>
+      <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(28px,3.4vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">Recent topics</h2>
       <a href="Explore.dc.html" style="text-decoration:none;font-size:16px;font-weight:600;color:#16361e;border-bottom:2px solid #8ee05e;padding-bottom:2px;">View all topics</a>
     </div>
     <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;overflow:hidden;">
       <sc-for list="{{ trending }}" as="r" hint-placeholder-count="3">
         <sc-if value="{{ r.notFirst }}" hint-placeholder-val="{{ false }}"><div style="height:1px;background:rgba(22,54,30,0.10);"></div></sc-if>
-        <a href="Thread.dc.html" style="text-decoration:none;display:flex;align-items:center;gap:20px;padding:22px 26px;transition:background .15s ease;" style-hover="background:#f4fcec;">
+        <a href="{{ r.href }}" style="text-decoration:none;display:flex;align-items:center;gap:20px;padding:22px 26px;transition:background .15s ease;" style-hover="background:#f4fcec;">
           <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:26px;color:#bcd3b3;width:30px;flex:0 0 auto;">{{ r.ordinal }}</span>
           <span style="flex:1 1 auto;">
             <span style="display:block;font-family:'Ubuntu',Arial,sans-serif;font-size:20px;color:#16361e;line-height:1.25;margin-bottom:5px;">{{ r.t }}</span>
             <span style="display:block;font-size:14px;color:#5a7060;">{{ r.meta }}</span>
           </span>
-          <span style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:600;color:#fe4c24;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fe4c24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l6 7h-4v9h-4v-9H6z"></path></svg>
-            {{ r.boosts }}
-          </span>
+          {{ r.rightEl }}
         </a>
       </sc-for>
     </div>
@@ -160,6 +152,66 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
+  state = { remoteTopics: null, me: null };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  REGIONS = {
+    groningen: 'Groningen', friesland: 'Friesland', drenthe: 'Drenthe', noordholland: 'Noord-Holland',
+    flevoland: 'Flevoland', overijssel: 'Overijssel', utrecht: 'Utrecht', gelderland: 'Gelderland',
+    zuidholland: 'Zuid-Holland', zeeland: 'Zeeland', noordbrabant: 'Noord-Brabant', limburg: 'Limburg',
+  };
+
+  componentDidMount() {
+    try { const s = window.localStorage.getItem('ak_me'); if (s) this.setState({ me: JSON.parse(s) }); } catch (e) {}
+    const subscribe = () => {
+      this._unsub = window.AK.watchTopics((rows) => { if (rows) this.setState({ remoteTopics: rows }); });
+      window.AK.onAuth((u) => this.setState({ me: u }));
+    };
+    if (window.AK && window.AK.isConfigured && window.AK.isConfigured()) { subscribe(); return; }
+    const start = Date.now();
+    const tryInit = () => {
+      if (window.AK && window.AK.isConfigured && window.AK.isConfigured()) { subscribe(); return; }
+      if (Date.now() - start < 6000) setTimeout(tryInit, 150);
+      else this.setState({ remoteTopics: [] });
+    };
+    tryInit();
+  }
+
+  componentWillUnmount() { if (this._unsub) this._unsub(); }
+
+  regionName(id) { return this.REGIONS[id] || ''; }
+
+  fmtTime(ms) {
+    if (!ms) return 'just now';
+    const h = Math.max(0, (Date.now() - ms) / 3600000);
+    if (h < 1) { const m = Math.round(h * 60); return m <= 1 ? 'just now' : m + 'm ago'; }
+    if (h < 24) return Math.round(h) + 'h ago';
+    const d = Math.round(h / 24);
+    return d === 1 ? '1d ago' : d + 'd ago';
+  }
+
+  pin(size, color) {
+    return this.h('svg', { width: size || 14, height: size || 14, viewBox: '0 0 24 24', fill: 'none', stroke: color || '#5a7060', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true },
+      this.h('path', { d: 'M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z' }), this.h('circle', { cx: 12, cy: 10, r: 2.4 }));
+  }
+
+  regionPill(t) {
+    const region = t.region || this.regionName(t.regionId);
+    if (!region) return null;
+    return this.h('span', { style: { flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#16361e', background: '#e3fbd8', border: '1px solid rgba(22,54,30,0.14)', borderRadius: 999, padding: '5px 11px' } }, this.pin(11, '#16361e'), region);
+  }
+
+  recentMetaEl(t) {
+    const region = t.region || this.regionName(t.regionId);
+    const kids = [];
+    if (region) kids.push(this.h('span', { key: 'r', style: { display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 15, color: '#33473b' } }, this.pin(16, '#16361e'), region));
+    kids.push(this.h('span', { key: 't', style: { fontSize: 15, color: '#5a7060' } }, this.fmtTime(t.createdAt)));
+    return this.h(React.Fragment, null, ...kids);
+  }
+
   icon(name) {
     const common = { width: 26, height: 26, viewBox: '0 0 24 24', fill: 'none', stroke: '#16361e', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' };
     const paths = {
@@ -169,45 +221,94 @@ class Component extends DCLogic {
       tech: [React.createElement('rect',{key:1,x:7,y:7,width:10,height:10,rx:1.5}), React.createElement('path',{key:2,d:'M10 4v3M14 4v3M10 17v3M14 17v3M4 10h3M4 14h3M17 10h3M17 14h3'})],
       precision: [React.createElement('circle',{key:1,cx:12,cy:12,r:7}), React.createElement('circle',{key:2,cx:12,cy:12,r:2.2}), React.createElement('path',{key:3,d:'M12 2v3M12 19v3M2 12h3M19 12h3'})],
       crop: [React.createElement('path',{key:1,d:'M12 21V11'}), React.createElement('path',{key:2,d:'M12 11c0-3 2.5-5 6-5 0 3-2.5 5-6 5z'}), React.createElement('path',{key:3,d:'M12 14c0-2.5-2-4.5-5-4.5 0 2.5 2 4.5 5 4.5z'})],
+      grow: [React.createElement('path',{key:1,d:'M12 21V9'}), React.createElement('path',{key:2,d:'M12 12C12 8 15 6 19 6c0 4-3 6-7 6z'}), React.createElement('path',{key:3,d:'M12 15c0-3-2.5-5-6-5 0 3 2.5 5 6 5z'})],
+      box: [React.createElement('path',{key:1,d:'M21 8l-9-5-9 5 9 5 9-5z'}), React.createElement('path',{key:2,d:'M3 8v8l9 5 9-5V8'}), React.createElement('path',{key:3,d:'M12 13v8'})],
       ask: [React.createElement('path',{key:1,d:'M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 20l1.4-4.2A8.5 8.5 0 1 1 21 11.5z'}), React.createElement('path',{key:2,d:'M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 1.8-2 3'}), React.createElement('path',{key:3,d:'M12 16.5h0'})],
       discuss: [React.createElement('path',{key:1,d:'M17 8.5a4.5 4.5 0 0 1-4.5 4.5H9l-3.5 3v-3A4.5 4.5 0 0 1 5 4.5h7A4.5 4.5 0 0 1 17 8.5z'}), React.createElement('path',{key:2,d:'M19 12.5a4.5 4.5 0 0 0 1.5 3.4V19l-2.8-1.6'})],
       boost: [React.createElement('path',{key:1,d:'M12 19V6'}), React.createElement('path',{key:2,d:'M6 12l6-6 6 6'})],
-      grow: [React.createElement('path',{key:1,d:'M12 21V9'}), React.createElement('path',{key:2,d:'M12 12C12 8 15 6 19 6c0 4-3 6-7 6z'}), React.createElement('path',{key:3,d:'M12 15c0-3-2.5-5-6-5 0 3 2.5 5 6 5z'})],
+      growstep: [React.createElement('path',{key:1,d:'M12 21V9'}), React.createElement('path',{key:2,d:'M12 12C12 8 15 6 19 6c0 4-3 6-7 6z'}), React.createElement('path',{key:3,d:'M12 15c0-3-2.5-5-6-5 0 3 2.5 5 6 5z'})],
     };
     return React.createElement('svg', common, paths[name] || []);
   }
 
   renderVals() {
-    const cats = [
-      { name: 'Pests & Diseases', icon: 'pests', count: '142 topics' },
-      { name: 'Irrigation', icon: 'water', count: '86 topics' },
-      { name: 'Soil Health', icon: 'soil', count: '118 topics' },
-      { name: 'New Technologies', icon: 'tech', count: '64 topics' },
-      { name: 'Precision Agriculture', icon: 'precision', count: '73 topics' },
-      { name: 'Crop Management', icon: 'crop', count: '129 topics' },
-    ].map((c) => ({ ...c, iconEl: this.icon(c.icon) }));
+    const loading = this.state.remoteTopics === null;
+    const topics = this.state.remoteTopics || []; // watchTopics returns newest-first
+
+    // Recent discussion card
+    const recent = topics[0] || null;
+    const recentHref = recent ? 'Thread.dc.html?id=' + encodeURIComponent(recent.id) : 'CreatePost.dc.html';
+    const recentTitle = recent ? recent.title : (loading ? 'Loading…' : 'No discussions yet');
+    const recentMetaEl = recent
+      ? this.recentMetaEl(recent)
+      : (loading ? null : this.h('span', { style: { fontSize: 15, color: '#5a7060' } }, 'Be the first to start a discussion.'));
+
+    // Most active region
+    const regionCounts = {};
+    topics.forEach((t) => { if (t.regionId) regionCounts[t.regionId] = (regionCounts[t.regionId] || 0) + 1; });
+    let activeId = '';
+    Object.keys(regionCounts).forEach((k) => { if (regionCounts[k] > (regionCounts[activeId] || 0)) activeId = k; });
+    const activeRegionLabel = activeId ? ('Most active: ' + this.regionName(activeId)) : (loading ? 'Loading…' : 'Be the first to post');
+
+    // Categories with live counts
+    const catCounts = {};
+    topics.forEach((t) => { const c = t.category || 'Other'; catCounts[c] = (catCounts[c] || 0) + 1; });
+    const CAT_DEFS = [
+      { name: 'Soil & Tillage', icon: 'soil' },
+      { name: 'Fertilisation & Nutrients', icon: 'grow' },
+      { name: 'Crop Protection', icon: 'pests' },
+      { name: 'Crops & Rotation', icon: 'crop' },
+      { name: 'Water & Drainage', icon: 'water' },
+      { name: 'Precision & Technology', icon: 'precision' },
+      { name: 'Machinery', icon: 'tech' },
+      { name: 'Storage & Marketing', icon: 'box' },
+    ];
+    const cats = CAT_DEFS.map((c) => {
+      const n = catCounts[c.name] || 0;
+      return { name: c.name, count: n + (n === 1 ? ' topic' : ' topics'), iconEl: this.icon(c.icon) };
+    });
+
+    // Recent topics list
+    const list = topics.slice(0, 5);
+    let trending;
+    if (list.length) {
+      trending = list.map((t, i) => ({
+        t: t.title,
+        meta: (t.authorName || 'Member') + ' · ' + this.fmtTime(t.createdAt),
+        href: 'Thread.dc.html?id=' + encodeURIComponent(t.id),
+        ordinal: String(i + 1).padStart(2, '0'),
+        notFirst: i > 0,
+        rightEl: this.regionPill(t),
+      }));
+    } else {
+      trending = [{
+        t: loading ? 'Loading…' : 'No topics yet',
+        meta: loading ? '' : 'Be the first to post — it takes a minute.',
+        href: loading ? 'Explore.dc.html' : 'CreatePost.dc.html',
+        ordinal: '01', notFirst: false, rightEl: null,
+      }];
+    }
 
     const steps = [
       { icon: 'ask', t: 'Post a question', d: 'Share your challenge with the community.' },
       { icon: 'discuss', t: 'Compare field experience', d: 'Get practical answers from experienced colleagues.' },
       { icon: 'boost', t: 'Boost useful ideas', d: 'Upvote helpful answers and surface the best knowledge.' },
-      { icon: 'grow', t: 'Apply and grow', d: 'Turn ideas into action and improve results together.' },
+      { icon: 'growstep', t: 'Apply and grow', d: 'Turn ideas into action and improve results together.' },
     ].map((s) => ({ ...s, iconEl: this.icon(s.icon) }));
-
-    const trending = [
-      { t: 'Reducing black-grass in winter wheat', a: 'Pieter Bakker', time: '2h ago', boosts: 45 },
-      { t: 'Irrigation strategy in dry springs', a: 'Marieke Jansen', time: '5h ago', boosts: 21 },
-      { t: 'Variable rate seeding in onions', a: 'Kees van Dijk', time: '1d ago', boosts: 32 },
-    ].map((r, i) => ({ ...r, ordinal: String(i + 1).padStart(2, '0'), meta: r.a + ' ' + r.time, notFirst: i > 0 }));
 
     const values = [
       { t: 'Trust', d: 'Built on respect and transparency.' },
       { t: 'Practical knowledge', d: 'Real experiences from the field.' },
       { t: 'No hidden advertising', d: 'Independent platform, no product promotions.' },
       { t: 'Farmer-first innovation', d: 'Together we explore better ways forward.' },
-    ].map((v, i) => ({ ...v, notFirst: i > 0 }));
+    ];
 
-    return { cats, steps, trending, values };
+    const me = this.state.me;
+    return {
+      recentHref, recentTitle, recentMetaEl, activeRegionLabel, activeRegionId: activeId, cats, steps, trending, values,
+      heroCtaHref: me ? 'CreatePost.dc.html' : 'SignUp.dc.html',
+      heroCtaLabel: me ? 'Start a topic' : 'Create account',
+    };
   }
 }
 </script>

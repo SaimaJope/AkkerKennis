@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/Favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="assets/Favicon/favicon.svg" />
+<link rel="shortcut icon" href="assets/Favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/Favicon/apple-touch-icon.png" />
+<link rel="manifest" href="assets/Favicon/site.webmanifest" />
+<script src="./gate.js"></script>
+<script src="./theme.js"></script>
+<script src="./firebase.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  .ak-signout:hover{background:#fde9e3;border-color:rgba(254,76,36,0.4);}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="account" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:720px;margin:0 auto;padding:clamp(28px,3vw,44px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-bottom:20px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+      Home
+    </a>
+
+    <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.8vw,44px);color:#16361e;margin:0 0 8px;letter-spacing:-0.4px;">Account</h1>
+    <p style="font-size:17px;color:#33473b;margin:0 0 30px;max-width:520px;">Manage how you appear in the community, your preferences, and your session.</p>
+
+    {{ bodyEl }}
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { me: null, resolved: false, dark: false };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  componentDidMount() {
+    try { const s = window.localStorage.getItem('ak_me'); if (s) this.setState({ me: JSON.parse(s) }); } catch (e) {}
+    try { this.setState({ dark: !!(window.akIsDark && window.akIsDark()) }); } catch (e) {}
+    const start = Date.now();
+    const tryInit = () => {
+      if (window.AK && window.AK.isConfigured && window.AK.isConfigured()) {
+        window.AK.onAuth((u) => this.setState({ me: u, resolved: true }));
+        return;
+      }
+      if (Date.now() - start < 6000) setTimeout(tryInit, 150);
+      else this.setState({ resolved: true });
+    };
+    tryInit();
+  }
+
+  toggleDark() {
+    let on = this.state.dark;
+    try { if (window.akToggleDark) on = window.akToggleDark(); } catch (e) {}
+    this.setState({ dark: on });
+  }
+
+  card(children) {
+    return this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 20, padding: 'clamp(20px,3vw,28px)', marginBottom: 18 } }, children);
+  }
+
+  sectionLabel(text) {
+    return this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, text);
+  }
+
+  toggleSwitch(on, onClick) {
+    return this.h('button', { type: 'button', role: 'switch', 'aria-checked': on, onClick: onClick, style: { position: 'relative', width: 52, height: 30, borderRadius: 999, border: 'none', cursor: 'pointer', background: on ? '#16361e' : '#cfe0c8', transition: 'background .18s ease', flex: '0 0 auto', padding: 0 } },
+      this.h('span', { style: { position: 'absolute', top: 3, left: on ? 25 : 3, width: 24, height: 24, borderRadius: '50%', background: '#ffffff', transition: 'left .18s ease', boxShadow: '0 1px 3px rgba(0,0,0,0.25)' } })
+    );
+  }
+
+  signedOutEl() {
+    return this.card(this.h(React.Fragment, null,
+      this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 24, color: '#16361e', margin: '0 0 8px' } }, 'Sign in to manage your account'),
+      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'You need to be signed in to view your account settings.'),
+      this.h('div', { style: { display: 'flex', gap: 12, flexWrap: 'wrap' } },
+        this.h('a', { href: 'SignIn.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 16, fontWeight: 600, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'Sign in'),
+        this.h('a', { href: 'SignUp.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 16, fontWeight: 600, color: '#16361e', background: 'transparent', border: '1.5px solid rgba(22,54,30,0.3)', borderRadius: 12 } }, 'Create account')
+      )
+    ));
+  }
+
+  settingRow(title, desc, control) {
+    return this.h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18 } },
+      this.h('div', null,
+        this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#16361e' } }, title),
+        desc ? this.h('div', { style: { fontSize: 14, color: '#5a7060', marginTop: 2 } }, desc) : null
+      ),
+      control
+    );
+  }
+
+  signedInEl(me) {
+    return this.h(React.Fragment, null,
+      // identity
+      this.card(this.h(React.Fragment, null,
+        this.sectionLabel('Your profile'),
+        this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 16 } },
+          this.h('span', { style: { flex: '0 0 auto', width: 64, height: 64, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26 } }, me.initials || '?'),
+          this.h('div', { style: { minWidth: 0 } },
+            this.h('div', { style: { fontSize: 20, fontWeight: 700, color: '#16361e' } }, me.name),
+            this.h('div', { style: { fontSize: 15, color: '#5a7060', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, me.email || ''),
+            this.h('div', { style: { fontSize: 14, color: '#8aa090', marginTop: 4 } }, 'AkkerBooster member')
+          )
+        ),
+        this.h('a', { href: 'Profile.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 46, padding: '0 22px', marginTop: 20, textDecoration: 'none', fontSize: 15, fontWeight: 600, color: '#16361e', border: '1.5px solid rgba(22,54,30,0.22)', borderRadius: 12 } }, 'View public profile')
+      )),
+
+      // preferences
+      this.card(this.h(React.Fragment, null,
+        this.sectionLabel('Preferences'),
+        this.settingRow('Dark mode', 'Easier on the eyes in low light. Saved on this device.', this.toggleSwitch(this.state.dark, () => this.toggleDark()))
+      )),
+
+      // session
+      this.card(this.h(React.Fragment, null,
+        this.sectionLabel('Session'),
+        this.settingRow(
+          'Signed in as ' + me.name,
+          me.email || '',
+          this.h('button', { type: 'button', className: 'ak-signout', onClick: () => { window.AK.signOut().then(() => { window.location.href = 'index.html'; }); }, style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 46, padding: '0 22px', whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 15, fontWeight: 600, color: '#c43a18', background: '#ffffff', border: '1.5px solid rgba(254,76,36,0.32)', borderRadius: 12, transition: 'background .15s ease,border-color .15s ease' } }, 'Sign out')
+        )
+      ))
+    );
+  }
+
+  renderVals() {
+    const st = this.state;
+    let bodyEl;
+    if (st.me) bodyEl = this.signedInEl(st.me);
+    else if (st.resolved) bodyEl = this.signedOutEl();
+    else bodyEl = this.h('div', { style: { padding: '20px 4px', fontSize: 16, color: '#5a7060' } }, 'Loading…');
+    return { bodyEl };
+  }
+}
+</script>
+</body>
+<style>
+header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
+html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;pointer-events:none!important;}
+</style>
+<script>
+(function(){
+  var root=document.documentElement,lastY=0,ticking=false;
+  window.addEventListener('scroll',function(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var y=Math.max(0,window.scrollY||0),d=y-lastY;
+      if(y<24||d<0)root.classList.remove('hdr-off');
+      else if(y>96&&d>0)root.classList.add('hdr-off');
+      lastY=y;ticking=false;
+    });
+  },{passive:true});
+})();
+</script>
+</html>

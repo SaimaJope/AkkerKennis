@@ -138,6 +138,12 @@
     ready: ready,
     isConfigured: configured,
     me: function () { return me; },
+    // Last known signed-in user, read synchronously from localStorage. Lets the
+    // header render the logged-in state on the very first paint (no logged-out
+    // flash) while Firebase restores the real session in the background.
+    cachedMe: function () {
+      try { var s = window.localStorage.getItem('ak_me'); return s ? JSON.parse(s) : null; } catch (e) { return null; }
+    },
 
     // ── Auth ────────────────────────────────────────────────────────────────
     onAuth: function (cb) {
@@ -145,6 +151,10 @@
         if (!ctx) { cb(null); return; }
         ctx.auth.onAuthStateChanged(function (u) {
           me = shapeUser(u);
+          try {
+            if (me) window.localStorage.setItem('ak_me', JSON.stringify(me));
+            else window.localStorage.removeItem('ak_me');
+          } catch (e) {}
           cb(me);
         });
       });
@@ -157,6 +167,7 @@
       });
     },
     signOut: function () {
+      try { window.localStorage.removeItem('ak_me'); } catch (e) {}
       return ready.then(function (ctx) { return ctx && ctx.auth.signOut(); });
     },
 

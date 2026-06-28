@@ -72,3 +72,53 @@
     return root.classList.contains('ak-dark');
   };
 })();
+
+/* Brief branded page loader — smooths the gap between page navigations while the
+   app renders and the session restores. Uses the site's green palette and is
+   removed on window load (with a short minimum so it never just flickers, and a
+   hard cap so it can never get stuck). Sits below the PIN gate's z-index. */
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var css = document.createElement('style');
+  css.id = 'ak-loader-css';
+  css.textContent = [
+    '#ak-loader{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147482000;',
+    'display:flex;align-items:center;justify-content:center;',
+    'background:radial-gradient(1200px 600px at 50% -10%,#effbe7 0%,rgba(239,251,231,0) 60%),',
+    'linear-gradient(160deg,#e3fbd8 0%,#d4f4c6 100%);transition:opacity .35s ease;}',
+    '#ak-loader.ak-loader-out{opacity:0;pointer-events:none;}',
+    '.ak-load-anim{--c1:#16361e;--c2:#8ee05e;--s:1.7px;width:calc(64*var(--s));height:calc(48*var(--s));',
+    'position:relative;animation:ak-split 1s ease-in infinite alternate;}',
+    '.ak-load-anim::before,.ak-load-anim::after{content:"";position:absolute;height:calc(48*var(--s));',
+    'width:calc(48*var(--s));border-radius:50%;left:0;top:0;transform:translateX(calc(-10*var(--s)));',
+    'background:var(--c1);opacity:0.8;}',
+    '.ak-load-anim::after{left:auto;right:0;background:var(--c2);transform:translateX(calc(10*var(--s)));}',
+    '@keyframes ak-split{0%,25%{width:calc(64*var(--s));}100%{width:calc(148*var(--s));}}'
+  ].join('');
+  (document.head || root).appendChild(css);
+
+  function mount() {
+    if (document.getElementById('ak-loader')) return;
+    var o = document.createElement('div');
+    o.id = 'ak-loader';
+    o.setAttribute('aria-hidden', 'true');
+    o.innerHTML = '<span class="ak-load-anim"></span>';
+    document.body.appendChild(o);
+    var shown = Date.now();
+    var removed = false;
+    function done() {
+      if (removed) return; removed = true;
+      var wait = Math.max(0, 300 - (Date.now() - shown));
+      setTimeout(function () {
+        o.classList.add('ak-loader-out');
+        setTimeout(function () { if (o.parentNode) o.parentNode.removeChild(o); }, 380);
+      }, wait);
+    }
+    if (document.readyState === 'complete') done();
+    else window.addEventListener('load', done);
+    setTimeout(done, 3000);
+  }
+  if (document.body) mount();
+  else document.addEventListener('DOMContentLoaded', mount);
+})();
