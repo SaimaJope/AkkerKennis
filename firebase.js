@@ -113,8 +113,13 @@
       return Promise.resolve(null);
     }
     return loadScript(SDK + 'firebase-app-compat.js')
-      .then(function () { return loadScript(SDK + 'firebase-auth-compat.js'); })
-      .then(function () { return loadScript(SDK + 'firebase-firestore-compat.js'); })
+      .then(function () {
+        // auth + firestore don't depend on each other — load them in parallel.
+        return Promise.all([
+          loadScript(SDK + 'firebase-auth-compat.js'),
+          loadScript(SDK + 'firebase-firestore-compat.js'),
+        ]);
+      })
       .then(function () {
         var fb = window.firebase;
         fb.initializeApp(CONFIG);
