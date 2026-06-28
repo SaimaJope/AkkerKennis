@@ -173,6 +173,18 @@
         if (!ctx) { cb(null); return; }
         ctx.auth.onAuthStateChanged(function (u) {
           me = shapeUser(u);
+          // Carry the last-known display name + photo from the cached session so
+          // this first emission never regresses the header to initials for a beat
+          // while the profile doc re-loads (the enrichment below refreshes it).
+          if (u) {
+            try {
+              var cached = JSON.parse(window.localStorage.getItem('ak_me') || 'null');
+              if (cached && cached.uid === u.uid) {
+                if (cached.name) { me.name = cached.name; me.initials = initials(cached.name); }
+                if (cached.photo) me.photo = cached.photo;
+              }
+            } catch (e) {}
+          }
           persistMe(me);
           cb(me);
           // Then enrich with the saved profile (custom display name + photo) and
