@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/Favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="assets/Favicon/favicon.svg" />
+<link rel="shortcut icon" href="assets/Favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/Favicon/apple-touch-icon.png" />
+<link rel="manifest" href="assets/Favicon/site.webmanifest" />
+<script src="./gate.js"></script>
+<script src="./theme.js"></script>
+<script src="./support.js"></script>
+<script src="./projects-data.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  .ak-project-card:hover{transform:translateY(-2px);border-color:rgba(22,54,30,0.28);}
+  .ak-project-card:hover .ak-project-open{gap:9px;}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="projects" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:1120px;margin:0 auto;padding:clamp(32px,4vw,56px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    <div style="margin-bottom:32px;max-width:700px;">
+      <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.4vw,52px);color:#16361e;margin:0 0 10px;letter-spacing:-0.4px;">Projects</h1>
+      <p style="font-size:18px;line-height:1.6;color:#33473b;margin:0;">Member-led pilots and collaborative trials that turn useful topics into practical field work. Open a project to see who runs it, who funds it, and how to take part.</p>
+    </div>
+
+    {{ ongoingEl }}
+    {{ pastEl }}
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  projects() {
+    return (typeof window !== 'undefined' && Array.isArray(window.AK_PROJECTS)) ? window.AK_PROJECTS : [];
+  }
+
+  byStatus(status) {
+    return this.projects().filter((p) => p.status === status);
+  }
+
+  sectionEl(title, projects, emptyText) {
+    return this.h('section', { style: { marginBottom: 36 } },
+      this.h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', marginBottom: 16 } },
+        this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(26px,3.2vw,36px)', color: '#16361e', margin: 0 } }, title),
+        this.h('span', { style: { fontSize: 14, fontWeight: 700, color: '#5a7060' } }, projects.length + (projects.length === 1 ? ' project' : ' projects'))
+      ),
+      projects.length
+        ? this.h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 18 } }, ...projects.map((project) => this.projectCard(project)))
+        : this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '40px 26px', textAlign: 'center', fontSize: 15, color: '#5a7060' } }, emptyText)
+    );
+  }
+
+  projectCard(project) {
+    const isPast = project.status === 'past';
+    return this.h('a', { key: project.id, href: 'Project.dc.html?id=' + encodeURIComponent(project.id), className: 'ak-project-card', style: { textDecoration: 'none', color: 'inherit', background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', minHeight: 250, transition: 'transform .16s ease,border-color .16s ease' } },
+      this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 } },
+        this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: 'uppercase', padding: '5px 11px', borderRadius: 999, background: isPast ? '#16361e' : '#8ee05e', color: isPast ? '#bff0a6' : '#0f2a16' } }, isPast ? 'Past' : 'Ongoing'),
+        this.h('span', { style: { fontSize: 13, fontWeight: 700, color: '#fe4c24', textTransform: 'uppercase', letterSpacing: 0.4 } }, project.region)
+      ),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 23, lineHeight: 1.22, color: '#16361e', margin: '0 0 10px' } }, project.title),
+      this.h('p', { style: { fontSize: 15, lineHeight: 1.6, color: '#33473b', margin: '0 0 16px' } }, project.summary),
+      this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, marginTop: 'auto', marginBottom: 16, fontSize: 14, color: '#5a7060' } },
+        this.h('span', null, this.h('strong', { style: { color: '#16361e' } }, 'Manager: '), project.manager),
+        this.h('span', null, this.h('strong', { style: { color: '#16361e' } }, 'Funded by: '), project.funder)
+      ),
+      this.h('span', { className: 'ak-project-open', style: { display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 15, fontWeight: 700, color: '#16361e', transition: 'gap .15s ease' } },
+        'View project details',
+        this.h('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: '#16361e', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M9 18l6-6-6-6' }))
+      )
+    );
+  }
+
+  renderVals() {
+    return {
+      ongoingEl: this.sectionEl('Ongoing Projects', this.byStatus('ongoing'), 'No ongoing projects right now.'),
+      pastEl: this.sectionEl('Past Projects', this.byStatus('past'), 'No past projects yet.'),
+    };
+  }
+}
+</script>
+</body>
+<style>
+header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
+html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;pointer-events:none!important;}
+</style>
+<script>
+(function(){
+  var root=document.documentElement,lastY=0,ticking=false;
+  window.addEventListener('scroll',function(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var y=Math.max(0,window.scrollY||0),d=y-lastY;
+      if(y<24||d<0)root.classList.remove('hdr-off');
+      else if(y>96&&d>0)root.classList.add('hdr-off');
+      lastY=y;ticking=false;
+    });
+  },{passive:true});
+})();
+</script>
+</html>

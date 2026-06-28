@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// AkkerBooster Firestore security rules.
+// Paste these into Firebase console → Firestore Database → Rules → Publish.
+//
+// Model: only signed-in testers can read or write. Anyone signed in may toggle
+// the `votes` array on a reply (that's an upvote), but only the author may
+// create a reply as themselves, or edit/delete their own.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Only the `votes` field changed (an upvote toggle), nothing else.
+    function onlyVotesChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votes']);
+    }
+
+    match /replies/{replyId} {
+      allow read: if signedIn();
+
+      // Create only as yourself, starting with an empty vote list.
+      allow create: if signedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.votes.size() == 0;
+
+      // Anyone signed in may upvote (votes-only change); the author may edit theirs.
+      allow update: if signedIn()
+        && (onlyVotesChanged() || resource.data.authorUid == request.auth.uid);
+
+      allow delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    // Optional: topics created by testers (for when you wire CreatePost).
+    match /topics/{topicId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+    }
+  }
+}

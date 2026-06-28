@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mozilla+Text:wght@200..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/Favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="assets/Favicon/favicon.svg" />
+<link rel="shortcut icon" href="assets/Favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/Favicon/apple-touch-icon.png" />
+<link rel="manifest" href="assets/Favicon/site.webmanifest" />
+<script src="./gate.js"></script>
+<script src="./theme.js"></script>
+<script src="./support.js"></script>
+<script src="./events-data.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::selection{background:#8ee05e;color:#08100d;}
+  select{appearance:none;-webkit-appearance:none;}
+  .ak-event-card:hover{transform:translateY(-2px);border-color:rgba(22,54,30,0.28);}
+  .ak-event-card:hover .ak-event-open{gap:9px;}
+</style>
+</helmet>
+
+<div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
+  <dc-import name="Header" active="events" hint-size="100%,72px"></dc-import>
+
+  <section style="max-width:1200px;margin:0 auto;padding:clamp(32px,4vw,56px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
+    <div style="margin-bottom:32px;max-width:680px;">
+      <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.4vw,52px);color:#16361e;margin:0 0 10px;letter-spacing:-0.4px;">Events</h1>
+      <p style="font-size:18px;line-height:1.6;color:#33473b;margin:0;">Workshops, field days, expeditions, and member meetups for practical arable farming knowledge. Open an event to see the full details and join its WhatsApp group.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:268px 1fr;gap:28px;align-items:start;">
+      <!-- SIDEBAR: region filter (same pattern as Topics) -->
+      <aside style="display:flex;flex-direction:column;gap:20px;">
+        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+            <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0;">Region</h3>
+            <div style="display:inline-flex;align-items:center;gap:3px;background:#e3fbd8;border:1px solid rgba(22,54,30,0.15);border-radius:999px;padding:3px;">
+              <button type="button" onClick="{{ showMapRegion }}" style="{{ mapToggleStyle }}">Map</button>
+              <button type="button" onClick="{{ showTextRegion }}" style="{{ textToggleStyle }}">Text</button>
+            </div>
+          </div>
+
+          <sc-if value="{{ regionMapVisible }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;justify-content:center;margin:2px 0 12px;">
+              <dc-import name="NLMap" selected="{{ mapSelected }}" interactive="true" showCaption="false" onSelect="{{ onMapRegion }}" hint-size="228px,260px"></dc-import>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:13px;line-height:1.4;color:#5a7060;">{{ regionHint }}</div>
+              <button type="button" onClick="{{ clearRegion }}" style="{{ allRegionsStyle }}">{{ allRegionsLabel }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ regionTextVisible }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;">
+              <select value="{{ region }}" onChange="{{ onRegion }}" style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;color:#16361e;background:#e3fbd8;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:13px 38px 13px 14px;cursor:pointer;">
+                <sc-for list="{{ regionOpts }}" as="r" hint-placeholder-count="6">
+                  <option value="{{ r.id }}">{{ r.name }}</option>
+                </sc-for>
+              </select>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+          </sc-if>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+          <span style="font-size:15px;color:#5a7060;">{{ resultLabel }}</span>
+        </div>
+
+        <div id="events" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;">
+          {{ eventsEl }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { region: 'all', regionMode: 'map' };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  REGIONS = [
+    { id: 'all', name: 'All regions' },
+    { id: 'groningen', name: 'Groningen' }, { id: 'friesland', name: 'Friesland' }, { id: 'drenthe', name: 'Drenthe' },
+    { id: 'noordholland', name: 'Noord-Holland' }, { id: 'flevoland', name: 'Flevoland' }, { id: 'overijssel', name: 'Overijssel' },
+    { id: 'utrecht', name: 'Utrecht' }, { id: 'gelderland', name: 'Gelderland' }, { id: 'zuidholland', name: 'Zuid-Holland' },
+    { id: 'zeeland', name: 'Zeeland' }, { id: 'noordbrabant', name: 'Noord-Brabant' }, { id: 'limburg', name: 'Limburg' },
+  ];
+
+  events() {
+    return (typeof window !== 'undefined' && Array.isArray(window.AK_EVENTS)) ? window.AK_EVENTS : [];
+  }
+
+  regionName(id) {
+    const found = this.REGIONS.find((r) => r.id === id);
+    return found ? found.name : 'All regions';
+  }
+
+  eventCard(e) {
+    return this.h('a', { key: e.id, href: 'Event.dc.html?id=' + encodeURIComponent(e.id), className: 'ak-event-card', style: { textDecoration: 'none', color: 'inherit', background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 20, padding: 24, minHeight: 300, display: 'flex', flexDirection: 'column', transition: 'transform .16s ease,border-color .16s ease' } },
+      this.h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 } },
+        this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: 'uppercase', padding: '6px 11px', borderRadius: 999, background: '#e3fbd8', color: '#16361e', border: '1px solid rgba(22,54,30,0.14)' } }, e.type),
+        this.h('span', { style: { fontSize: 13, fontWeight: 700, color: '#fe4c24' } }, e.date)
+      ),
+      this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 24, lineHeight: 1.2, color: '#16361e', margin: '0 0 10px' } }, e.title),
+      this.h('p', { style: { fontSize: 15, lineHeight: 1.6, color: '#33473b', margin: '0 0 18px' } }, e.summary),
+      this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8, marginTop: 'auto', marginBottom: 16, fontSize: 14, color: '#5a7060' } },
+        this.h('span', null, this.h('strong', { style: { color: '#16361e' } }, 'Location: '), e.location),
+        this.h('span', null, this.h('strong', { style: { color: '#16361e' } }, 'Organiser: '), e.organiser)
+      ),
+      this.h('span', { className: 'ak-event-open', style: { display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 15, fontWeight: 700, color: '#16361e', transition: 'gap .15s ease' } },
+        'View event details',
+        this.h('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: '#16361e', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M9 18l6-6-6-6' }))
+      )
+    );
+  }
+
+  emptyEl(regionSelected, regionLabel) {
+    return this.h('div', { style: { gridColumn: '1 / -1', background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, regionSelected ? 'No events in ' + regionLabel : 'No events scheduled yet'),
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: 0 } }, regionSelected ? 'Try another region, or clear the filter to see every event.' : 'Check back soon for new workshops, field days, and meetups.')
+    );
+  }
+
+  renderVals() {
+    const st = this.state;
+    const all = this.events();
+    const regionSelected = st.region !== 'all';
+    const selectedRegionName = this.regionName(st.region);
+
+    const list = all.filter((e) => st.region === 'all' || e.regionId === st.region);
+
+    const mapMode = st.regionMode === 'map';
+    const modeBase = "font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;border:none;border-radius:999px;padding:6px 10px;cursor:pointer;line-height:1;";
+
+    return {
+      eventsEl: list.length
+        ? this.h(React.Fragment, null, ...list.map((event) => this.eventCard(event)))
+        : this.emptyEl(regionSelected, selectedRegionName),
+      resultLabel: list.length + (list.length === 1 ? ' event' : ' events') + (regionSelected ? ' in ' + selectedRegionName : ''),
+
+      regionOpts: this.REGIONS,
+      region: st.region,
+      mapSelected: st.region,
+      regionMapVisible: mapMode,
+      regionTextVisible: !mapMode,
+      mapToggleStyle: modeBase + (mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
+      textToggleStyle: modeBase + (!mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
+      regionHint: regionSelected ? 'Showing events in ' + selectedRegionName + '.' : 'Tap a province to filter events.',
+      allRegionsLabel: regionSelected ? 'Clear region: ' + selectedRegionName : 'All regions',
+      allRegionsStyle: "width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:14px;font-weight:600;color:#16361e;background:" + (regionSelected ? '#ffffff' : '#e3fbd8') + ";border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:11px 13px;cursor:pointer;text-align:center;",
+      showMapRegion: () => this.setState({ regionMode: 'map' }),
+      showTextRegion: () => this.setState({ regionMode: 'text' }),
+      onMapRegion: (id) => this.setState({ region: id }),
+      clearRegion: () => this.setState({ region: 'all' }),
+      onRegion: (e) => this.setState({ region: e.target.value }),
+    };
+  }
+}
+</script>
+</body>
+<style>
+header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
+html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;pointer-events:none!important;}
+</style>
+<script>
+(function(){
+  var root=document.documentElement,lastY=0,ticking=false;
+  window.addEventListener('scroll',function(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var y=Math.max(0,window.scrollY||0),d=y-lastY;
+      if(y<24||d<0)root.classList.remove('hdr-off');
+      else if(y>96&&d>0)root.classList.add('hdr-off');
+      lastY=y;ticking=false;
+    });
+  },{passive:true});
+})();
+</script>
+</html>

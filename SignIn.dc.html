@@ -13,6 +13,7 @@
 <link rel="manifest" href="assets/Favicon/site.webmanifest" />
 <script src="./gate.js"></script>
 <script src="./theme.js"></script>
+<script src="./firebase.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -30,7 +31,7 @@
   <div style="background:#16361e;color:#cfe6d2;padding:clamp(36px,4vw,64px);display:flex;flex-direction:column;justify-content:space-between;min-height:100vh;">
     <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
       <img src="assets/logo.png" alt="" width="40" height="40" style="width:40px;height:40px;border-radius:50%;" />
-      <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:23px;font-weight:700;color:#eafbe1;">AkkerKennis</span>
+      <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:23px;font-weight:700;color:#eafbe1;">AkkerBooster</span>
     </a>
     <div>
       <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.4vw,44px);line-height:1.12;color:#ffffff;margin:0 0 18px;letter-spacing:-0.4px;">Welcome back to the field.</h1>
@@ -43,32 +44,96 @@
   <div style="padding:clamp(32px,4vw,64px);display:flex;align-items:center;justify-content:center;">
     <div style="width:100%;max-width:420px;">
       <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:32px;color:#16361e;margin:0 0 6px;">Sign in</h2>
-      <p style="font-size:15px;color:#5a7060;margin:0 0 30px;">New to AkkerKennis? <a href="SignUp.dc.html" style="color:#16361e;font-weight:600;text-decoration:none;border-bottom:2px solid #8ee05e;">Create an account</a></p>
+      <p style="font-size:15px;color:#5a7060;margin:0 0 30px;">New to AkkerBooster? <a href="SignUp.dc.html" style="color:#16361e;font-weight:600;text-decoration:none;border-bottom:2px solid #8ee05e;">Create an account</a></p>
+
+      {{ noticeEl }}
 
       <label style="display:block;margin-bottom:18px;">
         <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Email</span>
-        <input type="email" placeholder="you@example.nl" style="width:100%;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:15px 16px;" />
+        <input type="email" value="{{ email }}" onInput="{{ onEmail }}" placeholder="you@example.nl" style="width:100%;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:15px 16px;" />
       </label>
       <label style="display:block;margin-bottom:14px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
           <span style="font-size:14px;font-weight:600;color:#16361e;">Password</span>
           <a href="#" style="font-size:13px;color:#5a7060;text-decoration:none;">Forgot password?</a>
         </div>
-        <input type="password" placeholder="********" style="width:100%;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:15px 16px;" />
+        <input type="password" value="{{ password }}" onInput="{{ onPassword }}" placeholder="********" style="width:100%;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:15px 16px;" />
       </label>
       <label style="display:flex;align-items:center;gap:11px;margin-bottom:26px;cursor:pointer;">
         <input type="checkbox" style="width:20px;height:20px;accent-color:#16361e;cursor:pointer;" />
         <span style="font-size:14px;color:#33473b;">Keep me signed in</span>
       </label>
 
-      <button type="button" style="width:100%;min-height:54px;font-family:'Ubuntu',Arial,sans-serif;font-size:17px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:14px;cursor:pointer;transition:background .15s ease;" style-hover="background:#0f2716;">Sign in</button>
+      {{ errorEl }}
+
+      <button type="button" onClick="{{ onSubmit }}" style="{{ submitStyle }}" style-hover="background:#0f2716;">{{ submitLabel }}</button>
 
       <a href="index.html" style="display:block;text-align:center;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-top:18px;">Continue browsing as guest</a>
     </div>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{}"></script>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { email: '', password: '', error: '', busy: false, configured: false };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  componentDidMount() {
+    const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
+    this.setState({ configured });
+    // If already signed in, skip straight to the topics.
+    if (configured) {
+      window.AK.onAuth((u) => { if (u) window.location.href = 'Explore.dc.html'; });
+    }
+  }
+
+  submit() {
+    if (this.state.busy) return;
+    if (!this.state.configured) {
+      this.setState({ error: 'Backend not configured yet — see SETUP_FIREBASE.md.' });
+      return;
+    }
+    const email = this.state.email.trim();
+    const password = this.state.password;
+    if (!email || !password) {
+      this.setState({ error: 'Enter your email and password.' });
+      return;
+    }
+    this.setState({ busy: true, error: '' });
+    window.AK.signIn(email, password)
+      .then(() => { window.location.href = 'Explore.dc.html'; })
+      .catch((e) => {
+        const code = e && e.code ? e.code : '';
+        const msg = (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found')
+          ? 'Email or password is incorrect.'
+          : (e && e.message) || 'Could not sign in. Try again.';
+        this.setState({ busy: false, error: msg });
+      });
+  }
+
+  renderVals() {
+    const st = this.state;
+    return {
+      email: st.email,
+      password: st.password,
+      onEmail: (e) => this.setState({ email: e.target.value }),
+      onPassword: (e) => this.setState({ password: e.target.value }),
+      onSubmit: () => this.submit(),
+      submitLabel: st.busy ? 'Signing in…' : 'Sign in',
+      submitStyle: "width:100%;min-height:54px;font-family:'Ubuntu',Arial,sans-serif;font-size:17px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:14px;cursor:" + (st.busy ? 'default' : 'pointer') + ";opacity:" + (st.busy ? '0.7' : '1') + ";transition:background .15s ease;",
+      errorEl: st.error
+        ? this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 9, background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, fontSize: 14, color: '#c43a18' } }, st.error)
+        : null,
+      noticeEl: (!st.configured)
+        ? this.h('div', { style: { background: '#16361e', borderRadius: 12, padding: '12px 14px', marginBottom: 20, fontSize: 13, lineHeight: 1.5, color: '#cfe6d2' } }, 'Backend not configured yet. Add your Firebase keys in firebase.js (see SETUP_FIREBASE.md) to enable real tester logins.')
+        : null,
+    };
+  }
+}
+</script>
 </body>
 <style>
 header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
@@ -89,4 +154,3 @@ html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;po
 })();
 </script>
 </html>
-
