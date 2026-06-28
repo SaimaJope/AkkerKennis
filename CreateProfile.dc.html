@@ -85,9 +85,7 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:26px;">
           <div>
             <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:20px;color:#16361e;margin:0 0 10px;">Main crops</h2>
-            <div style="display:flex;gap:9px;flex-wrap:wrap;">
-              {{ cropChipsEl }}
-            </div>
+            {{ cropsField }}
           </div>
           <div>
             <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:20px;color:#16361e;margin:0 0 10px;">Experience</h2>
@@ -149,6 +147,9 @@ class Component extends DCLogic {
     saving: false,
     error: '',
     crops: [],
+    cropQuery: '',
+    cropOpen: false,
+    cropHi: 0,
   };
 
   NAMES = {
@@ -156,6 +157,28 @@ class Component extends DCLogic {
     flevoland: 'Flevoland', overijssel: 'Overijssel', utrecht: 'Utrecht', gelderland: 'Gelderland',
     zuidholland: 'Zuid-Holland', zeeland: 'Zeeland', noordbrabant: 'Noord-Brabant', limburg: 'Limburg',
   };
+
+  // The crop suggestion list for the "Main crops" typeahead. Tuned for Dutch
+  // arable farming: cereals, roots/tubers, beet, alliums, brassicas, legumes,
+  // oil/fibre, forage/cover crops, fruit and flower bulbs. Free-typed entries
+  // are always allowed too. NOTE: when the site is translated, swap these labels
+  // to Dutch here — this single array is the only place to change.
+  CROPS = [
+    'Potatoes', 'Seed potatoes', 'Starch potatoes', 'Ware potatoes',
+    'Sugar beet', 'Fodder beet',
+    'Winter wheat', 'Spring wheat', 'Winter barley', 'Spring barley',
+    'Oats', 'Rye', 'Triticale', 'Grain maize', 'Silage maize',
+    'Onions', 'Seed onions', 'Shallots', 'Garlic', 'Leeks',
+    'Carrots', 'Parsnips', 'Celeriac', 'Beetroot', 'Chicory (witlof)',
+    'Cabbage', 'Cauliflower', 'Broccoli', 'Brussels sprouts',
+    'Spinach', 'Lettuce', 'Endive', 'Asparagus',
+    'Peas', 'Field beans', 'Green beans', 'Soybeans', 'Lupins',
+    'Oilseed rape', 'Linseed', 'Fibre flax', 'Sunflower', 'Hemp', 'Caraway',
+    'Grass seed', 'Grassland / pasture', 'Clover', 'Alfalfa (lucerne)', 'Ryegrass',
+    'Cover crops', 'Green manure', 'Yellow mustard', 'Phacelia', 'Fodder radish',
+    'Strawberries', 'Apples', 'Pears', 'Blueberries', 'Pumpkins',
+    'Tulips', 'Lilies', 'Daffodils', 'Hyacinths', 'Gladioli',
+  ];
 
   // Require a signed-in user, then prefill the form with their saved profile.
   componentDidMount() {
@@ -222,29 +245,99 @@ class Component extends DCLogic {
       .catch((err) => this.setState({ photoBusy: false, error: (err && err.message) || 'Could not load that photo' }));
   }
 
-  cropChipsEl() {
-    const all = ['Potatoes', 'Sugar beet', 'Winter wheat', 'Onions', 'Maize', 'Cover crops'];
-    return this.h(React.Fragment, null, ...all.map((crop) => {
-      const active = this.state.crops.includes(crop);
-      return this.h('button', {
-        key: crop,
-        type: 'button',
-        onClick: () => this.setState((s) => ({ crops: s.crops.includes(crop) ? s.crops.filter((c) => c !== crop) : s.crops.concat(crop) })),
-        style: {
-          display: 'inline-flex',
-          alignItems: 'center',
-          minHeight: 36,
-          padding: '0 13px',
-          fontSize: 14,
-          fontWeight: 700,
-          color: active ? '#eafbe1' : '#16361e',
-          background: active ? '#16361e' : '#f6fcf0',
-          border: active ? '1px solid #16361e' : '1px solid rgba(22,54,30,0.18)',
-          borderRadius: 999,
-          cursor: 'pointer',
-        },
-      }, crop);
+  addCrop(name) {
+    const v = String(name || '').trim();
+    if (!v) return;
+    this.setState((s) => ({
+      crops: s.crops.some((c) => c.toLowerCase() === v.toLowerCase()) ? s.crops : s.crops.concat(v),
+      cropQuery: '',
+      cropHi: 0,
     }));
+  }
+
+  removeCrop(name) {
+    this.setState((s) => ({ crops: s.crops.filter((c) => c !== name) }));
+  }
+
+  // The dropdown options for the current query: matching suggestions not already
+  // chosen, plus an "Add …" option for anything typed that isn't in the list.
+  cropMenuItems() {
+    const q = (this.state.cropQuery || '').trim();
+    const ql = q.toLowerCase();
+    const taken = this.state.crops.map((c) => c.toLowerCase());
+    let pool = this.CROPS.filter((c) => taken.indexOf(c.toLowerCase()) === -1);
+    if (ql) pool = pool.filter((c) => c.toLowerCase().indexOf(ql) !== -1);
+    const items = pool.slice(0, 8).map((c) => ({ label: c, value: c, add: false }));
+    const exists = this.CROPS.concat(this.state.crops).some((c) => c.toLowerCase() === ql);
+    if (q && !exists) items.push({ label: 'Add “' + q + '”', value: q, add: true });
+    return items;
+  }
+
+  onCropKey(e) {
+    const items = this.cropMenuItems();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (items.length) this.addCrop(items[Math.min(this.state.cropHi || 0, items.length - 1)].value);
+      else { const v = (this.state.cropQuery || '').trim(); if (v) this.addCrop(v); }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      this.setState((s) => ({ cropOpen: true, cropHi: Math.min((s.cropHi || 0) + 1, Math.max(0, items.length - 1)) }));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      this.setState((s) => ({ cropHi: Math.max((s.cropHi || 0) - 1, 0) }));
+    } else if (e.key === 'Escape') {
+      this.setState({ cropOpen: false });
+    } else if (e.key === 'Backspace' && !(this.state.cropQuery || '')) {
+      this.setState((s) => (s.crops.length ? { crops: s.crops.slice(0, -1) } : null));
+    }
+  }
+
+  cropsFieldEl() {
+    const st = this.state;
+    const chips = st.crops.map((crop) => this.h('span', {
+      key: 'chip-' + crop,
+      style: { display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: 34, padding: '0 5px 0 13px', fontSize: 14, fontWeight: 700, color: '#eafbe1', background: '#16361e', border: '1px solid #16361e', borderRadius: 999 },
+    },
+      crop,
+      this.h('button', {
+        type: 'button', 'aria-label': 'Remove ' + crop,
+        onMouseDown: (e) => { e.preventDefault(); this.removeCrop(crop); },
+        style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.18)', color: '#eafbe1', cursor: 'pointer', fontSize: 15, lineHeight: 1, padding: 0 },
+      }, '×')
+    ));
+
+    const input = this.h('input', {
+      type: 'text', value: st.cropQuery,
+      placeholder: st.crops.length ? 'Add another…' : 'Type a crop…',
+      ref: (el) => { this._cropInput = el; },
+      onChange: (e) => this.setState({ cropQuery: e.target.value, cropOpen: true, cropHi: 0 }),
+      onFocus: () => this.setState({ cropOpen: true }),
+      onBlur: () => setTimeout(() => this.setState({ cropOpen: false }), 130),
+      onKeyDown: (e) => this.onCropKey(e),
+      style: { flex: '1 1 110px', minWidth: 110, border: 'none', outline: 'none', background: 'transparent', fontSize: 16, color: '#08100d', padding: '6px 2px' },
+    });
+
+    const control = this.h('div', {
+      onMouseDown: (e) => { if (e.target === e.currentTarget && this._cropInput) { e.preventDefault(); this._cropInput.focus(); this.setState({ cropOpen: true }); } },
+      style: { display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.18)', borderRadius: 12, padding: '8px 10px', cursor: 'text' },
+    }, ...chips, input);
+
+    const items = this.cropMenuItems();
+    let menu = null;
+    if (st.cropOpen && items.length) {
+      menu = this.h('div', {
+        role: 'listbox',
+        style: { position: 'absolute', left: 0, right: 0, top: 'calc(100% + 6px)', zIndex: 30, background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 12, boxShadow: '0 18px 44px -18px rgba(16,40,22,0.4)', padding: 6, maxHeight: 244, overflowY: 'auto' },
+      }, ...items.map((it, i) => this.h('button', {
+        key: 'opt-' + it.value + '-' + i,
+        type: 'button', role: 'option', 'aria-selected': i === (st.cropHi || 0),
+        onMouseDown: (e) => { e.preventDefault(); this.addCrop(it.value); },
+        onMouseEnter: () => this.setState({ cropHi: i }),
+        style: { display: 'block', width: '100%', textAlign: 'left', padding: '9px 11px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 15, fontWeight: it.add ? 700 : 500, color: '#16361e', background: i === (st.cropHi || 0) ? '#eef9e3' : 'transparent' },
+      }, it.label)));
+    }
+
+    return this.h('div', { style: { position: 'relative' } }, control, menu);
   }
 
   renderVals() {
@@ -263,7 +356,7 @@ class Component extends DCLogic {
       provinceName: this.NAMES[st.province] || '-',
       experience: st.experience,
       avatarEl,
-      cropChipsEl: this.cropChipsEl(),
+      cropsField: this.cropsFieldEl(),
       uploadLabel: st.photoBusy ? 'Processing…' : (st.photo ? 'Change photo' : 'Upload photo'),
       saveLabel: st.saving ? 'Saving…' : 'Save profile',
       saveStyle,
