@@ -157,7 +157,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, posting: false };
+  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false };
 
   // All topic links open this page; replies persist under one shared thread id.
   THREAD_ID = 'blackgrass-winter-wheat';
@@ -172,8 +172,9 @@ class Component extends DCLogic {
     this.setState({ configured });
     if (!configured) return;
     window.AK.onAuth((u) => this.setState({ me: u, loggedIn: !!u, prompt: u ? false : this.state.prompt }));
-    this._unsub = window.AK.watchReplies(this.THREAD_ID, (rows) => {
-      if (rows) this.setState({ remoteReplies: rows });
+    this._unsub = window.AK.watchReplies(this.THREAD_ID, (rows, err) => {
+      if (err) this.setState({ repliesError: err });
+      else this.setState({ remoteReplies: rows, repliesError: '' });
     });
   }
 
@@ -202,9 +203,10 @@ class Component extends DCLogic {
   // configured, otherwise the built-in demo replies with local vote state.
   buildReplies() {
     const st = this.state;
-    if (st.configured && st.remoteReplies) {
+    // With the backend on, ALWAYS reflect the database (never fake demo data).
+    if (st.configured) {
       const uid = st.me && st.me.uid;
-      return st.remoteReplies.map((r) => ({
+      return (st.remoteReplies || []).map((r) => ({
         id: r.id,
         name: r.authorName,
         initials: r.authorInitials,
@@ -231,10 +233,10 @@ class Component extends DCLogic {
     const text = this.state.replyText.trim();
     if (!text || this.state.posting) return;
     if (!this.state.configured) { this.setState({ replyText: '' }); return; }
-    this.setState({ posting: true });
+    this.setState({ posting: true, postError: '' });
     window.AK.addReply(this.THREAD_ID, text)
-      .then(() => this.setState({ replyText: '', replyImageName: null, posting: false }))
-      .catch((e) => { console.error(e); this.setState({ posting: false }); });
+      .then(() => this.setState({ replyText: '', replyImageName: null, posting: false, postError: '' }))
+      .catch((e) => { console.error(e); this.setState({ posting: false, postError: (e && e.message) || 'Could not post your reply.' }); });
   }
 
   icon(name, size = 16) {
@@ -374,7 +376,21 @@ class Component extends DCLogic {
   }
 
   repliesSectionEl(replies) {
-    const heading = this.state.configured && !this.state.remoteReplies
+    const st = this.state;
+
+    // Backend on but the comment listener errored — surface the real cause.
+    if (st.configured && st.repliesError) {
+      return this.h(React.Fragment, null,
+        this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 20px' } }, 'Comments'),
+        this.h('div', { style: { background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 16, padding: '20px 22px', marginBottom: 32 } },
+          this.h('div', { style: { fontSize: 17, fontWeight: 700, color: '#c43a18', marginBottom: 6 } }, 'Comments can’t load from the database'),
+          this.h('div', { style: { fontSize: 15, lineHeight: 1.55, color: '#8a3b22', marginBottom: 10 } }, 'This is almost always the Firestore step: create the database and publish the security rules (see SETUP_FIREBASE.md). Once published, comments and upvotes work instantly.'),
+          this.h('div', { style: { fontSize: 13, fontFamily: 'Ubuntu Mono, monospace', color: '#8a3b22', opacity: 0.8 } }, 'Details: ' + st.repliesError)
+        )
+      );
+    }
+
+    const heading = st.configured && st.remoteReplies === null
       ? 'Loading replies…'
       : replies.length + (replies.length === 1 ? ' reply' : ' replies');
     return this.h(React.Fragment, null,
@@ -416,6 +432,7 @@ class Component extends DCLogic {
           ),
           this.h('button', { type: 'button', onClick: () => this.postReply(), style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', fontSize: 15, fontWeight: 600, color: '#eafbe1', background: '#16361e', border: 'none', borderRadius: 12, cursor: st.posting ? 'default' : 'pointer', opacity: st.posting ? 0.7 : 1 } }, st.posting ? 'Posting…' : 'Post reply')
         ),
+        st.postError ? this.h('div', { style: { marginTop: 12, fontSize: 14, color: '#c43a18', background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 10, padding: '10px 12px' } }, st.postError) : null,
         this.h('div', { style: { marginTop: 10, fontSize: 13, color: '#5a7060' } }, 'Be respectful and practical. No hidden advertising.')
       );
     }

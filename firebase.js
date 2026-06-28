@@ -16,6 +16,8 @@
 (function () {
   'use strict';
 
+  if (window.AK) return; // already initialised on this page (e.g. loaded twice)
+
   // 1) PASTE your Firebase web config here (Project settings → Your apps → SDK).
   var CONFIG = {
     apiKey: 'AIzaSyDKI_BWvdGcsxDiRiUp8YVMVMfOJ5eWDH0',
@@ -136,8 +138,11 @@
               };
             });
             rows.sort(function (a, b) { return a.createdAt - b.createdAt; });
-            cb(rows);
-          }, function (err) { console.error('[AK] watchReplies:', err); cb(null); });
+            cb(rows, null);
+          }, function (err) {
+            console.error('[AK] watchReplies:', err);
+            cb(null, (err && err.message) ? err.message : 'Could not load comments');
+          });
       });
       return function () { unsub(); };
     },

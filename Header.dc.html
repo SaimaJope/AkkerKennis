@@ -26,6 +26,7 @@
      actually pins it and the hide/show transitions work in both directions. */
   [data-sc-name="Header"]{display:contents;}
 </style>
+<script src="./firebase.js"></script>
 </helmet>
 <header style="{{ headerStyle }}">
   <div style="max-width:1200px;margin:0 auto;padding:14px clamp(20px,4vw,40px);display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
@@ -62,14 +63,55 @@
     </nav>
 
     <div style="display:flex;align-items:center;gap:12px;flex:0 0 auto;">
-      <a href="SignIn.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 20px;white-space:nowrap;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:600;color:#16361e;border:1.5px solid rgba(22,54,30,0.22);border-radius:999px;background:transparent;transition:border-color .18s ease,background .18s ease;" style-hover="background:#e3fbd8;border-color:#16361e;">Sign in</a>
-      <a href="SignUp.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;white-space:nowrap;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border:1.5px solid #16361e;border-radius:999px;transition:transform .18s ease,background .18s ease;" style-hover="background:#0f2716;transform:translateY(-1px);">Create account</a>
+      {{ authEl }}
     </div>
   </div>
 </header>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:80},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;explore&quot;,&quot;events&quot;,&quot;projects&quot;,&quot;about&quot;,&quot;contact&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
+  state = { me: null };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  // firebase.js is injected via this component's helmet, so it may arrive a
+  // moment after mount — poll briefly until window.AK is ready, then subscribe.
+  componentDidMount() {
+    const start = Date.now();
+    const tryInit = () => {
+      if (window.AK && typeof window.AK.isConfigured === 'function') {
+        if (!window.AK.isConfigured()) return; // no backend → keep default buttons
+        window.AK.onAuth((u) => this.setState({ me: u }));
+        return;
+      }
+      if (Date.now() - start < 6000) setTimeout(tryInit, 120);
+    };
+    tryInit();
+  }
+
+  authEl() {
+    const me = this.state.me;
+    if (me) {
+      return this.h(React.Fragment, null,
+        this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 9, minHeight: 46, padding: '0 6px 0 8px', whiteSpace: 'nowrap', fontFamily: "'Ubuntu',Arial,sans-serif" } },
+          this.h('span', { style: { flex: '0 0 auto', width: 32, height: 32, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 600 } }, me.initials),
+          this.h('span', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, me.name)
+        ),
+        this.h('button', {
+          type: 'button',
+          onClick: () => { window.AK.signOut().then(() => { window.location.href = 'index.html'; }); },
+          style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 46, padding: '0 20px', whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16, fontWeight: 600, color: '#16361e', border: '1.5px solid rgba(22,54,30,0.22)', borderRadius: 999, background: 'transparent' },
+        }, 'Sign out')
+      );
+    }
+    return this.h(React.Fragment, null,
+      this.h('a', { href: 'SignIn.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 46, padding: '0 20px', whiteSpace: 'nowrap', textDecoration: 'none', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16, fontWeight: 600, color: '#16361e', border: '1.5px solid rgba(22,54,30,0.22)', borderRadius: 999, background: 'transparent' } }, 'Sign in'),
+      this.h('a', { href: 'SignUp.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 46, padding: '0 22px', whiteSpace: 'nowrap', textDecoration: 'none', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16, fontWeight: 600, color: '#eafbe1', background: '#16361e', border: '1.5px solid #16361e', borderRadius: 999 } }, 'Create account')
+    );
+  }
+
   headerStyle() {
     return {
       position: 'sticky',
@@ -88,6 +130,7 @@ class Component extends DCLogic {
     const a = this.props.active || 'home';
     return {
       headerStyle: this.headerStyle(),
+      authEl: this.authEl(),
       isHome: a === 'home',
       isExplore: a === 'explore',
       isEvents: a === 'events',
