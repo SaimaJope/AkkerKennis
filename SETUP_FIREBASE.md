@@ -61,6 +61,17 @@ var CONFIG = {
 That's the backend live. Refresh the site, go to **Sign in**, log in as a tester — you can now
 reply and upvote on a thread, and the other testers see it in real time.
 
+## 4b. Enable Storage (for photos on posts & replies)
+
+Posts, replies, events and projects can carry photos — essential for field Q&A. Turn on Storage:
+
+1. Console → **Storage** → **Get started** → accept the default bucket → pick the same region
+   as Firestore (e.g. `europe-west`).
+2. Open the **Rules** tab there, paste the entire contents of **`storage.rules`**, click **Publish**.
+
+Images are public-read (so guests see them) but a signed-in user can only write into their own
+folder — enforced by both `storage.rules` and the per-user path in `AK.uploadImage()`.
+
 ## 5. (Optional) Seed the starter comments
 
 A fresh thread starts empty. To pre-fill the three example replies so testers have something to

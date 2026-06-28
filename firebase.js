@@ -70,10 +70,11 @@
     return loadScript(SDK + 'firebase-app-compat.js')
       .then(function () { return loadScript(SDK + 'firebase-auth-compat.js'); })
       .then(function () { return loadScript(SDK + 'firebase-firestore-compat.js'); })
+      .then(function () { return loadScript(SDK + 'firebase-storage-compat.js'); })
       .then(function () {
         var fb = window.firebase;
         fb.initializeApp(CONFIG);
-        return { auth: fb.auth(), db: fb.firestore(), fb: fb };
+        return { auth: fb.auth(), db: fb.firestore(), storage: fb.storage(), fb: fb };
       })
       .catch(function (e) {
         console.error('[AK] Firebase failed to initialise:', e);
@@ -134,6 +135,7 @@
                 authorName: data.authorName,
                 authorInitials: data.authorInitials || initials(data.authorName),
                 votes: data.votes || [],
+                images: data.images || [],
                 edited: !!data.edited,
                 originalBody: data.originalBody || '',
                 createdAt: data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : 0,
@@ -148,7 +150,7 @@
       });
       return function () { unsub(); };
     },
-    addReply: function (threadId, body) {
+    addReply: function (threadId, body, images) {
       return ready.then(function (ctx) {
         var u = ctx && ctx.auth.currentUser;
         if (!u) throw new Error('Sign in to reply');
@@ -160,8 +162,27 @@
           authorName: who.name,
           authorInitials: who.initials,
           votes: [],
+          images: Array.isArray(images) ? images : [],
           createdAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
         });
+      });
+    },
+
+    // ── Media (Firebase Storage) ──────────────────────────────────────────────
+    // Upload one image file, resolve to its public download URL. Owner-scoped
+    // path so the storage rules can restrict writes to the uploader.
+    uploadImage: function (file, folder) {
+      return ready.then(function (ctx) {
+        if (!ctx) throw new Error('Backend not configured');
+        var u = ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to upload');
+        if (!file) throw new Error('No file selected');
+        if (file.type && file.type.indexOf('image/') !== 0) throw new Error('Only image files are allowed');
+        if (file.size > 8 * 1024 * 1024) throw new Error('Image is larger than 8 MB');
+        var safe = String(file.name || 'image').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-60);
+        var path = (folder || 'uploads') + '/' + u.uid + '/' + Date.now() + '_' + safe;
+        var ref = ctx.storage.ref().child(path);
+        return ref.put(file).then(function (snap) { return snap.ref.getDownloadURL(); });
       });
     },
     // ── Topics (posts) ──────────────────────────────────────────────────────
@@ -180,7 +201,12 @@
               category: data.category || 'General',
               region: data.region || '',
               regionId: data.regionId || '',
+              type: data.type || 'Question',
+              images: data.images || [],
+              tags: data.tags || [],
+              seekingProject: !!data.seekingProject,
               authorName: data.authorName,
+              authorInitials: data.authorInitials || initials(data.authorName),
               createdAt: data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : 0,
             };
           });
@@ -215,6 +241,9 @@
           region: data.region || '',
           regionId: data.regionId || '',
           type: data.type || 'Question',
+          images: Array.isArray(data.images) ? data.images : [],
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          seekingProject: !!data.seekingProject,
           authorUid: u.uid,
           authorName: who.name,
           authorInitials: who.initials,

@@ -24,94 +24,23 @@
   html,body{margin:0;padding:0;}
   ::selection{background:#8ee05e;color:#08100d;}
   textarea{font-family:'Ubuntu',Arial,sans-serif;}
-  .forum-cta-primary:hover{background:#7bd24c;}
-  .forum-cta-outline:hover{border-color:#eafbe1;}
-  .forum-related-link:hover{color:#3d6b48;}
   .forum-reply-vote:hover{border-color:#fe4c24;}
+  .ak-gallery-img:hover{opacity:0.92;}
 </style>
 </helmet>
 
 <div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
   <dc-import name="Header" active="explore" hint-size="100%,72px"></dc-import>
 
-  <!-- viewing-as bar -->
-  <div style="background:#16361e;">
-    {{ viewingBarEl }}
-  </div>
+  <div style="background:#16361e;">{{ viewingBarEl }}</div>
 
   <section style="max-width:1120px;margin:0 auto;padding:clamp(24px,3vw,36px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
-    <a href="Forum.dc.html" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-bottom:22px;">
+    <a href="Explore.dc.html" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-bottom:22px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
-      All boards
+      All topics
     </a>
 
-    <div style="display:grid;grid-template-columns:1fr 312px;gap:32px;align-items:start;">
-      <!-- MAIN THREAD -->
-      <div>
-        {{ topicEl }}
-
-        <!-- action bar -->
-        {{ actionBarEl }}
-
-        {{ promptEl }}
-
-        <!-- high-traction panel -->
-        <div style="background:#16361e;border-radius:22px;padding:clamp(24px,3vw,34px);margin-bottom:36px;color:#dbeede;">
-          <div style="display:inline-flex;align-items:center;gap:9px;padding:6px 13px;border-radius:999px;background:rgba(142,224,94,0.18);margin-bottom:16px;">
-            <span style="width:8px;height:8px;border-radius:50%;background:#8ee05e;display:inline-block;"></span>
-            <span style="font-size:12px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#bff0a6;">Strong community interest</span>
-          </div>
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:26px;color:#ffffff;margin:0 0 10px;line-height:1.2;">This topic has strong community interest.</h3>
-          <p style="font-size:16px;line-height:1.65;color:#aecdb4;margin:0 0 22px;max-width:560px;">Farmers can continue the discussion in a dedicated working group, or request access to an optional WhatsApp group. Promising threads can be developed into a pilot project with partners.</p>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <button class="forum-cta-primary" type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#0f2a16;background:#8ee05e;border:none;border-radius:12px;cursor:pointer;transition:background .15s ease;">Join extended discussion</button>
-            <button class="forum-cta-outline" type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#eafbe1;background:transparent;border:1.5px solid rgba(255,255,255,0.35);border-radius:12px;cursor:pointer;transition:border-color .15s ease;">Request WhatsApp group access</button>
-            <button type="button" style="display:inline-flex;align-items:center;min-height:50px;padding:0 8px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#bff0a6;background:transparent;border:none;cursor:pointer;">Explore project opportunity &rarr;</button>
-          </div>
-        </div>
-
-        <!-- replies -->
-        {{ repliesSectionEl }}
-
-        <!-- reply input / logged-out prompt -->
-        {{ replyGateEl }}
-      </div>
-
-      <!-- SIDEBAR -->
-      <aside style="display:flex;flex-direction:column;gap:18px;">
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:22px;">
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 16px;">About the author</h3>
-          <div style="display:flex;align-items:center;gap:13px;margin-bottom:14px;">
-            <span style="flex:0 0 auto;width:52px;height:52px;border-radius:50%;background:#16361e;color:#bff0a6;display:flex;align-items:center;justify-content:center;font-family:'Ubuntu',Arial,sans-serif;font-size:20px;">PB</span>
-            <div>
-              <div style="font-size:16px;font-weight:600;color:#16361e;">Pieter Bakker</div>
-              <div style="font-size:14px;color:#5a7060;">Arable farmer, Groningen</div>
-            </div>
-          </div>
-          <a href="Profile.dc.html" style="display:block;text-align:center;text-decoration:none;font-size:14px;font-weight:600;color:#16361e;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;padding:11px;margin-top:16px;">View profile</a>
-        </div>
-
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:22px;">
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 16px;">Topic details</h3>
-          <div style="display:flex;flex-direction:column;gap:13px;">
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Category</span><span style="color:#16361e;font-weight:600;">Crop Management</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Region</span><span style="color:#16361e;font-weight:600;">Groningen</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Posted</span><span style="color:#16361e;font-weight:600;">12 Mar 2026</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Participants</span><span style="color:#16361e;font-weight:600;">19 farmers</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#5a7060;">Status</span><span style="color:#fe4c24;font-weight:600;">High traction</span></div>
-          </div>
-        </div>
-
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:22px;">
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 14px;">Related topics</h3>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <a class="forum-related-link" href="Thread.dc.html" style="text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;line-height:1.3;color:#16361e;">Spring cropping to break grass-weed cycles</a>
-            <a class="forum-related-link" href="Thread.dc.html" style="text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;line-height:1.3;color:#16361e;">Stale seedbed timing on heavy clay</a>
-            <a class="forum-related-link" href="Thread.dc.html" style="text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;line-height:1.3;color:#16361e;">Higher seed rates: does competition pay?</a>
-          </div>
-        </div>
-      </aside>
-    </div>
+    {{ bodyEl }}
   </section>
 
   <dc-import name="Footer" hint-size="100%,320px"></dc-import>
@@ -119,128 +48,40 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false, topic: null, topicId: '', topicLoading: false, threadId: 'blackgrass-winter-wheat', threadStats: { boosts: [], issues: [] }, editingId: null, editText: '', showOriginal: {} };
-
-  // The default demo topic id; a ?id= in the URL (a created post) overrides it.
-  THREAD_ID = 'blackgrass-winter-wheat';
+  state = { configured: false, me: null, loggedIn: false, topicId: '', topic: null, topicLoading: true, remoteReplies: null, repliesError: '', postError: '', posting: false, replyText: '', replyImages: [], threadStats: { boosts: [], issues: [] }, editingId: null, editText: '', showOriginal: {}, prompt: false };
 
   h(type, props, ...children) {
     return React.createElement(type, props, ...children);
   }
 
-  // ── Backend wiring (no-op + demo fallback when Firebase isn't configured) ──
   componentDidMount() {
+    this._rImgSeq = 0;
     const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
     let topicId = '';
     try { topicId = new URLSearchParams(window.location.search).get('id') || ''; } catch (e) {}
-    const threadId = topicId || 'blackgrass-winter-wheat';
-    this.THREAD_ID = threadId;
-    this.setState({ configured, topicId, threadId });
-    if (!configured) return;
+    this.setState({ configured, topicId });
+    if (!configured) { this.setState({ topicLoading: false }); return; }
+
     window.AK.onAuth((u) => this.setState({ me: u, loggedIn: !!u, prompt: u ? false : this.state.prompt }));
-    this._unsub = window.AK.watchReplies(threadId, (rows, err) => {
+    if (!topicId) { this.setState({ topicLoading: false }); return; }
+
+    window.AK.getTopic(topicId)
+      .then((t) => this.setState({ topic: t, topicLoading: false }))
+      .catch((e) => { console.error(e); this.setState({ topicLoading: false }); });
+    this._unsub = window.AK.watchReplies(topicId, (rows, err) => {
       if (err) this.setState({ repliesError: err });
       else this.setState({ remoteReplies: rows, repliesError: '' });
     });
-    this._unsubStats = window.AK.watchThreadStats(threadId, (stats) => { if (stats) this.setState({ threadStats: stats }); });
-    if (topicId) {
-      this.setState({ topicLoading: true });
-      window.AK.getTopic(topicId)
-        .then((t) => this.setState({ topic: t, topicLoading: false }))
-        .catch((e) => { console.error(e); this.setState({ topicLoading: false }); });
-    }
-  }
-
-  fmtTopicDate(ts) {
-    let d = null;
-    if (ts && ts.toDate) d = ts.toDate();
-    else if (typeof ts === 'number') d = new Date(ts);
-    if (!d) return 'just now';
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-  }
-
-  // Renders the topic header + body — for the default demo topic or a created one.
-  renderTopic(o) {
-    const badgeStyle = o.status === 'High traction' ? { background: '#fe4c24', color: '#fff' } : { background: '#8ee05e', color: '#0f2a16' };
-    const pin = this.h('svg', { width: 13, height: 13, viewBox: '0 0 24 24', fill: 'none', stroke: '#5a7060', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z' }), this.h('circle', { cx: 12, cy: 10, r: 2.4 }));
-
-    const metaRow = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 } },
-      this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, ...badgeStyle } }, o.status),
-      o.category ? this.h('span', { style: { fontSize: 13, fontWeight: 600, color: '#5a7060' } }, o.category) : null,
-      o.region ? this.h('span', { style: { width: 3, height: 3, borderRadius: '50%', background: '#b6cdac', display: 'inline-block' } }) : null,
-      o.region ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#5a7060' } }, pin, o.region) : null
-    );
-
-    const title = this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(30px,3.8vw,44px)', lineHeight: 1.12, color: '#16361e', margin: '0 0 18px', letterSpacing: '-0.4px' } }, o.title);
-
-    const author = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13, marginBottom: 20 } },
-      this.h('span', { style: { flex: '0 0 auto', width: 46, height: 46, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 18 } }, o.authorInitials),
-      this.h('div', null,
-        this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#16361e' } }, o.authorName),
-        this.h('div', { style: { fontSize: 14, color: '#5a7060' } }, o.authorMeta)
-      )
-    );
-
-    const tags = (o.tags && o.tags.length)
-      ? this.h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 } },
-          ...o.tags.map((tg) => this.h('span', { key: tg, style: { fontSize: 13, color: '#16361e', background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 999, padding: '5px 12px' } }, tg)))
-      : this.h('div', { style: { marginBottom: 8 } });
-
-    const bodyChildren = [];
-    (o.bodyParas || []).forEach((p, i) => bodyChildren.push(this.h('p', { key: 'p' + i, style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: '0 0 18px' } }, p)));
-    if (o.triedList && o.triedList.length) {
-      bodyChildren.push(this.h('h3', { key: 'th', style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 21, color: '#16361e', margin: '28px 0 12px' } }, 'What I have tried'));
-      bodyChildren.push(this.h('ul', { key: 'tl', style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: 0, paddingLeft: 22 } }, ...o.triedList.map((li, i) => this.h('li', { key: i, style: { marginBottom: i === o.triedList.length - 1 ? 0 : 8 } }, li))));
-    } else if (o.triedText) {
-      bodyChildren.push(this.h('h3', { key: 'th', style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 21, color: '#16361e', margin: '28px 0 12px' } }, 'What I have tried'));
-      o.triedText.split(/\n\n+/).filter(Boolean).forEach((p, i) => bodyChildren.push(this.h('p', { key: 'tt' + i, style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: '0 0 18px' } }, p)));
-    }
-    const bodyCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 20, padding: 'clamp(24px,3vw,36px)' } }, ...bodyChildren);
-
-    return this.h(React.Fragment, null, metaRow, title, author, tags, bodyCard);
-  }
-
-  topicEl(st) {
-    if (st.topicId && st.topicLoading) {
-      return this.h('div', { style: { padding: '30px 0 24px', fontSize: 16, color: '#5a7060' } }, 'Loading topic…');
-    }
-    const t = st.topic;
-    if (t) {
-      return this.renderTopic({
-        status: (t.type && t.type !== 'Question') ? t.type : 'New',
-        category: t.category || 'General',
-        region: t.region || '',
-        title: t.title || 'Untitled topic',
-        authorInitials: t.authorInitials || '?',
-        authorName: t.authorName || 'Member',
-        authorMeta: (t.region ? t.region + ' · ' : '') + 'Posted ' + this.fmtTopicDate(t.createdAt),
-        bodyParas: (t.body || '').split(/\n\n+/).filter(Boolean),
-        triedText: t.tried || '',
-        tags: t.crop ? ['#' + String(t.crop).toLowerCase().replace(/\s+/g, '')] : [],
-      });
-    }
-    // Default demo topic (also the fallback if a ?id= topic can't be found).
-    return this.renderTopic({
-      status: 'High traction', category: 'Crop Management', region: 'Groningen',
-      title: 'Reducing black-grass in winter wheat',
-      authorInitials: 'PB', authorName: 'Pieter Bakker', authorMeta: 'Arable farmer, Groningen · Posted 12 March 2026',
-      bodyParas: [
-        'Black-grass pressure has crept up over three seasons on our heavier fields, despite stale seedbeds and delayed drilling. We are now seeing patches that clearly knock yield, and I want to get ahead of it before it becomes unmanageable.',
-        'My main question: for those of you on similar clay soils in the north, what combination of cultural controls actually held the population back — and over how many seasons did you see a real difference?',
-      ],
-      triedList: [
-        'Delayed drilling to mid-October, which helped but cost us establishment in the wet autumn.',
-        'A spring crop in the rotation every third year.',
-        'Higher seed rates to improve crop competition.',
-      ],
-      tags: ['#winterwheat', '#blackgrass', '#rotation', '#heavyclay'],
-    });
+    this._unsubStats = window.AK.watchThreadStats(topicId, (stats) => { if (stats) this.setState({ threadStats: stats }); });
   }
 
   componentWillUnmount() {
     if (this._unsub) this._unsub();
     if (this._unsubStats) this._unsubStats();
+  }
+
+  guarded(fn) {
+    return () => { if (!this.state.loggedIn) { this.setState({ prompt: true }); return; } fn(); };
   }
 
   avatarBg(seed) {
@@ -260,64 +101,13 @@ class Component extends DCLogic {
     return Math.round(hrs / 24) + 'd ago';
   }
 
-  // Normalised reply list the cards render against — from Firestore when
-  // configured, otherwise the built-in demo replies with local vote state.
-  buildReplies() {
-    const st = this.state;
-    // With the backend on, ALWAYS reflect the database (never fake demo data).
-    if (st.configured) {
-      const uid = st.me && st.me.uid;
-      return (st.remoteReplies || []).map((r) => ({
-        id: r.id,
-        name: r.authorName,
-        initials: r.authorInitials,
-        avatarBg: this.avatarBg(r.authorUid || r.authorName),
-        meta: (r.authorName) + ' · ' + this.fmtTime(r.createdAt),
-        body: r.body,
-        count: r.votes.length,
-        voted: !!(uid && r.votes.indexOf(uid) !== -1),
-        mine: !!(uid && r.authorUid === uid),
-        edited: r.edited,
-        originalBody: r.originalBody,
-        onVote: this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
-      }));
-    }
-    return this.replies().map((r) => {
-      const voted = !!st.replyVotes[r.id];
-      return {
-        id: r.id, name: r.name, initials: r.initials, avatarBg: r.avatarBg, meta: r.meta, body: r.body,
-        count: r.boosts + (voted ? 1 : 0),
-        voted,
-        mine: false,
-        onVote: this.guarded(() => this.setState((s) => ({ replyVotes: { ...s.replyVotes, [r.id]: !s.replyVotes[r.id] } }))),
-      };
-    });
-  }
-
-  toggleOriginal(id) { this.setState((s) => ({ showOriginal: { ...s.showOriginal, [id]: !s.showOriginal[id] } })); }
-  startEdit(r) { this.setState({ editingId: r.id, editText: r.body, postError: '' }); }
-  cancelEdit() { this.setState({ editingId: null, editText: '' }); }
-  saveEdit() {
-    const id = this.state.editingId;
-    const text = this.state.editText.trim();
-    if (!id || !text) return;
-    window.AK.editReply(id, text)
-      .then(() => this.setState({ editingId: null, editText: '' }))
-      .catch((e) => { console.error(e); this.setState({ postError: (e && e.message) || 'Could not save the edit.' }); });
-  }
-  removeReply(r) {
-    if (!window.confirm('Delete your comment? This cannot be undone.')) return;
-    window.AK.deleteReply(r.id).catch((e) => { console.error(e); this.setState({ postError: (e && e.message) || 'Could not delete.' }); });
-  }
-
-  postReply() {
-    const text = this.state.replyText.trim();
-    if (!text || this.state.posting) return;
-    if (!this.state.configured) { this.setState({ replyText: '' }); return; }
-    this.setState({ posting: true, postError: '' });
-    window.AK.addReply(this.THREAD_ID, text)
-      .then(() => this.setState({ replyText: '', replyImageName: null, posting: false, postError: '' }))
-      .catch((e) => { console.error(e); this.setState({ posting: false, postError: (e && e.message) || 'Could not post your reply.' }); });
+  fmtTopicDate(ts) {
+    let d = null;
+    if (ts && ts.toDate) d = ts.toDate();
+    else if (typeof ts === 'number') d = new Date(ts);
+    if (!d) return 'just now';
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
 
   icon(name, size = 16) {
@@ -325,151 +115,166 @@ class Component extends DCLogic {
     const paths = {
       boost: [this.h('path', { key: 1, d: 'M12 4l6 7h-4v9h-4v-9H6z' })],
       shield: [this.h('path', { key: 1, d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' })],
-      flag: [this.h('path', { key: 1, d: 'M4 21V4h12l-1.5 4L16 12H4' })],
       alert: [this.h('circle', { key: 1, cx: 12, cy: 12, r: 9 }), this.h('path', { key: 2, d: 'M12 8v5M12 16h0' })],
       image: [this.h('rect', { key: 1, x: 4, y: 5, width: 16, height: 14, rx: 2 }), this.h('circle', { key: 2, cx: 9, cy: 10, r: 1.6 }), this.h('path', { key: 3, d: 'M20 15l-4.5-4.5L7 19' })],
-      close: [this.h('path', { key: 1, d: 'M18 6L6 18M6 6l12 12' })],
+      pin: [this.h('path', { key: 1, d: 'M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z' }), this.h('circle', { key: 2, cx: 12, cy: 10, r: 2.4 })],
     };
     return this.h('svg', common, ...(paths[name] || []));
   }
 
-  guarded(fn) {
-    return () => {
-      if (!this.state.loggedIn) { this.setState({ prompt: true }); return; }
-      fn();
-    };
-  }
-
-  actionButtonStyle(active, activeStyle = {}) {
-    return {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 8,
-      whiteSpace: 'nowrap',
-      fontFamily: "'Ubuntu',Arial,sans-serif",
-      fontSize: 14,
-      fontWeight: 600,
-      borderRadius: 11,
-      padding: '11px 16px',
-      cursor: 'pointer',
-      transition: 'all .15s ease',
-      background: '#ffffff',
-      color: '#16361e',
-      border: '1.5px solid rgba(22,54,30,0.22)',
-      ...(active ? activeStyle : {}),
-    };
-  }
-
-  replies() {
-    return [
-      { id: 'henk-de-vries', name: 'Henk de Vries', initials: 'HV', avatarBg: '#3d6b48', boosts: 18, meta: 'Arable farmer, Groningen - 1h ago', body: 'On similar clay I only saw a real drop after committing to two spring crops in the rotation back to back. Year one barely moved; by year three the head counts were visibly lower. Delayed drilling alone was not enough for us.' },
-      { id: 'marieke-jansen', name: 'Marieke Jansen', initials: 'MJ', avatarBg: '#7a5e1f', boosts: 11, meta: 'Agronomist, Flevoland - 3h ago', body: 'Worth mapping the worst patches and treating them as no-wheat zones for a season. Targeted spring cropping on just those blocks gave us most of the benefit without taking the whole field out of wheat.' },
-      { id: 'kees-van-dijk', name: 'Kees van Dijk', initials: 'KD', avatarBg: '#16361e', boosts: 6, meta: 'Arable farmer, Zeeland - 6h ago', body: 'Higher seed rates plus a competitive variety made a noticeable difference for us, but only alongside the cultural controls. On its own it just thickened the crop without holding the grass back.' },
-    ];
-  }
-
-  viewingBarEl(st) {
-    const btnStyle = { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 13, fontWeight: 600, color: '#16361e', background: '#8ee05e', border: 'none', borderRadius: 999, padding: '7px 15px', cursor: 'pointer' };
-
-    // Real auth once Firebase is configured.
-    if (st.configured) {
-      const name = st.me ? st.me.name : null;
-      return this.h('div', { style: { maxWidth: 1120, margin: '0 auto', padding: '11px clamp(20px,4vw,40px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' } },
-        this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 9, fontSize: 14, color: '#cfe6d2' } },
-          this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: name ? '#8ee05e' : '#c9a24a', display: 'inline-block' } }),
-          name ? ('Signed in as ' + name) : 'Browsing as a guest - sign in to reply and upvote'
-        ),
-        name
-          ? this.h('button', { type: 'button', onClick: () => window.AK.signOut(), style: btnStyle }, 'Sign out')
-          : this.h('a', { href: 'SignIn.dc.html', style: { ...btnStyle, textDecoration: 'none', display: 'inline-block' } }, 'Sign in')
-      );
-    }
-
-    // Demo toggle (backend not configured yet).
-    return this.h('div', { style: { maxWidth: 1120, margin: '0 auto', padding: '11px clamp(20px,4vw,40px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' } },
-      this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 9, fontSize: 14, color: '#cfe6d2' } },
-        this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: st.loggedIn ? '#8ee05e' : '#c9a24a', display: 'inline-block' } }),
-        st.loggedIn ? 'Viewing as Jan Dekker' : 'You are browsing as a guest - read freely, sign up to take part'
-      ),
-      this.h('button', {
-        type: 'button',
-        onClick: () => this.setState((s) => ({ loggedIn: !s.loggedIn, prompt: false })),
-        style: btnStyle,
-      }, st.loggedIn ? 'Switch to guest view' : 'Switch to member view')
-    );
-  }
-
-  actionBarEl(st) {
+  // ── Replies ───────────────────────────────────────────────────────────────
+  buildReplies() {
+    const st = this.state;
     const uid = st.me && st.me.uid;
-    let boosted, boostCount, hasIssue, issueCount, onBoost, onIssue;
-    if (st.configured) {
-      const b = st.threadStats.boosts || [];
-      const i = st.threadStats.issues || [];
-      boosted = !!(uid && b.indexOf(uid) !== -1);
-      boostCount = b.length;
-      hasIssue = !!(uid && i.indexOf(uid) !== -1);
-      issueCount = i.length;
-      onBoost = this.guarded(() => window.AK.toggleThreadReaction(st.threadId, 'boosts').catch((e) => console.error(e)));
-      onIssue = this.guarded(() => window.AK.toggleThreadReaction(st.threadId, 'issues').catch((e) => console.error(e)));
-    } else {
-      boosted = st.boosted; boostCount = st.boostCount; hasIssue = st.hasIssue; issueCount = st.issueCount;
-      onBoost = this.guarded(() => this.setState((s) => ({ boosted: !s.boosted, boostCount: s.boostCount + (s.boosted ? -1 : 1) })));
-      onIssue = this.guarded(() => this.setState((s) => ({ hasIssue: !s.hasIssue, issueCount: s.issueCount + (s.hasIssue ? -1 : 1) })));
-    }
-    const onFollow = this.guarded(() => this.setState((s) => ({ follow: !s.follow })));
-    const onSave = this.guarded(() => this.setState((s) => ({ save: !s.save })));
+    return (st.remoteReplies || []).map((r) => ({
+      id: r.id,
+      name: r.authorName,
+      initials: r.authorInitials,
+      avatarBg: this.avatarBg(r.authorUid || r.authorName),
+      meta: r.authorName + ' · ' + this.fmtTime(r.createdAt),
+      body: r.body,
+      images: r.images || [],
+      count: r.votes.length,
+      voted: !!(uid && r.votes.indexOf(uid) !== -1),
+      mine: !!(uid && r.authorUid === uid),
+      edited: r.edited,
+      originalBody: r.originalBody,
+      onVote: this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
+    }));
+  }
 
-    return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '22px 0' } },
-      this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea - ' + boostCount),
-      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too - ' + issueCount),
-      this.h('button', { type: 'button', onClick: onFollow, style: this.actionButtonStyle(st.follow, { background: '#8ee05e', color: '#0f2a16', border: '1.5px solid #8ee05e' }) }, st.follow ? 'Following' : 'Follow topic'),
-      this.h('button', { type: 'button', onClick: onSave, style: this.actionButtonStyle(st.save, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, st.save ? 'Saved' : 'Save'),
-      this.h('button', { type: 'button', onClick: this.guarded(() => {}), style: { marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 500, color: '#8a7a6f', background: 'transparent', border: 'none', cursor: 'pointer' } }, this.icon('flag', 15), 'Report')
+  toggleOriginal(id) { this.setState((s) => ({ showOriginal: { ...s.showOriginal, [id]: !s.showOriginal[id] } })); }
+  startEdit(r) { this.setState({ editingId: r.id, editText: r.body, postError: '' }); }
+  cancelEdit() { this.setState({ editingId: null, editText: '' }); }
+  saveEdit() {
+    const id = this.state.editingId; const text = this.state.editText.trim();
+    if (!id || !text) return;
+    window.AK.editReply(id, text).then(() => this.setState({ editingId: null, editText: '' }))
+      .catch((e) => { console.error(e); this.setState({ postError: (e && e.message) || 'Could not save the edit.' }); });
+  }
+  removeReply(r) {
+    if (!window.confirm('Delete your comment? This cannot be undone.')) return;
+    window.AK.deleteReply(r.id).catch((e) => { console.error(e); this.setState({ postError: (e && e.message) || 'Could not delete.' }); });
+  }
+
+  // ── Reply photo upload ────────────────────────────────────────────────────
+  onPickReplyImages(fileList) {
+    const files = Array.prototype.slice.call(fileList || []);
+    const room = 4 - this.state.replyImages.length;
+    files.slice(0, Math.max(0, room)).forEach((file) => {
+      const id = ++this._rImgSeq;
+      this.setState((s) => ({ replyImages: s.replyImages.concat([{ id, name: file.name, uploading: true, url: '', error: '' }]) }));
+      window.AK.uploadImage(file, 'replies')
+        .then((url) => this.setState((s) => ({ replyImages: s.replyImages.map((im) => im.id === id ? Object.assign({}, im, { url, uploading: false }) : im) })))
+        .catch((e) => { console.error(e); this.setState((s) => ({ replyImages: s.replyImages.map((im) => im.id === id ? Object.assign({}, im, { uploading: false, error: (e && e.message) || 'Upload failed' }) : im) })); });
+    });
+  }
+  removeReplyImage(id) { this.setState((s) => ({ replyImages: s.replyImages.filter((im) => im.id !== id) })); }
+  anyReplyUploading() { return this.state.replyImages.some((im) => im.uploading); }
+  uploadedReplyUrls() { return this.state.replyImages.filter((im) => im.url && !im.error).map((im) => im.url); }
+
+  postReply() {
+    const text = this.state.replyText.trim();
+    if ((!text && !this.uploadedReplyUrls().length) || this.state.posting) return;
+    if (!this.state.topicId) return;
+    if (this.anyReplyUploading()) { this.setState({ postError: 'Hang on — your photo is still uploading.' }); return; }
+    this.setState({ posting: true, postError: '' });
+    window.AK.addReply(this.state.topicId, text, this.uploadedReplyUrls())
+      .then(() => this.setState({ replyText: '', replyImages: [], posting: false, postError: '' }))
+      .catch((e) => { console.error(e); this.setState({ posting: false, postError: (e && e.message) || 'Could not post your comment.' }); });
+  }
+
+  // ── Topic header ──────────────────────────────────────────────────────────
+  galleryEl(images, folder) {
+    if (!images || !images.length) return null;
+    return this.h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 10, marginTop: 18 } },
+      ...images.map((src, i) => this.h('a', { key: i, href: src, target: '_blank', rel: 'noreferrer', style: { display: 'block', height: 170, borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(22,54,30,0.14)' } },
+        this.h('img', { src: src, alt: '', loading: 'lazy', className: 'ak-gallery-img', style: { width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'opacity .15s ease' } })
+      ))
     );
   }
 
-  promptEl(st) {
+  renderTopic(t) {
+    const dot = this.h('span', { style: { width: 3, height: 3, borderRadius: '50%', background: '#b6cdac', display: 'inline-block' } });
+    const metaRow = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 } },
+      this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, background: '#8ee05e', color: '#0f2a16' } }, t.type || 'Question'),
+      t.category ? this.h('span', { style: { fontSize: 13, fontWeight: 600, color: '#5a7060' } }, t.category) : null,
+      t.region ? dot : null,
+      t.region ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#5a7060' } }, this.icon('pin', 13), t.region) : null
+    );
+    const title = this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(30px,3.8vw,44px)', lineHeight: 1.12, color: '#16361e', margin: '0 0 18px', letterSpacing: '-0.4px', overflowWrap: 'anywhere' } }, t.title || 'Untitled topic');
+    const author = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13, marginBottom: 20 } },
+      this.h('span', { style: { flex: '0 0 auto', width: 46, height: 46, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 18 } }, t.authorInitials || '?'),
+      this.h('div', null,
+        this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#16361e' } }, t.authorName || 'Member'),
+        this.h('div', { style: { fontSize: 14, color: '#5a7060' } }, (t.region ? t.region + ' · ' : '') + 'Posted ' + this.fmtTopicDate(t.createdAt))
+      )
+    );
+    const tags = (t.tags && t.tags.length)
+      ? this.h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 } }, ...t.tags.map((tg) => this.h('span', { key: tg, style: { fontSize: 13, color: '#16361e', background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 999, padding: '5px 12px' } }, tg)))
+      : null;
+
+    const bodyChildren = [];
+    (t.body || '').split(/\n\n+/).filter(Boolean).forEach((p, i) => bodyChildren.push(this.h('p', { key: 'p' + i, style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: '0 0 18px', overflowWrap: 'anywhere' } }, p)));
+    if (t.tried) {
+      bodyChildren.push(this.h('h3', { key: 'th', style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 21, color: '#16361e', margin: '28px 0 12px' } }, 'What I have tried'));
+      (t.tried).split(/\n\n+/).filter(Boolean).forEach((p, i) => bodyChildren.push(this.h('p', { key: 'tt' + i, style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: '0 0 18px', overflowWrap: 'anywhere' } }, p)));
+    }
+    const bodyCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 20, padding: 'clamp(24px,3vw,36px)' } }, ...bodyChildren, this.galleryEl(t.images, 'topics'));
+
+    return this.h(React.Fragment, null, metaRow, title, author, tags, bodyCard);
+  }
+
+  notFoundEl() {
+    return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
+      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Topic not found'),
+      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This topic may have been removed. Browse the current discussions instead.'),
+      this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all topics')
+    );
+  }
+
+  // ── Action bar (persistent reactions only) ────────────────────────────────
+  actionButtonStyle(active, activeStyle) {
+    return Object.assign({ display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, borderRadius: 11, padding: '11px 16px', cursor: 'pointer', transition: 'all .15s ease', background: '#ffffff', color: '#16361e', border: '1.5px solid rgba(22,54,30,0.22)' }, active ? (activeStyle || {}) : {});
+  }
+
+  actionBarEl(t) {
+    const st = this.state;
+    const uid = st.me && st.me.uid;
+    const b = st.threadStats.boosts || [];
+    const i = st.threadStats.issues || [];
+    const boosted = !!(uid && b.indexOf(uid) !== -1);
+    const hasIssue = !!(uid && i.indexOf(uid) !== -1);
+    const onBoost = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'boosts').catch((e) => console.error(e)));
+    const onIssue = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'issues').catch((e) => console.error(e)));
+    return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '22px 0' } },
+      this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea · ' + b.length),
+      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too · ' + i.length)
+    );
+  }
+
+  promptEl() {
+    const st = this.state;
     if (!st.prompt || st.loggedIn) return null;
     return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 12, padding: '12px 16px', marginBottom: 18, fontSize: 14, color: '#c43a18' } },
-      this.icon('alert', 16),
-      'Create a free account to boost ideas, reply, and follow topics.'
+      this.icon('alert', 16), 'Create a free account to boost ideas, reply, and react.'
     );
   }
 
-  replyCard(r) {
-    const voted = r.voted;
-    const count = r.count;
-    const onVote = r.onVote;
-
-    return this.h('div', { key: r.id, style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: '22px 24px' } },
-      this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 } },
-        this.h('span', { style: { flex: '0 0 auto', width: 40, height: 40, borderRadius: '50%', background: r.avatarBg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16 } }, r.initials),
-        this.h('div', { style: { flex: '1 1 auto' } },
-          this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } },
-            this.h('span', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, r.name)
-          ),
-          this.h('div', { style: { fontSize: 13, color: '#5a7060' } }, r.meta)
-        ),
-        this.h('button', {
-          type: 'button',
-          onClick: onVote,
-          'aria-pressed': voted,
-          'aria-label': (voted ? 'Remove upvote from' : 'Upvote') + ' reply by ' + r.name,
-          className: 'forum-reply-vote',
-          style: {
-            display: 'inline-flex', alignItems: 'center', gap: 6, flex: '0 0 auto',
-            fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600,
-            borderRadius: 999, padding: '7px 13px', cursor: 'pointer', transition: 'all .15s ease',
-            background: voted ? '#fe4c24' : '#ffffff',
-            color: voted ? '#ffffff' : '#fe4c24',
-            border: '1.5px solid ' + (voted ? '#fe4c24' : 'rgba(254,76,36,0.4)'),
-          },
-        }, this.icon('boost', 15), count)
+  projectPanelEl(t) {
+    if (!t || !t.seekingProject) return null;
+    return this.h('div', { style: { background: '#16361e', borderRadius: 22, padding: 'clamp(24px,3vw,34px)', margin: '8px 0 36px', color: '#dbeede' } },
+      this.h('div', { style: { display: 'inline-flex', alignItems: 'center', gap: 9, padding: '6px 13px', borderRadius: 999, background: 'rgba(142,224,94,0.18)', marginBottom: 16 } },
+        this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: '#8ee05e', display: 'inline-block' } }),
+        this.h('span', { style: { fontSize: 12, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: '#bff0a6' } }, 'Project candidate')
       ),
-      this.replyBody(r)
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 24, color: '#ffffff', margin: '0 0 10px', lineHeight: 1.2 } }, 'The author flagged this as a possible pilot or working group.'),
+      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#aecdb4', margin: '0 0 22px', maxWidth: 560 } }, 'If enough farmers want to take it further, it can become a member-led project — with a manager, funding, and a WhatsApp group on the Projects page.'),
+      this.h('a', { href: 'Projects.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 24px', textDecoration: 'none', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 15, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', borderRadius: 12 } }, 'See member projects')
     );
   }
 
+  // ── Reply rendering ───────────────────────────────────────────────────────
   replyActionStyle(color) {
     return { display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 13, fontWeight: 600, color: color || '#5a7060', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' };
   }
@@ -495,7 +300,8 @@ class Component extends DCLogic {
     ) : null;
 
     return this.h(React.Fragment, null,
-      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#26352c', margin: 0 } }, r.body),
+      r.body ? this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#26352c', margin: 0, overflowWrap: 'anywhere' } }, r.body) : null,
+      this.galleryEl(r.images, 'replies'),
       editedRow,
       r.mine ? this.h('div', { style: { display: 'flex', gap: 16, marginTop: 12 } },
         this.h('button', { type: 'button', onClick: () => this.startEdit(r), style: this.replyActionStyle() }, 'Edit'),
@@ -504,68 +310,77 @@ class Component extends DCLogic {
     );
   }
 
-  repliesSectionEl(replies) {
-    const st = this.state;
+  replyCard(r) {
+    return this.h('div', { key: r.id, style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: '22px 24px' } },
+      this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 } },
+        this.h('span', { style: { flex: '0 0 auto', width: 40, height: 40, borderRadius: '50%', background: r.avatarBg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16 } }, r.initials),
+        this.h('div', { style: { flex: '1 1 auto' } },
+          this.h('div', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, r.name),
+          this.h('div', { style: { fontSize: 13, color: '#5a7060' } }, r.meta)
+        ),
+        this.h('button', { type: 'button', onClick: r.onVote, 'aria-pressed': r.voted, className: 'forum-reply-vote', style: { display: 'inline-flex', alignItems: 'center', gap: 6, flex: '0 0 auto', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, borderRadius: 999, padding: '7px 13px', cursor: 'pointer', transition: 'all .15s ease', background: r.voted ? '#fe4c24' : '#ffffff', color: r.voted ? '#ffffff' : '#fe4c24', border: '1.5px solid ' + (r.voted ? '#fe4c24' : 'rgba(254,76,36,0.4)') } }, this.icon('boost', 15), r.count)
+      ),
+      this.replyBody(r)
+    );
+  }
 
-    // Backend on but the comment listener errored — surface the real cause.
-    if (st.configured && st.repliesError) {
+  repliesSectionEl() {
+    const st = this.state;
+    const replies = this.buildReplies();
+    if (st.repliesError) {
       return this.h(React.Fragment, null,
         this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 20px' } }, 'Comments'),
         this.h('div', { style: { background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 16, padding: '20px 22px', marginBottom: 32 } },
           this.h('div', { style: { fontSize: 17, fontWeight: 700, color: '#c43a18', marginBottom: 6 } }, 'Comments can’t load from the database'),
-          this.h('div', { style: { fontSize: 15, lineHeight: 1.55, color: '#8a3b22', marginBottom: 10 } }, 'This is almost always the Firestore step: create the database and publish the security rules (see SETUP_FIREBASE.md). Once published, comments and upvotes work instantly.'),
+          this.h('div', { style: { fontSize: 15, lineHeight: 1.55, color: '#8a3b22', marginBottom: 10 } }, 'Create the Firestore database and publish the security rules (see SETUP_FIREBASE.md).'),
           this.h('div', { style: { fontSize: 13, fontFamily: 'Ubuntu Mono, monospace', color: '#8a3b22', opacity: 0.8 } }, 'Details: ' + st.repliesError)
         )
       );
     }
-
-    const heading = st.configured && st.remoteReplies === null
-      ? 'Loading replies…'
-      : replies.length + (replies.length === 1 ? ' reply' : ' replies');
+    const heading = st.remoteReplies === null ? 'Loading comments…' : replies.length + (replies.length === 1 ? ' comment' : ' comments');
     return this.h(React.Fragment, null,
       this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 20px' } }, heading),
       replies.length
         ? this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 32 } }, ...replies.map((r) => this.replyCard(r)))
-        : this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '32px 24px', marginBottom: 32, textAlign: 'center', fontSize: 15, color: '#5a7060' } }, 'No replies yet — be the first to share your experience.')
+        : this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '32px 24px', marginBottom: 32, textAlign: 'center', fontSize: 15, color: '#5a7060' } }, 'No comments yet — be the first to share your experience.')
     );
   }
 
-  replyGateEl(st) {
+  replyComposerImagesEl() {
+    const imgs = this.state.replyImages;
+    if (!imgs.length) return null;
+    return this.h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 } },
+      ...imgs.map((im) => this.h('div', { key: im.id, style: { position: 'relative', width: 72, height: 72, borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(22,54,30,0.18)', background: '#f6fcf0', flex: '0 0 auto' } },
+        im.url ? this.h('img', { src: im.url, alt: '', style: { width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: im.uploading ? 0.5 : 1 } }) : null,
+        im.uploading ? this.h('div', { style: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#16361e', background: 'rgba(246,252,240,0.7)' } }, '…') : null,
+        im.error ? this.h('div', { style: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 9, color: '#c43a18', background: '#fde9e3', padding: 4 } }, im.error) : null,
+        this.h('button', { type: 'button', onClick: () => this.removeReplyImage(im.id), 'aria-label': 'Remove photo', style: { position: 'absolute', top: 3, right: 3, width: 20, height: 20, borderRadius: 999, border: 'none', background: 'rgba(8,16,13,0.6)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, lineHeight: 1, padding: 0 } }, '×')
+      ))
+    );
+  }
+
+  replyGateEl() {
+    const st = this.state;
     if (st.loggedIn) {
+      const canAdd = st.replyImages.length < 4;
       return this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: '22px 24px' } },
         this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 } },
-          this.h('span', { style: { flex: '0 0 auto', width: 40, height: 40, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16 } }, st.me ? st.me.initials : 'JD'),
+          this.h('span', { style: { flex: '0 0 auto', width: 40, height: 40, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16 } }, st.me ? st.me.initials : '?'),
           this.h('span', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, 'Write a reply')
         ),
         this.h('textarea', { value: st.replyText, onInput: (e) => this.setState({ replyText: e.target.value }), placeholder: 'Share your practical experience...', rows: 4, style: { width: '100%', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16, lineHeight: 1.6, color: '#08100d', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 12, padding: '14px 16px', resize: 'vertical' } }),
+        this.replyComposerImagesEl(),
         this.h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 14, flexWrap: 'wrap' } },
-          this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' } },
-            this.h('label', { style: { display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 42, padding: '0 14px', fontSize: 14, fontWeight: 600, color: '#16361e', background: '#f6fcf0', border: '1.5px solid rgba(22,54,30,0.18)', borderRadius: 12, cursor: 'pointer' } },
-              this.icon('image', 17),
-              'Add picture',
-              this.h('input', {
-                type: 'file',
-                accept: 'image/*',
-                onChange: (e) => {
-                  const file = e.target.files && e.target.files[0];
-                  this.setState({ replyImageName: file ? file.name : null });
-                  e.target.value = '';
-                },
-                style: { display: 'none' },
-              })
-            ),
-            st.replyImageName ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: 260, minHeight: 42, padding: '0 10px 0 12px', fontSize: 13, fontWeight: 600, color: '#16361e', background: '#e3fbd8', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 12 } },
-              this.h('span', { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, st.replyImageName),
-              this.h('button', { type: 'button', onClick: () => this.setState({ replyImageName: null }), 'aria-label': 'Remove selected picture', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, flex: '0 0 auto', color: '#5a7060', background: 'transparent', border: 'none', borderRadius: 999, cursor: 'pointer', padding: 0 } }, this.icon('close', 14))
-            ) : null
-          ),
+          canAdd ? this.h('label', { style: { display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 42, padding: '0 14px', fontSize: 14, fontWeight: 600, color: '#16361e', background: '#f6fcf0', border: '1.5px solid rgba(22,54,30,0.18)', borderRadius: 12, cursor: 'pointer' } },
+            this.icon('image', 17), 'Add photo',
+            this.h('input', { type: 'file', accept: 'image/*', multiple: true, onChange: (e) => { this.onPickReplyImages(e.target.files); e.target.value = ''; }, style: { display: 'none' } })
+          ) : this.h('span', { style: { fontSize: 13, color: '#8aa090' } }, 'Up to 4 photos'),
           this.h('button', { type: 'button', onClick: () => this.postReply(), style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', fontSize: 15, fontWeight: 600, color: '#eafbe1', background: '#16361e', border: 'none', borderRadius: 12, cursor: st.posting ? 'default' : 'pointer', opacity: st.posting ? 0.7 : 1 } }, st.posting ? 'Posting…' : 'Post reply')
         ),
         st.postError ? this.h('div', { style: { marginTop: 12, fontSize: 14, color: '#c43a18', background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 10, padding: '10px 12px' } }, st.postError) : null,
         this.h('div', { style: { marginTop: 10, fontSize: 13, color: '#5a7060' } }, 'Be respectful and practical. No hidden advertising.')
       );
     }
-
     return this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 18, padding: 'clamp(26px,3vw,38px)', textAlign: 'center' } },
       this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 24, color: '#16361e', margin: '0 0 8px' } }, 'Sign up to reply, ask questions, and boost useful ideas.'),
       this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'You can read every discussion freely. Create a free account to join the conversation.'),
@@ -576,32 +391,75 @@ class Component extends DCLogic {
     );
   }
 
-  tagsEl() {
-    const tags = ['#winterwheat', '#blackgrass', '#rotation', '#heavyclay'];
-    const style = {
-      fontSize: 13,
-      color: '#16361e',
-      background: '#ffffff',
-      border: '1px solid rgba(22,54,30,0.16)',
-      borderRadius: 999,
-      padding: '5px 12px',
-    };
+  viewingBarEl() {
+    const st = this.state;
+    if (!st.configured) return this.h('div', { style: { height: 0 } });
+    const btnStyle = { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 13, fontWeight: 600, color: '#16361e', background: '#8ee05e', border: 'none', borderRadius: 999, padding: '7px 15px', cursor: 'pointer' };
+    const name = st.me ? st.me.name : null;
+    return this.h('div', { style: { maxWidth: 1120, margin: '0 auto', padding: '11px clamp(20px,4vw,40px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' } },
+      this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 9, fontSize: 14, color: '#cfe6d2' } },
+        this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: name ? '#8ee05e' : '#c9a24a', display: 'inline-block' } }),
+        name ? ('Signed in as ' + name) : 'Browsing as a guest — sign in to reply and boost'
+      ),
+      name
+        ? this.h('button', { type: 'button', onClick: () => window.AK.signOut(), style: btnStyle }, 'Sign out')
+        : this.h('a', { href: 'SignIn.dc.html', style: Object.assign({}, btnStyle, { textDecoration: 'none', display: 'inline-block' }) }, 'Sign in')
+    );
+  }
 
-    return this.h(React.Fragment, null, ...tags.map((tag) => this.h('span', { key: tag, style }, tag)));
+  sidebarEl(t) {
+    const detailRow = (label, value, color) => value ? this.h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: 14, fontSize: 14 } },
+      this.h('span', { style: { color: '#5a7060', flex: '0 0 auto' } }, label),
+      this.h('span', { style: { color: color || '#16361e', fontWeight: 600, textAlign: 'right' } }, value)
+    ) : null;
+
+    const authorCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: 22 } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Posted by'),
+      this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13 } },
+        this.h('span', { style: { flex: '0 0 auto', width: 52, height: 52, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20 } }, t.authorInitials || '?'),
+        this.h('div', null,
+          this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#16361e' } }, t.authorName || 'Member'),
+          this.h('div', { style: { fontSize: 14, color: '#5a7060' } }, t.region ? ('Arable farmer · ' + t.region) : 'AkkerBooster member')
+        )
+      )
+    );
+
+    const detailsCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: 22 } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Topic details'),
+      this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 13 } },
+        detailRow('Type', t.type),
+        detailRow('Category', t.category),
+        detailRow('Region', t.region),
+        detailRow('Crop', t.crop),
+        detailRow('Posted', this.fmtTopicDate(t.createdAt)),
+        t.seekingProject ? detailRow('Status', 'Project candidate', '#fe4c24') : null
+      )
+    );
+
+    return this.h('aside', { className: 'ak-detail-side', style: { display: 'flex', flexDirection: 'column', gap: 18 } }, authorCard, detailsCard);
+  }
+
+  bodyEl() {
+    const st = this.state;
+    if (st.topicLoading) return this.h('div', { style: { padding: '30px 0', fontSize: 16, color: '#5a7060' } }, 'Loading topic…');
+    const t = st.topic;
+    if (!t) return this.notFoundEl();
+    return this.h('div', { className: 'ak-detail-grid', style: { display: 'grid', gridTemplateColumns: '1fr 312px', gap: 32, alignItems: 'start' } },
+      this.h('div', null,
+        this.renderTopic(t),
+        this.actionBarEl(t),
+        this.promptEl(),
+        this.h('div', { style: { height: 24 } }),
+        this.projectPanelEl(t),
+        this.repliesSectionEl(),
+        this.replyGateEl()
+      ),
+      this.sidebarEl(t)
+    );
   }
 
   renderVals() {
-    const st = this.state;
-    const replies = this.buildReplies();
-
-    return {
-      topicEl: this.topicEl(st),
-      viewingBarEl: this.viewingBarEl(st),
-      actionBarEl: this.actionBarEl(st),
-      promptEl: this.promptEl(st),
-      repliesSectionEl: this.repliesSectionEl(replies),
-      replyGateEl: this.replyGateEl(st),
-    };
+    return { viewingBarEl: this.viewingBarEl(), bodyEl: this.bodyEl() };
   }
 }
 </script>
@@ -609,6 +467,7 @@ class Component extends DCLogic {
 <style>
 header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
 html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;pointer-events:none!important;}
+@media (max-width:820px){.ak-detail-grid{grid-template-columns:1fr!important;}}
 </style>
 <script>
 (function(){

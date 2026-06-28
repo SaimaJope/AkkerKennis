@@ -24,6 +24,8 @@
   html,body{margin:0;padding:0;}
   ::selection{background:#8ee05e;color:#08100d;}
   select{appearance:none;-webkit-appearance:none;}
+  .ak-topic-card:hover{transform:translateY(-2px);border-color:rgba(22,54,30,0.28);}
+  .ak-new-topic:hover{background:#0f2716;}
 </style>
 </helmet>
 
@@ -36,9 +38,14 @@
       <p style="font-size:18px;color:#33473b;margin:0;max-width:560px;">Browse practical discussions from arable farmers across the Netherlands. Filter by category, region, or what the community is talking about right now.</p>
     </div>
 
-    <div style="display:grid;grid-template-columns:268px 1fr;gap:28px;align-items:start;">
+    <div class="ak-explore-grid" style="display:grid;grid-template-columns:268px 1fr;gap:28px;align-items:start;">
       <!-- SIDEBAR -->
       <aside style="display:flex;flex-direction:column;gap:20px;">
+        <a href="CreatePost.dc.html" class="ak-new-topic" style="display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;text-decoration:none;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border-radius:14px;transition:background .18s ease;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eafbe1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+          New topic
+        </a>
+
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:20px;">
           <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 14px;">Category</h3>
           <div style="display:flex;flex-direction:column;gap:4px;">
@@ -81,65 +88,26 @@
             </div>
           </sc-if>
         </div>
-
-        <a href="CreatePost.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;text-decoration:none;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border-radius:14px;transition:background .18s ease;" style-hover="background:#0f2716;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eafbe1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
-          New topic
-        </a>
       </aside>
 
       <!-- MAIN -->
       <div>
-        <!-- search -->
         <div style="position:relative;margin-bottom:18px;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
           <input type="text" value="{{ query }}" onInput="{{ onQuery }}" placeholder="Search topics, crops, methods..." style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.16);border-radius:14px;padding:16px 18px 16px 50px;" />
         </div>
 
-        <!-- sort + count -->
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
           <span style="font-size:15px;color:#5a7060;">{{ resultLabel }}</span>
           <div style="display:flex;gap:6px;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:999px;padding:5px;">
-            <sc-for list="{{ sortList }}" as="s" hint-placeholder-count="4">
+            <sc-for list="{{ sortList }}" as="s" hint-placeholder-count="2">
               <button type="button" onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.name }}</button>
             </sc-for>
           </div>
         </div>
 
-        <!-- list -->
         <div style="display:flex;flex-direction:column;gap:14px;">
-          <sc-for list="{{ topics }}" as="t" hint-placeholder-count="6">
-            <a href="{{ t.href }}" style="text-decoration:none;display:block;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:24px 26px;transition:transform .16s ease,border-color .16s ease;" style-hover="transform:translateY(-2px);border-color:rgba(22,54,30,0.28);">
-              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-                <span style="{{ t.statusStyle }}">{{ t.status }}</span>
-                <span style="font-size:13px;font-weight:600;color:#5a7060;">{{ t.category }}</span>
-                <span style="width:3px;height:3px;border-radius:50%;background:#b6cdac;display:inline-block;"></span>
-                <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#5a7060;">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
-                  {{ t.region }}
-                </span>
-              </div>
-              <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:23px;line-height:1.25;color:#16361e;margin:0 0 8px;">{{ t.title }}</h3>
-              <p style="font-size:15px;line-height:1.55;color:#4a5a4f;margin:0 0 16px;">{{ t.summary }}</p>
-              <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-                <span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;color:#33473b;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 20l1.4-4.2A8.5 8.5 0 1 1 21 11.5z"></path></svg>
-                  {{ t.replies }} replies
-                </span>
-                <span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#fe4c24;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fe4c24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l6 7h-4v9h-4v-9H6z"></path></svg>
-                  {{ t.boosts }} boosts
-                </span>
-                <span style="font-size:14px;color:#5a7060;margin-left:auto;">Last activity {{ t.activity }}</span>
-              </div>
-            </a>
-          </sc-for>
-          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
-            <div style="background:#ffffff;border:1px dashed rgba(22,54,30,0.22);border-radius:18px;padding:52px 26px;text-align:center;">
-              <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:0 0 8px;">No topics found</h3>
-              <p style="font-size:15px;color:#5a7060;margin:0;">Try a different category, region, or search term.</p>
-            </div>
-          </sc-if>
+          {{ topicsEl }}
         </div>
       </div>
     </div>
@@ -150,28 +118,28 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { category: 'all', region: 'all', regionMode: 'map', sort: 'latest', query: '', remoteTopics: [] };
+  state = { category: 'all', region: 'all', regionMode: 'map', sort: 'latest', query: '', remoteTopics: null, topicsError: '', configured: false };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
 
   componentDidMount() {
-    if (window.AK && window.AK.isConfigured && window.AK.isConfigured()) {
-      this._unsub = window.AK.watchTopics((rows) => { if (rows) this.setState({ remoteTopics: rows }); });
+    const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
+    this.setState({ configured });
+    if (configured) {
+      this._unsub = window.AK.watchTopics((rows, err) => {
+        if (err) this.setState({ topicsError: err });
+        else this.setState({ remoteTopics: rows || [], topicsError: '' });
+      });
+    } else {
+      this.setState({ remoteTopics: [] });
     }
   }
 
   componentWillUnmount() {
     if (this._unsub) this._unsub();
   }
-
-  ALL = [
-    { title: 'Reducing black-grass in winter wheat', summary: 'Black-grass pressure has crept up over three seasons despite stale seedbeds. Looking for rotation and stacking strategies that actually held it back.', category: 'Crop Management', region: 'groningen', regionName: 'Groningen', replies: 38, boosts: 45, hours: 2, status: 'High traction' },
-    { title: 'Irrigation strategy in dry springs', summary: 'With drier Aprils becoming normal, how are you scheduling the first irrigation pass without wasting water early?', category: 'Irrigation', region: 'flevoland', regionName: 'Flevoland', replies: 21, boosts: 21, hours: 5, status: 'Active' },
-    { title: 'Variable rate seeding in onions', summary: 'Trialled VR seeding based on soil-scan zones this year. Sharing the prescription map logic and what I would change next season.', category: 'Precision Agriculture', region: 'zeeland', regionName: 'Zeeland', replies: 16, boosts: 32, hours: 26, status: 'Project potential' },
-    { title: 'Best timing for fungicide in potatoes?', summary: 'Late blight risk models disagree this week. Curious how others weigh model output against what they actually see in the crop.', category: 'Pests & Diseases', region: 'drenthe', regionName: 'Drenthe', replies: 28, boosts: 23, hours: 3, status: 'Needs input' },
-    { title: 'Cover crops to improve soil structure', summary: 'Three years into a multi-species cover crop mix. Aggregate stability is clearly better - here are the species ratios that worked.', category: 'Soil Health', region: 'gelderland', regionName: 'Gelderland', replies: 12, boosts: 18, hours: 8, status: 'Active' },
-    { title: 'Experiences with autonomous weeding robots', summary: 'Considering a shared purchase with two neighbouring farms. Looking for honest hours-per-hectare numbers and reliability in wet soil.', category: 'New Technologies', region: 'noordbrabant', regionName: 'Noord-Brabant', replies: 9, boosts: 27, hours: 22, status: 'New' },
-    { title: 'Managing nitrogen leaching on sandy soils', summary: 'Split applications plus a catch crop brought our measured leaching down substantially. Sharing the full schedule and results.', category: 'Soil Health', region: 'noordbrabant', regionName: 'Noord-Brabant', replies: 31, boosts: 19, hours: 50, status: 'Solved' },
-    { title: 'Detecting late blight early with drones', summary: 'Multispectral flights every five days flagged infection before it was visible from the tramlines. Walkthrough of the workflow and costs.', category: 'Precision Agriculture', region: 'friesland', regionName: 'Friesland', replies: 14, boosts: 22, hours: 12, status: 'High traction' },
-  ];
 
   CATS = ['Pests & Diseases', 'Irrigation', 'Soil Health', 'New Technologies', 'Precision Agriculture', 'Crop Management'];
 
@@ -188,42 +156,92 @@ class Component extends DCLogic {
     return found ? found.name : 'All regions';
   }
 
-  statusStyle(status) {
-    const base = 'display:inline-flex;align-items:center;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:0.3px;padding:5px 11px;border-radius:999px;';
-    const map = {
-      'New': 'background:#e3fbd8;color:#16361e;border:1px solid rgba(22,54,30,0.20);',
-      'Active': 'background:#ffffff;color:#16361e;border:1px solid rgba(22,54,30,0.28);',
-      'Needs input': 'background:#fde9e3;color:#c43a18;border:1px solid rgba(254,76,36,0.28);',
-      'High traction': 'background:#fe4c24;color:#ffffff;border:1px solid #fe4c24;',
-      'Solved': 'background:#16361e;color:#bff0a6;border:1px solid #16361e;',
-      'Project potential': 'background:#8ee05e;color:#0f2a16;border:1px solid #8ee05e;',
-    };
-    return base + (map[status] || map['Active']);
-  }
+  topics() { return this.state.remoteTopics || []; }
 
-  fmtActivity(h) {
-    if (h < 24) return h + 'h ago';
+  fmtActivity(ms) {
+    if (!ms) return 'just now';
+    const h = Math.max(0, (Date.now() - ms) / 3600000);
+    if (h < 1) { const m = Math.round(h * 60); return m <= 1 ? 'just now' : m + 'm ago'; }
+    if (h < 24) return Math.round(h) + 'h ago';
     const d = Math.round(h / 24);
     return d === 1 ? '1d ago' : d + 'd ago';
   }
 
+  pin() {
+    return this.h('svg', { width: 13, height: 13, viewBox: '0 0 24 24', fill: 'none', stroke: '#5a7060', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z' }), this.h('circle', { cx: 12, cy: 10, r: 2.4 }));
+  }
+
+  topicCard(t) {
+    const dot = this.h('span', { style: { width: 3, height: 3, borderRadius: '50%', background: '#b6cdac', display: 'inline-block' } });
+    const metaRow = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 } },
+      this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, background: '#e3fbd8', color: '#16361e', border: '1px solid rgba(22,54,30,0.18)' } }, t.type || 'Question'),
+      this.h('span', { style: { fontSize: 13, fontWeight: 600, color: '#5a7060' } }, t.category),
+      (t.regionName && t.regionName !== '—') ? dot : null,
+      (t.regionName && t.regionName !== '—') ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#5a7060' } }, this.pin(), t.regionName) : null,
+      t.seekingProject ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', borderRadius: 999, padding: '4px 10px' } }, 'Could become a project') : null
+    );
+
+    const footer = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } },
+      this.h('span', { style: { fontSize: 13, color: '#5a7060' } }, (t.authorName || 'Member') + ' · ' + this.fmtActivity(t.createdAt)),
+      ...(t.tags || []).slice(0, 4).map((tg) => this.h('span', { key: tg, style: { fontSize: 12, color: '#16361e', background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 999, padding: '3px 9px' } }, tg))
+    );
+
+    const textCol = this.h('div', { style: { flex: '1 1 auto', minWidth: 0 } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 23, lineHeight: 1.25, color: '#16361e', margin: '0 0 8px', overflowWrap: 'anywhere' } }, t.title),
+      this.h('p', { style: { fontSize: 15, lineHeight: 1.55, color: '#4a5a4f', margin: '0 0 16px', overflowWrap: 'anywhere' } }, t.summary),
+      footer
+    );
+
+    const thumb = (t.images && t.images[0]) ? this.h('div', { style: { flex: '0 0 auto', width: 104, height: 104, borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(22,54,30,0.14)' } }, this.h('img', { src: t.images[0], alt: '', loading: 'lazy', style: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' } })) : null;
+
+    return this.h('a', { key: t.id, href: 'Thread.dc.html?id=' + encodeURIComponent(t.id), className: 'ak-topic-card', style: { textDecoration: 'none', display: 'block', background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: '24px 26px', transition: 'transform .16s ease,border-color .16s ease' } },
+      metaRow,
+      this.h('div', { style: { display: 'flex', gap: 18 } }, textCol, thumb)
+    );
+  }
+
+  firstRunEmptyEl() {
+    return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No topics yet'),
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, 'Be the first to ask a question or share what worked on your farm.'),
+      this.h('a', { href: 'CreatePost.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } },
+        this.h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: '#eafbe1', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, this.h('path', { d: 'M12 5v14M5 12h14' })),
+        'Start the first topic')
+    );
+  }
+
+  noMatchEl() {
+    return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No topics found'),
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: 0 } }, 'Try a different category, region, or search term.')
+    );
+  }
+
+  errorEl(msg) {
+    return this.h('div', { style: { background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 18, padding: '24px 26px' } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20, color: '#c43a18', margin: '0 0 6px' } }, 'Topics can’t load from the database'),
+      this.h('p', { style: { fontSize: 15, lineHeight: 1.55, color: '#8a3b22', margin: '0 0 8px' } }, 'Create the Firestore database and publish the security rules (see SETUP_FIREBASE.md).'),
+      this.h('div', { style: { fontSize: 13, fontFamily: 'Ubuntu Mono, monospace', color: '#8a3b22', opacity: 0.8 } }, 'Details: ' + msg)
+    );
+  }
+
+  buildTopicsEl(list) {
+    const st = this.state;
+    if (st.configured && st.topicsError) return this.errorEl(st.topicsError);
+    if (st.remoteTopics === null) return this.h('div', { style: { padding: '40px 4px', fontSize: 16, color: '#5a7060' } }, 'Loading topics…');
+    if (this.topics().length === 0) return this.firstRunEmptyEl();
+    if (list.length === 0) return this.noMatchEl();
+    return this.h(React.Fragment, null, ...list.map((t) => this.topicCard(t)));
+  }
+
   renderVals() {
     const st = this.state;
-
-    // Topics created by testers (live from Firestore) sit on top of the demo set.
-    const remote = (st.remoteTopics || []).map((r) => ({
-      id: r.id,
-      title: r.title,
-      summary: r.summary,
-      category: r.category || 'General',
-      region: r.regionId || '',
-      regionName: r.region || '—',
-      replies: 0,
-      boosts: 0,
-      hours: Math.max(0, (Date.now() - (r.createdAt || Date.now())) / 3600000),
-      status: 'New',
+    const source = this.topics().map((r) => ({
+      id: r.id, title: r.title, summary: r.summary,
+      category: r.category || 'General', region: r.regionId || '', regionName: r.region || '—',
+      type: r.type, images: r.images || [], tags: r.tags || [], seekingProject: r.seekingProject,
+      authorName: r.authorName, createdAt: r.createdAt || 0,
     }));
-    const source = remote.concat(this.ALL);
 
     const catCounts = {};
     source.forEach((t) => { catCounts[t.category] = (catCounts[t.category] || 0) + 1; });
@@ -233,26 +251,13 @@ class Component extends DCLogic {
       if (st.region !== 'all' && t.region !== st.region) return false;
       if (st.query.trim()) {
         const q = st.query.toLowerCase();
-        if (!(t.title.toLowerCase().includes(q) || t.summary.toLowerCase().includes(q) || t.category.toLowerCase().includes(q))) return false;
+        const hay = [(t.title || ''), (t.summary || ''), (t.category || ''), (t.tags || []).join(' ')].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
       }
       return true;
     });
 
-    list = list.slice().sort((a, b) => {
-      if (st.sort === 'discussed') return b.replies - a.replies;
-      if (st.sort === 'boosted') return b.boosts - a.boosts;
-      if (st.sort === 'trending') return (b.boosts * 2 + b.replies) / b.hours - (a.boosts * 2 + a.replies) / a.hours;
-      return a.hours - b.hours;
-    });
-
-    const topics = list.map((t) => ({
-      ...t,
-      regionName: t.regionName,
-      region: t.regionName,
-      activity: this.fmtActivity(t.hours),
-      statusStyle: this.statusStyle(t.status),
-      href: t.id ? 'Thread.dc.html?id=' + encodeURIComponent(t.id) : 'Thread.dc.html',
-    }));
+    list = list.slice().sort((a, b) => st.sort === 'oldest' ? a.createdAt - b.createdAt : b.createdAt - a.createdAt);
 
     const chipBase = 'display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;font-family:\'Ubuntu\',Arial,sans-serif;font-size:15px;border:none;border-radius:11px;padding:11px 13px;cursor:pointer;transition:background .15s ease;';
     const mkCat = (id, name, count) => {
@@ -271,14 +276,15 @@ class Component extends DCLogic {
       const active = st.sort === id;
       return { name, style: sortBase + (active ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#33473b;'), onClick: () => this.setState({ sort: id }) };
     };
-    const sortList = [mkSort('latest', 'Latest'), mkSort('discussed', 'Most discussed'), mkSort('boosted', 'Most boosted'), mkSort('trending', 'Trending')];
+    const sortList = [mkSort('latest', 'Latest'), mkSort('oldest', 'Oldest')];
+
     const modeBase = 'font-family:\'Ubuntu\',Arial,sans-serif;font-size:12px;font-weight:700;border:none;border-radius:999px;padding:6px 10px;cursor:pointer;line-height:1;';
     const mapMode = st.regionMode === 'map';
     const selectedRegionName = this.regionName(st.region);
     const regionSelected = st.region !== 'all';
 
     return {
-      topics,
+      topicsEl: this.buildTopicsEl(list),
       catList,
       sortList,
       regionOpts: this.REGIONS,
@@ -298,8 +304,7 @@ class Component extends DCLogic {
       query: st.query,
       onRegion: (e) => this.setState({ region: e.target.value }),
       onQuery: (e) => this.setState({ query: e.target.value }),
-      resultLabel: topics.length + (topics.length === 1 ? ' topic' : ' topics'),
-      isEmpty: topics.length === 0,
+      resultLabel: (st.remoteTopics === null ? '' : list.length + (list.length === 1 ? ' topic' : ' topics')),
     };
   }
 }
@@ -308,6 +313,7 @@ class Component extends DCLogic {
 <style>
 header{transition:opacity .28s ease,transform .28s ease,box-shadow .28s ease!important;}
 html.hdr-off header{opacity:0!important;transform:translateY(-100%)!important;pointer-events:none!important;}
+@media (max-width:820px){.ak-explore-grid{grid-template-columns:1fr!important;}}
 </style>
 <script>
 (function(){
