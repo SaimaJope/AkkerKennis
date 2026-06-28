@@ -226,12 +226,7 @@ class Component extends DCLogic {
   }
 
   ownerBarEl(t) {
-    if (!this.isMine(t)) return null;
-    if (!t.deleted) {
-      return this.h('div', { style: { margin: '18px 0' } },
-        this.h('button', { type: 'button', onClick: () => this.deleteTopic(), style: { display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44, padding: '0 18px', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, color: '#c43a18', background: '#ffffff', border: '1.5px solid rgba(254,76,36,0.32)', borderRadius: 11, cursor: 'pointer' } },
-          this.h('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13' })), 'Delete topic'));
-    }
+    if (!this.isMine(t) || !t.deleted) return null;
     if (t.archived) {
       return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 9, margin: '18px 0', padding: '12px 16px', background: '#e3fbd8', border: '1px solid rgba(22,54,30,0.14)', borderRadius: 12, fontSize: 14, color: '#16361e' } }, 'Archived — this discussion is kept permanently.');
     }
@@ -302,9 +297,14 @@ class Component extends DCLogic {
     const hasIssue = !!(uid && i.indexOf(uid) !== -1);
     const onBoost = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'boosts').catch((e) => console.error(e)));
     const onIssue = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'issues').catch((e) => console.error(e)));
+    const deleteBtn = this.isMine(t) && !t.deleted
+      ? this.h('button', { type: 'button', onClick: () => this.deleteTopic(), style: { display: 'inline-flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, borderRadius: 11, padding: '11px 16px', cursor: 'pointer', background: '#ffffff', color: '#8aa090', border: '1.5px solid rgba(22,54,30,0.15)', marginLeft: 'auto' } },
+        this.h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13' })), 'Delete topic')
+      : null;
     return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '22px 0' } },
       this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea · ' + b.length),
-      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too · ' + i.length)
+      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too · ' + i.length),
+      deleteBtn
     );
   }
 
