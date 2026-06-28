@@ -36,9 +36,9 @@
         <span style="font-size:13px;font-weight:600;letter-spacing:0.4px;color:#16361e;">For arable farmers in the Netherlands</span>
       </div>
       <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-weight:700;font-size:clamp(40px,5.4vw,68px);line-height:1.04;letter-spacing:-0.5px;color:#16361e;margin:0 0 22px;">Share field knowledge.<br />Grow better together.</h1>
-      <p style="font-size:19px;line-height:1.6;color:#33473b;max-width:520px;margin:0 0 34px;">AkkerKennis is the knowledge-sharing platform for arable farmers in the Netherlands. Exchange practical knowledge, solve challenges, and shape the future of our fields.</p>
+      <p style="font-size:19px;line-height:1.6;color:#33473b;max-width:520px;margin:0 0 34px;">AkkerBooster is the knowledge-sharing platform for arable farmers in the Netherlands. Exchange practical knowledge, solve challenges, and shape the future of our fields.</p>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
-        <a href="Explore.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#eafbe1;background:#16361e;border:1.5px solid #16361e;border-radius:999px;transition:transform .18s ease,background .18s ease;" style-hover="background:#0f2716;transform:translateY(-1px);">Explore topics</a>
+        <a href="Explore.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#eafbe1;background:#16361e;border:1.5px solid #16361e;border-radius:999px;transition:transform .18s ease,background .18s ease;" style-hover="background:#0f2716;transform:translateY(-1px);">Topics</a>
         <a href="SignUp.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.30);border-radius:999px;transition:border-color .18s ease,background .18s ease;" style-hover="background:rgba(255,255,255,0.55);border-color:#16361e;">Create account</a>
       </div>
     </div>
@@ -128,7 +128,7 @@
       <sc-for list="{{ trending }}" as="r" hint-placeholder-count="3">
         <sc-if value="{{ r.notFirst }}" hint-placeholder-val="{{ false }}"><div style="height:1px;background:rgba(22,54,30,0.10);"></div></sc-if>
         <a href="Thread.dc.html" style="text-decoration:none;display:flex;align-items:center;gap:20px;padding:22px 26px;transition:background .15s ease;" style-hover="background:#f4fcec;">
-          <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:26px;color:#bcd3b3;width:30px;flex:0 0 auto;">{{ r.rank }}</span>
+          <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:26px;color:#bcd3b3;width:30px;flex:0 0 auto;">{{ r.ordinal }}</span>
           <span style="flex:1 1 auto;">
             <span style="display:block;font-family:'Ubuntu',Arial,sans-serif;font-size:20px;color:#16361e;line-height:1.25;margin-bottom:5px;">{{ r.t }}</span>
             <span style="display:block;font-size:14px;color:#5a7060;">{{ r.meta }}</span>
@@ -189,7 +189,7 @@ class Component extends DCLogic {
 
     const steps = [
       { icon: 'ask', t: 'Post a question', d: 'Share your challenge with the community.' },
-      { icon: 'discuss', t: 'Farmers discuss', d: 'Get practical answers from experienced colleagues.' },
+      { icon: 'discuss', t: 'Compare field experience', d: 'Get practical answers from experienced colleagues.' },
       { icon: 'boost', t: 'Boost useful ideas', d: 'Upvote helpful answers and surface the best knowledge.' },
       { icon: 'grow', t: 'Apply and grow', d: 'Turn ideas into action and improve results together.' },
     ].map((s) => ({ ...s, iconEl: this.icon(s.icon) }));
@@ -198,7 +198,7 @@ class Component extends DCLogic {
       { t: 'Reducing black-grass in winter wheat', a: 'Pieter Bakker', time: '2h ago', boosts: 45 },
       { t: 'Irrigation strategy in dry springs', a: 'Marieke Jansen', time: '5h ago', boosts: 21 },
       { t: 'Variable rate seeding in onions', a: 'Kees van Dijk', time: '1d ago', boosts: 32 },
-    ].map((r, i) => ({ ...r, rank: String(i + 1).padStart(2, '0'), meta: r.a + ' ' + r.time, notFirst: i > 0 }));
+    ].map((r, i) => ({ ...r, ordinal: String(i + 1).padStart(2, '0'), meta: r.a + ' ' + r.time, notFirst: i > 0 }));
 
     const values = [
       { t: 'Trust', d: 'Built on respect and transparency.' },

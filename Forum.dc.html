@@ -26,17 +26,14 @@
   .ak-board:hover{color:#fe4c24;text-decoration:underline;}
   .ak-link{color:#16361e;}
   .ak-link:hover{color:#fe4c24;}
-  .ak-x:hover{color:#ffffff;}
-  .ak-filter-toggle:hover{color:#ffffff;}
 </style>
 </helmet>
 
 <div style="background:#e3fbd8;min-height:100vh;font-family:'Ubuntu',Arial,sans-serif;color:#08100d;">
-  <dc-import name="Header" active="forum" hint-size="100%,72px"></dc-import>
+  <dc-import name="Header" active="explore" hint-size="100%,72px"></dc-import>
 
   <section style="max-width:1080px;margin:0 auto;padding:clamp(22px,3vw,40px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
     {{ heroEl }}
-    {{ introEl }}
     {{ boardsEl }}
   </section>
 
@@ -45,8 +42,6 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { introOpen: true, filterOpen: false, filter: '' };
-
   h(type, props, ...children) {
     return React.createElement(type, props, ...children);
   }
@@ -76,7 +71,7 @@ class Component extends DCLogic {
     return this.h('div', { style: { textAlign: 'center', margin: '2px 0 24px' } },
       this.h('img', { src: 'assets/logo.png', alt: '', width: 46, height: 46, style: { width: 46, height: 46, borderRadius: '50%', display: 'inline-block', marginBottom: 10 } }),
       this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(26px,3.4vw,36px)', color: '#16361e', margin: '0 0 6px', letterSpacing: '-0.4px' } }, 'Community Boards'),
-      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: 0 } }, 'Pick a board and jump into the discussion.')
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: 0 } }, 'Pick a board and jump into the topic list.')
     );
   }
 
@@ -90,40 +85,8 @@ class Component extends DCLogic {
     );
   }
 
-  introEl(st) {
-    if (!st.introOpen) return null;
-    const xBtn = this.h('button', {
-      type: 'button', className: 'ak-x', 'aria-label': 'Dismiss', onClick: () => this.setState({ introOpen: false }),
-      style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, color: '#bcd9c0', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontSize: 20, lineHeight: 1 },
-    }, 'x');
-    const body = this.h('div', { style: { padding: '18px 20px', fontSize: 15, lineHeight: 1.7, color: '#2c3f33' } },
-      this.h('p', { style: { margin: '0 0 12px' } }, 'AkkerKennis is a knowledge board for arable farmers in the Netherlands. Pick a board below and jump into practical, field-tested discussion, everything from soil and crop protection to machinery, water, and markets. No hidden advertising, just real experience from the field.'),
-      this.h('p', { style: { margin: 0 } }, 'New here? Read the ',
-        this.h('a', { href: 'About.dc.html', className: 'ak-link', style: { color: '#16361e', fontWeight: 600 } }, 'community guidelines'),
-        ' before posting, or visit the ',
-        this.h('a', { href: 'Contact.dc.html', className: 'ak-link', style: { color: '#16361e', fontWeight: 600 } }, 'help & FAQ'),
-        ' to learn how it works.')
-    );
-    return this.box('What is AkkerKennis?', xBtn, body);
-  }
-
-  filteredColumns(filter) {
-    const f = filter.trim().toLowerCase();
-    return this.COLUMNS
-      .map((col) => col
-        .map((g) => ({ title: g.title, boards: f ? g.boards.filter((b) => b.toLowerCase().includes(f)) : g.boards }))
-        .filter((g) => g.boards.length))
-      .filter((col) => col.length);
-  }
-
-  boardsEl(st) {
-    const toggle = this.h('button', {
-      type: 'button', className: 'ak-filter-toggle', onClick: () => this.setState((s) => ({ filterOpen: !s.filterOpen })),
-      style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 13, fontWeight: 600, color: '#bcd9c0', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 },
-    }, 'filter', this.h('span', { style: { fontSize: 10 } }, st.filterOpen ? '^' : 'v'));
-
-    const cols = this.filteredColumns(st.filter);
-
+  boardsEl() {
+    const cols = this.COLUMNS;
     const grid = this.h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(168px,1fr))', gap: '22px 26px' } },
       ...cols.map((col, ci) => this.h('div', { key: ci, style: { display: 'flex', flexDirection: 'column', gap: 18 } },
         ...col.map((g, gi) => this.h('div', { key: gi },
@@ -135,30 +98,15 @@ class Component extends DCLogic {
       ))
     );
 
-    const empty = this.h('div', { style: { padding: '6px 2px 2px', fontSize: 14, color: '#5a7060' } }, 'No boards match "' + st.filter + '".');
+    const body = this.h('div', { style: { padding: '18px 20px 22px' } }, grid);
 
-    const filterRow = st.filterOpen ? this.h('div', { style: { marginBottom: 16 } },
-      this.h('input', {
-        type: 'text', value: st.filter, autoFocus: true, placeholder: 'Filter boards...',
-        onInput: (e) => this.setState({ filter: e.target.value }),
-        style: { width: '100%', maxWidth: 320, fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, color: '#16361e', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.18)', borderRadius: 10, padding: '9px 12px' },
-      })
-    ) : null;
-
-    const body = this.h('div', { style: { padding: '18px 20px 22px' } },
-      filterRow,
-      cols.length ? grid : empty
-    );
-
-    return this.box('Boards', toggle, body);
+    return this.box('Boards', null, body);
   }
 
   renderVals() {
-    const st = this.state;
     return {
       heroEl: this.heroEl(),
-      introEl: this.introEl(st),
-      boardsEl: this.boardsEl(st),
+      boardsEl: this.boardsEl(),
     };
   }
 }

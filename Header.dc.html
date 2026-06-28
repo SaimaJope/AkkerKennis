@@ -30,8 +30,8 @@
 <header style="{{ headerStyle }}">
   <div style="max-width:1200px;margin:0 auto;padding:14px clamp(20px,4vw,40px);display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
     <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto;">
-      <img src="assets/logo.png" alt="AkkerKennis" width="40" height="40" style="display:block;width:40px;height:40px;border-radius:50%;" />
-      <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:23px;font-weight:700;color:#16361e;letter-spacing:0.2px;">AkkerKennis</span>
+      <img src="assets/logo.png" alt="AkkerBooster" width="40" height="40" style="display:block;width:40px;height:40px;border-radius:50%;" />
+      <span style="font-family:'Ubuntu',Arial,sans-serif;font-size:23px;font-weight:700;color:#16361e;letter-spacing:0.2px;">AkkerBooster</span>
     </a>
 
     <nav style="display:flex;align-items:center;gap:clamp(14px,2.4vw,34px);flex:1 1 auto;flex-wrap:wrap;">
@@ -39,17 +39,21 @@
         Home
         <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
       </a>
+      <a href="Explore.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        Topics
+        <sc-if value="{{ isExplore }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
+      <a href="Events.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        Events
+        <sc-if value="{{ isEvents }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
+      <a href="Projects.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
+        Projects
+        <sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
+      </a>
       <a href="About.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
         About
         <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
-      </a>
-      <a href="Explore.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
-        Explore Topics
-        <sc-if value="{{ isExplore }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
-      </a>
-      <a href="Forum.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
-        Forum
-        <sc-if value="{{ isForum }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
       </a>
       <a href="Contact.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
         Contact
@@ -64,7 +68,7 @@
   </div>
 </header>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:80},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;about&quot;,&quot;explore&quot;,&quot;forum&quot;,&quot;contact&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:80},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;explore&quot;,&quot;events&quot;,&quot;projects&quot;,&quot;about&quot;,&quot;contact&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
   headerStyle() {
     return {
@@ -85,9 +89,10 @@ class Component extends DCLogic {
     return {
       headerStyle: this.headerStyle(),
       isHome: a === 'home',
-      isAbout: a === 'about',
       isExplore: a === 'explore',
-      isForum: a === 'forum',
+      isEvents: a === 'events',
+      isProjects: a === 'projects',
+      isAbout: a === 'about',
       isContact: a === 'contact',
     };
   }
@@ -95,4 +100,3 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
-

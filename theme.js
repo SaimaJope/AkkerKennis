@@ -1,4 +1,4 @@
-/* AkkerKennis dark-mode toggle.
+/* AkkerBooster dark-mode toggle.
  *
  * The site is built from many standalone pages that share inline-styled
  * components, so instead of re-theming every colour by hand we flip the whole

@@ -1,4 +1,4 @@
-/* AkkerKennis access gate — lightweight client-side PIN screen.
+/* AkkerBooster access gate — lightweight client-side PIN screen.
  *
  * NOTE: this is a static site, so the check runs in the browser. It keeps
  * casual visitors out, but anyone technical can read the PIN from this file
@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var PIN = '1234';
+  var PIN = '554422';
   var KEY = 'ak_gate_ok';
   var LEN = PIN.length;
   var store = null;
@@ -96,7 +96,7 @@
     gate.innerHTML =
       '<div id="ak-card">' +
         '<img class="ak-logo" src="assets/logo.png" alt="" width="56" height="56" />' +
-        '<div class="ak-brand">AkkerKennis</div>' +
+        '<div class="ak-brand">AkkerBooster</div>' +
         '<p class="ak-title">Enter access code to continue</p>' +
         '<div id="ak-dots"></div>' +
         '<div id="ak-error" aria-live="polite"></div>' +

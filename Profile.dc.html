@@ -35,10 +35,6 @@
       <div style="flex:1 1 280px;min-width:0;">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;">
           <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.6vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">Jan Dekker</h1>
-          <span style="display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:5px 13px;border-radius:999px;background:#eceef0;border:1px solid #c4ccd4;">
-            <span style="width:9px;height:9px;border-radius:50%;background:#9aa5af;display:inline-block;"></span>
-            <span style="font-size:13px;font-weight:700;color:#5c6670;">Silver contributor</span>
-          </span>
         </div>
         <p style="font-size:18px;color:#33473b;margin:0 0 14px;">Arable farmer, Drenthe</p>
         <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:#5a7060;">
@@ -112,25 +108,6 @@
           </div>
         </div>
 
-        <!-- RANK -->
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:24px;">
-          <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:0 0 16px;">Your rank</h2>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <sc-for list="{{ ranks }}" as="r" hint-placeholder-count="3">
-              <div style="display:flex;align-items:flex-start;gap:13px;">
-                <span style="{{ r.dotStyle }}"></span>
-                <div style="flex:1 1 auto;">
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:15px;font-weight:700;color:#16361e;">{{ r.name }}</span>
-                    <sc-if value="{{ r.current }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:700;letter-spacing:0.4px;color:#16361e;background:#8ee05e;padding:2px 9px;border-radius:999px;">CURRENT</span></sc-if>
-                  </div>
-                  <div style="font-size:13px;color:#5a7060;line-height:1.5;margin-top:2px;">{{ r.desc }}</div>
-                </div>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-
         <!-- SETTINGS -->
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:10px 8px;">
           <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:14px 16px 8px;">Account settings</h2>
@@ -180,13 +157,6 @@ class Component extends DCLogic {
       { type: 'Reply', title: 'Re: Managing nitrogen leaching on sandy soils', boosts: 7 },
     ].map((a, i) => ({ ...a, notFirst: i > 0, tagStyle: tag(a.type) }));
 
-    const dot = (color) => 'flex:0 0 auto;width:14px;height:14px;border-radius:50%;margin-top:3px;background:' + color + ';';
-    const ranks = [
-      { name: 'Bronze', current: false, desc: 'Granted after email confirmation - reply, create threads, and boost ideas.', dotStyle: dot('#c9955a') },
-      { name: 'Silver', current: true, desc: 'Earned through several useful contributions and successful threads.', dotStyle: dot('#9aa5af') },
-      { name: 'Gold', current: false, desc: 'Recognised trusted contributor or innovation leader in the community.', dotStyle: dot('#c9a24a') },
-    ];
-
     const rowBase = 'display:flex;align-items:center;justify-content:space-between;text-decoration:none;font-family:\'Ubuntu\',Arial,sans-serif;font-size:15px;font-weight:600;padding:14px 16px;border-radius:11px;transition:background .15s ease;';
     const settings = [
       { label: 'Create profile', href: 'CreateProfile.dc.html', danger: false },
@@ -198,7 +168,7 @@ class Component extends DCLogic {
     ].map((o) => ({ ...o, style: rowBase + (o.danger ? 'color:#c43a18;' : 'color:#16361e;') }));
 
     return {
-      stats, activity, ranks, settings,
+      stats, activity, settings,
       provinceId: this.state.province,
       provinceName: this.NAMES[this.state.province] || '-',
       onSelectProvince: (id) => this.setState({ province: id }),
