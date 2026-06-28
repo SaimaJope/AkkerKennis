@@ -13,6 +13,7 @@
 <link rel="manifest" href="assets/Favicon/site.webmanifest" />
 <script src="./gate.js"></script>
 <script src="./theme.js"></script>
+<script src="./firebase.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -108,7 +109,7 @@
         <!-- list -->
         <div style="display:flex;flex-direction:column;gap:14px;">
           <sc-for list="{{ topics }}" as="t" hint-placeholder-count="6">
-            <a href="Thread.dc.html" style="text-decoration:none;display:block;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:24px 26px;transition:transform .16s ease,border-color .16s ease;" style-hover="transform:translateY(-2px);border-color:rgba(22,54,30,0.28);">
+            <a href="{{ t.href }}" style="text-decoration:none;display:block;background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:24px 26px;transition:transform .16s ease,border-color .16s ease;" style-hover="transform:translateY(-2px);border-color:rgba(22,54,30,0.28);">
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
                 <span style="{{ t.statusStyle }}">{{ t.status }}</span>
                 <span style="font-size:13px;font-weight:600;color:#5a7060;">{{ t.category }}</span>
@@ -149,7 +150,17 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { category: 'all', region: 'all', regionMode: 'map', sort: 'latest', query: '' };
+  state = { category: 'all', region: 'all', regionMode: 'map', sort: 'latest', query: '', remoteTopics: [] };
+
+  componentDidMount() {
+    if (window.AK && window.AK.isConfigured && window.AK.isConfigured()) {
+      this._unsub = window.AK.watchTopics((rows) => { if (rows) this.setState({ remoteTopics: rows }); });
+    }
+  }
+
+  componentWillUnmount() {
+    if (this._unsub) this._unsub();
+  }
 
   ALL = [
     { title: 'Reducing black-grass in winter wheat', summary: 'Black-grass pressure has crept up over three seasons despite stale seedbeds. Looking for rotation and stacking strategies that actually held it back.', category: 'Crop Management', region: 'groningen', regionName: 'Groningen', replies: 38, boosts: 45, hours: 2, status: 'High traction' },
@@ -199,10 +210,25 @@ class Component extends DCLogic {
   renderVals() {
     const st = this.state;
 
-    const catCounts = {};
-    this.ALL.forEach((t) => { catCounts[t.category] = (catCounts[t.category] || 0) + 1; });
+    // Topics created by testers (live from Firestore) sit on top of the demo set.
+    const remote = (st.remoteTopics || []).map((r) => ({
+      id: r.id,
+      title: r.title,
+      summary: r.summary,
+      category: r.category || 'General',
+      region: r.regionId || '',
+      regionName: r.region || '—',
+      replies: 0,
+      boosts: 0,
+      hours: Math.max(0, (Date.now() - (r.createdAt || Date.now())) / 3600000),
+      status: 'New',
+    }));
+    const source = remote.concat(this.ALL);
 
-    let list = this.ALL.filter((t) => {
+    const catCounts = {};
+    source.forEach((t) => { catCounts[t.category] = (catCounts[t.category] || 0) + 1; });
+
+    let list = source.filter((t) => {
       if (st.category !== 'all' && t.category !== st.category) return false;
       if (st.region !== 'all' && t.region !== st.region) return false;
       if (st.query.trim()) {
@@ -225,6 +251,7 @@ class Component extends DCLogic {
       region: t.regionName,
       activity: this.fmtActivity(t.hours),
       statusStyle: this.statusStyle(t.status),
+      href: t.id ? 'Thread.dc.html?id=' + encodeURIComponent(t.id) : 'Thread.dc.html',
     }));
 
     const chipBase = 'display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;font-family:\'Ubuntu\',Arial,sans-serif;font-size:15px;border:none;border-radius:11px;padding:11px 13px;cursor:pointer;transition:background .15s ease;';
@@ -237,7 +264,7 @@ class Component extends DCLogic {
         onClick: () => this.setState({ category: id }),
       };
     };
-    const catList = [mkCat('all', 'All topics', this.ALL.length)].concat(this.CATS.map((c) => mkCat(c, c, catCounts[c] || 0)));
+    const catList = [mkCat('all', 'All topics', source.length)].concat(this.CATS.map((c) => mkCat(c, c, catCounts[c] || 0)));
 
     const sortBase = 'font-family:\'Ubuntu\',Arial,sans-serif;font-size:14px;font-weight:600;border:none;border-radius:999px;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:background .15s ease;';
     const mkSort = (id, name) => {

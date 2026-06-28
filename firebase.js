@@ -162,6 +162,65 @@
         });
       });
     },
+    // ── Topics (posts) ──────────────────────────────────────────────────────
+    // Realtime list of all topics, newest first.
+    watchTopics: function (cb) {
+      var unsub = function () {};
+      ready.then(function (ctx) {
+        if (!ctx) { cb(null); return; }
+        unsub = ctx.db.collection('topics').onSnapshot(function (snap) {
+          var rows = snap.docs.map(function (d) {
+            var data = d.data();
+            return {
+              id: d.id,
+              title: data.title,
+              summary: data.summary || data.body || '',
+              category: data.category || 'General',
+              region: data.region || '',
+              regionId: data.regionId || '',
+              authorName: data.authorName,
+              createdAt: data.createdAt && data.createdAt.toMillis ? data.createdAt.toMillis() : 0,
+            };
+          });
+          rows.sort(function (a, b) { return b.createdAt - a.createdAt; });
+          cb(rows, null);
+        }, function (err) { console.error('[AK] watchTopics:', err); cb(null, (err && err.message) || 'Could not load topics'); });
+      });
+      return function () { unsub(); };
+    },
+    // One-off fetch of a single topic (for the thread detail view).
+    getTopic: function (topicId) {
+      return ready.then(function (ctx) {
+        if (!ctx) return null;
+        return ctx.db.collection('topics').doc(topicId).get().then(function (d) {
+          return d.exists ? Object.assign({ id: d.id }, d.data()) : null;
+        });
+      });
+    },
+    // Create a topic; resolves to the new topic's id.
+    addTopic: function (data) {
+      return ready.then(function (ctx) {
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to post');
+        var who = shapeUser(u);
+        return ctx.db.collection('topics').add({
+          title: String(data.title || '').trim(),
+          summary: String(data.summary || '').trim(),
+          body: String(data.body || '').trim(),
+          tried: String(data.tried || '').trim(),
+          category: data.category || 'General',
+          crop: String(data.crop || '').trim(),
+          region: data.region || '',
+          regionId: data.regionId || '',
+          type: data.type || 'Question',
+          authorUid: u.uid,
+          authorName: who.name,
+          authorInitials: who.initials,
+          createdAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
+        }).then(function (ref) { return ref.id; });
+      });
+    },
+
     // Toggle the current user's upvote on a reply (atomic, race-safe).
     toggleReplyVote: function (replyId) {
       return ready.then(function (ctx) {

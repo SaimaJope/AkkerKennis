@@ -13,6 +13,7 @@
 <link rel="manifest" href="assets/Favicon/site.webmanifest" />
 <script src="./gate.js"></script>
 <script src="./theme.js"></script>
+<script src="./firebase.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -55,7 +56,7 @@
     <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:22px;">
       <label style="display:block;">
         <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Title</span>
-        <input type="text" placeholder="e.g. Best timing for fungicide in potatoes?" style="width:100%;font-size:16px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+        <input type="text" value="{{ title }}" onInput="{{ onTitle }}" placeholder="e.g. Best timing for fungicide in potatoes?" style="width:100%;font-size:16px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
         <span style="display:block;font-size:13px;color:#8aa090;margin-top:6px;">Ask one clear question or describe one specific problem.</span>
       </label>
 
@@ -63,7 +64,7 @@
         <label style="display:block;">
           <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Category</span>
           <div style="position:relative;">
-            <select style="width:100%;font-size:15px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 38px 14px 14px;cursor:pointer;">
+            <select value="{{ category }}" onChange="{{ onCategory }}" style="width:100%;font-size:15px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 38px 14px 14px;cursor:pointer;">
               <option>Pests &amp; Diseases</option><option>Irrigation</option><option>Soil Health</option><option>New Technologies</option><option>Precision Agriculture</option><option>Crop Management</option>
             </select>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
@@ -71,14 +72,14 @@
         </label>
         <label style="display:block;">
           <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Crop</span>
-          <input type="text" placeholder="e.g. Seed potatoes" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
+          <input type="text" value="{{ crop }}" onInput="{{ onCrop }}" placeholder="e.g. Seed potatoes" style="width:100%;font-size:15px;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;" />
         </label>
       </div>
 
       <label style="display:block;">
         <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Region</span>
         <div style="position:relative;">
-          <select style="width:100%;font-size:15px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 38px 14px 14px;cursor:pointer;">
+          <select value="{{ region }}" onChange="{{ onRegion }}" style="width:100%;font-size:15px;color:#16361e;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 38px 14px 14px;cursor:pointer;">
             <option>Groningen</option><option>Friesland</option><option>Drenthe</option><option>Noord-Holland</option><option>Flevoland</option><option>Overijssel</option><option>Utrecht</option><option>Gelderland</option><option>Zuid-Holland</option><option>Zeeland</option><option>Noord-Brabant</option><option>Limburg</option>
           </select>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
@@ -87,12 +88,12 @@
 
       <label style="display:block;">
         <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">Description</span>
-        <textarea rows="5" placeholder="Describe the situation: soil type, conditions, what you are seeing, and what a good answer would help you decide." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+        <textarea rows="5" value="{{ body }}" onInput="{{ onBody }}" placeholder="Describe the situation: soil type, conditions, what you are seeing, and what a good answer would help you decide." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
       </label>
 
       <label style="display:block;">
         <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:7px;">What have you tried? <span style="color:#8aa090;font-weight:500;">(optional, but recommended)</span></span>
-        <textarea rows="3" placeholder="List the approaches you have already used and how they worked out." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
+        <textarea rows="3" value="{{ tried }}" onInput="{{ onTried }}" placeholder="List the approaches you have already used and how they worked out." style="width:100%;font-size:16px;line-height:1.6;color:#08100d;background:#f6fcf0;border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:14px 16px;resize:vertical;"></textarea>
       </label>
 
       <label style="display:block;">
@@ -115,9 +116,11 @@
       </label>
     </div>
 
+    {{ statusEl }}
+
     <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;">
-      <button type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:14px;cursor:pointer;transition:background .15s ease;" style-hover="background:#0f2716;">Publish topic</button>
-      <button type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 26px;font-size:16px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.24);border-radius:14px;cursor:pointer;">Save draft</button>
+      <button type="button" onClick="{{ onPublish }}" style="{{ publishStyle }}" style-hover="background:#0f2716;">{{ publishLabel }}</button>
+      <a href="Explore.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 26px;text-decoration:none;font-size:16px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.24);border-radius:14px;cursor:pointer;">Cancel</a>
     </div>
   </section>
 
@@ -126,7 +129,42 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { type: 'Question' };
+  state = { type: 'Question', title: '', category: 'Pests & Diseases', crop: '', region: 'Groningen', body: '', tried: '', busy: false, error: '', configured: false, me: null };
+
+  REGION_IDS = {
+    'Groningen': 'groningen', 'Friesland': 'friesland', 'Drenthe': 'drenthe', 'Noord-Holland': 'noordholland',
+    'Flevoland': 'flevoland', 'Overijssel': 'overijssel', 'Utrecht': 'utrecht', 'Gelderland': 'gelderland',
+    'Zuid-Holland': 'zuidholland', 'Zeeland': 'zeeland', 'Noord-Brabant': 'noordbrabant', 'Limburg': 'limburg',
+  };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  componentDidMount() {
+    const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
+    this.setState({ configured });
+    if (configured) window.AK.onAuth((u) => this.setState({ me: u }));
+  }
+
+  publish() {
+    const st = this.state;
+    if (st.busy) return;
+    if (!st.configured) { this.setState({ error: 'Backend not configured yet (see SETUP_FIREBASE.md).' }); return; }
+    if (!st.me) { window.location.href = 'SignIn.dc.html'; return; }
+    if (!st.title.trim()) { this.setState({ error: 'Give your topic a title.' }); return; }
+    if (!st.body.trim()) { this.setState({ error: 'Add a short description so people can help.' }); return; }
+
+    this.setState({ busy: true, error: '' });
+    const summary = st.body.trim().length > 160 ? st.body.trim().slice(0, 157) + '…' : st.body.trim();
+    window.AK.addTopic({
+      title: st.title, body: st.body, summary, tried: st.tried,
+      category: st.category, crop: st.crop, region: st.region,
+      regionId: this.REGION_IDS[st.region] || '', type: st.type,
+    })
+      .then((id) => { window.location.href = 'Thread.dc.html?id=' + encodeURIComponent(id); })
+      .catch((e) => { console.error(e); this.setState({ busy: false, error: (e && e.message) || 'Could not publish. Try again.' }); });
+  }
 
   icon(name) {
     const c = { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round' };
@@ -159,7 +197,27 @@ class Component extends DCLogic {
         onClick: () => this.setState({ type: d.id }),
       };
     });
-    return { types };
+
+    const st = this.state;
+    const notConfigured = st.configured && !st.me;
+    return {
+      types,
+      title: st.title, category: st.category, crop: st.crop, region: st.region, body: st.body, tried: st.tried,
+      onTitle: (e) => this.setState({ title: e.target.value }),
+      onCategory: (e) => this.setState({ category: e.target.value }),
+      onCrop: (e) => this.setState({ crop: e.target.value }),
+      onRegion: (e) => this.setState({ region: e.target.value }),
+      onBody: (e) => this.setState({ body: e.target.value }),
+      onTried: (e) => this.setState({ tried: e.target.value }),
+      onPublish: () => this.publish(),
+      publishLabel: st.busy ? 'Publishing…' : 'Publish topic',
+      publishStyle: 'display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border:none;border-radius:14px;cursor:' + (st.busy ? 'default' : 'pointer') + ';opacity:' + (st.busy ? '0.7' : '1') + ';transition:background .15s ease;',
+      statusEl: st.error
+        ? this.h('div', { style: { marginTop: 18, display: 'flex', alignItems: 'center', gap: 9, background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 12, padding: '12px 14px', fontSize: 14, color: '#c43a18' } }, st.error)
+        : (notConfigured
+            ? this.h('div', { style: { marginTop: 18, background: '#16361e', borderRadius: 12, padding: '12px 14px', fontSize: 14, color: '#cfe6d2' } }, 'You are not signed in — publishing will take you to the sign-in page first.')
+            : null),
+    };
   }
 }
 </script>

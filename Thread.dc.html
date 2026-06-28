@@ -48,45 +48,7 @@
     <div style="display:grid;grid-template-columns:1fr 312px;gap:32px;align-items:start;">
       <!-- MAIN THREAD -->
       <div>
-        <!-- meta row -->
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-          <span style="display:inline-flex;align-items:center;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:0.3px;padding:5px 11px;border-radius:999px;background:#fe4c24;color:#fff;">High traction</span>
-          <span style="font-size:13px;font-weight:600;color:#5a7060;">Crop Management</span>
-          <span style="width:3px;height:3px;border-radius:50%;background:#b6cdac;display:inline-block;"></span>
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#5a7060;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
-            Groningen
-          </span>
-        </div>
-
-        <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.8vw,44px);line-height:1.12;color:#16361e;margin:0 0 18px;letter-spacing:-0.4px;">Reducing black-grass in winter wheat</h1>
-
-        <!-- author -->
-        <div style="display:flex;align-items:center;gap:13px;margin-bottom:20px;">
-          <span style="flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:#16361e;color:#bff0a6;display:flex;align-items:center;justify-content:center;font-family:'Ubuntu',Arial,sans-serif;font-size:18px;">PB</span>
-          <div>
-            <div style="font-size:16px;font-weight:600;color:#16361e;">Pieter Bakker</div>
-            <div style="font-size:14px;color:#5a7060;">Arable farmer, Groningen &middot; Posted 12 March 2026</div>
-          </div>
-        </div>
-
-        <!-- tags -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
-          {{ tagsEl }}
-        </div>
-
-        <!-- post body -->
-        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(24px,3vw,36px);">
-          <p style="font-size:17px;line-height:1.7;color:#26352c;margin:0 0 18px;">Black-grass pressure has crept up over three seasons on our heavier fields, despite stale seedbeds and delayed drilling. We are now seeing patches that clearly knock yield, and I want to get ahead of it before it becomes unmanageable.</p>
-          <p style="font-size:17px;line-height:1.7;color:#26352c;margin:0 0 18px;">My main question: for those of you on similar clay soils in the north, what combination of cultural controls actually held the population back &mdash; and over how many seasons did you see a real difference?</p>
-
-          <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:21px;color:#16361e;margin:28px 0 12px;">What I have tried</h3>
-          <ul style="font-size:17px;line-height:1.7;color:#26352c;margin:0;padding-left:22px;">
-            <li style="margin-bottom:8px;">Delayed drilling to mid-October, which helped but cost us establishment in the wet autumn.</li>
-            <li style="margin-bottom:8px;">A spring crop in the rotation every third year.</li>
-            <li>Higher seed rates to improve crop competition.</li>
-          </ul>
-        </div>
+        {{ topicEl }}
 
         <!-- action bar -->
         {{ actionBarEl }}
@@ -157,9 +119,9 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false };
+  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false, topic: null, topicId: '', topicLoading: false, threadId: 'blackgrass-winter-wheat' };
 
-  // All topic links open this page; replies persist under one shared thread id.
+  // The default demo topic id; a ?id= in the URL (a created post) overrides it.
   THREAD_ID = 'blackgrass-winter-wheat';
 
   h(type, props, ...children) {
@@ -169,12 +131,109 @@ class Component extends DCLogic {
   // ── Backend wiring (no-op + demo fallback when Firebase isn't configured) ──
   componentDidMount() {
     const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
-    this.setState({ configured });
+    let topicId = '';
+    try { topicId = new URLSearchParams(window.location.search).get('id') || ''; } catch (e) {}
+    const threadId = topicId || 'blackgrass-winter-wheat';
+    this.THREAD_ID = threadId;
+    this.setState({ configured, topicId, threadId });
     if (!configured) return;
     window.AK.onAuth((u) => this.setState({ me: u, loggedIn: !!u, prompt: u ? false : this.state.prompt }));
-    this._unsub = window.AK.watchReplies(this.THREAD_ID, (rows, err) => {
+    this._unsub = window.AK.watchReplies(threadId, (rows, err) => {
       if (err) this.setState({ repliesError: err });
       else this.setState({ remoteReplies: rows, repliesError: '' });
+    });
+    if (topicId) {
+      this.setState({ topicLoading: true });
+      window.AK.getTopic(topicId)
+        .then((t) => this.setState({ topic: t, topicLoading: false }))
+        .catch((e) => { console.error(e); this.setState({ topicLoading: false }); });
+    }
+  }
+
+  fmtTopicDate(ts) {
+    let d = null;
+    if (ts && ts.toDate) d = ts.toDate();
+    else if (typeof ts === 'number') d = new Date(ts);
+    if (!d) return 'just now';
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  // Renders the topic header + body — for the default demo topic or a created one.
+  renderTopic(o) {
+    const badgeStyle = o.status === 'High traction' ? { background: '#fe4c24', color: '#fff' } : { background: '#8ee05e', color: '#0f2a16' };
+    const pin = this.h('svg', { width: 13, height: 13, viewBox: '0 0 24 24', fill: 'none', stroke: '#5a7060', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z' }), this.h('circle', { cx: 12, cy: 10, r: 2.4 }));
+
+    const metaRow = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 } },
+      this.h('span', { style: { display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, ...badgeStyle } }, o.status),
+      o.category ? this.h('span', { style: { fontSize: 13, fontWeight: 600, color: '#5a7060' } }, o.category) : null,
+      o.region ? this.h('span', { style: { width: 3, height: 3, borderRadius: '50%', background: '#b6cdac', display: 'inline-block' } }) : null,
+      o.region ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#5a7060' } }, pin, o.region) : null
+    );
+
+    const title = this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(30px,3.8vw,44px)', lineHeight: 1.12, color: '#16361e', margin: '0 0 18px', letterSpacing: '-0.4px' } }, o.title);
+
+    const author = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13, marginBottom: 20 } },
+      this.h('span', { style: { flex: '0 0 auto', width: 46, height: 46, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 18 } }, o.authorInitials),
+      this.h('div', null,
+        this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#16361e' } }, o.authorName),
+        this.h('div', { style: { fontSize: 14, color: '#5a7060' } }, o.authorMeta)
+      )
+    );
+
+    const tags = (o.tags && o.tags.length)
+      ? this.h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 } },
+          ...o.tags.map((tg) => this.h('span', { key: tg, style: { fontSize: 13, color: '#16361e', background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 999, padding: '5px 12px' } }, tg)))
+      : this.h('div', { style: { marginBottom: 8 } });
+
+    const bodyChildren = [];
+    (o.bodyParas || []).forEach((p, i) => bodyChildren.push(this.h('p', { key: 'p' + i, style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: '0 0 18px' } }, p)));
+    if (o.triedList && o.triedList.length) {
+      bodyChildren.push(this.h('h3', { key: 'th', style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 21, color: '#16361e', margin: '28px 0 12px' } }, 'What I have tried'));
+      bodyChildren.push(this.h('ul', { key: 'tl', style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: 0, paddingLeft: 22 } }, ...o.triedList.map((li, i) => this.h('li', { key: i, style: { marginBottom: i === o.triedList.length - 1 ? 0 : 8 } }, li))));
+    } else if (o.triedText) {
+      bodyChildren.push(this.h('h3', { key: 'th', style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 21, color: '#16361e', margin: '28px 0 12px' } }, 'What I have tried'));
+      o.triedText.split(/\n\n+/).filter(Boolean).forEach((p, i) => bodyChildren.push(this.h('p', { key: 'tt' + i, style: { fontSize: 17, lineHeight: 1.7, color: '#26352c', margin: '0 0 18px' } }, p)));
+    }
+    const bodyCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 20, padding: 'clamp(24px,3vw,36px)' } }, ...bodyChildren);
+
+    return this.h(React.Fragment, null, metaRow, title, author, tags, bodyCard);
+  }
+
+  topicEl(st) {
+    if (st.topicId && st.topicLoading) {
+      return this.h('div', { style: { padding: '30px 0 24px', fontSize: 16, color: '#5a7060' } }, 'Loading topic…');
+    }
+    const t = st.topic;
+    if (t) {
+      return this.renderTopic({
+        status: (t.type && t.type !== 'Question') ? t.type : 'New',
+        category: t.category || 'General',
+        region: t.region || '',
+        title: t.title || 'Untitled topic',
+        authorInitials: t.authorInitials || '?',
+        authorName: t.authorName || 'Member',
+        authorMeta: (t.region ? t.region + ' · ' : '') + 'Posted ' + this.fmtTopicDate(t.createdAt),
+        bodyParas: (t.body || '').split(/\n\n+/).filter(Boolean),
+        triedText: t.tried || '',
+        tags: t.crop ? ['#' + String(t.crop).toLowerCase().replace(/\s+/g, '')] : [],
+      });
+    }
+    // Default demo topic (also the fallback if a ?id= topic can't be found).
+    return this.renderTopic({
+      status: 'High traction', category: 'Crop Management', region: 'Groningen',
+      title: 'Reducing black-grass in winter wheat',
+      authorInitials: 'PB', authorName: 'Pieter Bakker', authorMeta: 'Arable farmer, Groningen · Posted 12 March 2026',
+      bodyParas: [
+        'Black-grass pressure has crept up over three seasons on our heavier fields, despite stale seedbeds and delayed drilling. We are now seeing patches that clearly knock yield, and I want to get ahead of it before it becomes unmanageable.',
+        'My main question: for those of you on similar clay soils in the north, what combination of cultural controls actually held the population back — and over how many seasons did you see a real difference?',
+      ],
+      triedList: [
+        'Delayed drilling to mid-October, which helped but cost us establishment in the wet autumn.',
+        'A spring crop in the rotation every third year.',
+        'Higher seed rates to improve crop competition.',
+      ],
+      tags: ['#winterwheat', '#blackgrass', '#rotation', '#heavyclay'],
     });
   }
 
@@ -466,7 +525,7 @@ class Component extends DCLogic {
     const replies = this.buildReplies();
 
     return {
-      tagsEl: this.tagsEl(),
+      topicEl: this.topicEl(st),
       viewingBarEl: this.viewingBarEl(st),
       actionBarEl: this.actionBarEl(st),
       promptEl: this.promptEl(st),
