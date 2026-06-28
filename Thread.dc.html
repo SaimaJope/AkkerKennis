@@ -119,7 +119,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false, topic: null, topicId: '', topicLoading: false, threadId: 'blackgrass-winter-wheat' };
+  state = { loggedIn: false, boosted: false, boostCount: 45, follow: false, save: false, hasIssue: false, issueCount: 7, prompt: false, replyText: '', replyImageName: null, replyVotes: {}, configured: false, me: null, remoteReplies: null, repliesError: '', postError: '', posting: false, topic: null, topicId: '', topicLoading: false, threadId: 'blackgrass-winter-wheat', threadStats: { boosts: [], issues: [] }, editingId: null, editText: '' };
 
   // The default demo topic id; a ?id= in the URL (a created post) overrides it.
   THREAD_ID = 'blackgrass-winter-wheat';
@@ -142,6 +142,7 @@ class Component extends DCLogic {
       if (err) this.setState({ repliesError: err });
       else this.setState({ remoteReplies: rows, repliesError: '' });
     });
+    this._unsubStats = window.AK.watchThreadStats(threadId, (stats) => { if (stats) this.setState({ threadStats: stats }); });
     if (topicId) {
       this.setState({ topicLoading: true });
       window.AK.getTopic(topicId)
@@ -239,6 +240,7 @@ class Component extends DCLogic {
 
   componentWillUnmount() {
     if (this._unsub) this._unsub();
+    if (this._unsubStats) this._unsubStats();
   }
 
   avatarBg(seed) {
@@ -274,6 +276,7 @@ class Component extends DCLogic {
         body: r.body,
         count: r.votes.length,
         voted: !!(uid && r.votes.indexOf(uid) !== -1),
+        mine: !!(uid && r.authorUid === uid),
         onVote: this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
       }));
     }
@@ -283,9 +286,25 @@ class Component extends DCLogic {
         id: r.id, name: r.name, initials: r.initials, avatarBg: r.avatarBg, meta: r.meta, body: r.body,
         count: r.boosts + (voted ? 1 : 0),
         voted,
+        mine: false,
         onVote: this.guarded(() => this.setState((s) => ({ replyVotes: { ...s.replyVotes, [r.id]: !s.replyVotes[r.id] } }))),
       };
     });
+  }
+
+  startEdit(r) { this.setState({ editingId: r.id, editText: r.body, postError: '' }); }
+  cancelEdit() { this.setState({ editingId: null, editText: '' }); }
+  saveEdit() {
+    const id = this.state.editingId;
+    const text = this.state.editText.trim();
+    if (!id || !text) return;
+    window.AK.editReply(id, text)
+      .then(() => this.setState({ editingId: null, editText: '' }))
+      .catch((e) => { console.error(e); this.setState({ postError: (e && e.message) || 'Could not save the edit.' }); });
+  }
+  removeReply(r) {
+    if (!window.confirm('Delete your comment? This cannot be undone.')) return;
+    window.AK.deleteReply(r.id).catch((e) => { console.error(e); this.setState({ postError: (e && e.message) || 'Could not delete.' }); });
   }
 
   postReply() {
@@ -378,14 +397,28 @@ class Component extends DCLogic {
   }
 
   actionBarEl(st) {
-    const onBoost = this.guarded(() => this.setState((s) => ({ boosted: !s.boosted, boostCount: s.boostCount + (s.boosted ? -1 : 1) })));
-    const onIssue = this.guarded(() => this.setState((s) => ({ hasIssue: !s.hasIssue, issueCount: s.issueCount + (s.hasIssue ? -1 : 1) })));
+    const uid = st.me && st.me.uid;
+    let boosted, boostCount, hasIssue, issueCount, onBoost, onIssue;
+    if (st.configured) {
+      const b = st.threadStats.boosts || [];
+      const i = st.threadStats.issues || [];
+      boosted = !!(uid && b.indexOf(uid) !== -1);
+      boostCount = b.length;
+      hasIssue = !!(uid && i.indexOf(uid) !== -1);
+      issueCount = i.length;
+      onBoost = this.guarded(() => window.AK.toggleThreadReaction(st.threadId, 'boosts').catch((e) => console.error(e)));
+      onIssue = this.guarded(() => window.AK.toggleThreadReaction(st.threadId, 'issues').catch((e) => console.error(e)));
+    } else {
+      boosted = st.boosted; boostCount = st.boostCount; hasIssue = st.hasIssue; issueCount = st.issueCount;
+      onBoost = this.guarded(() => this.setState((s) => ({ boosted: !s.boosted, boostCount: s.boostCount + (s.boosted ? -1 : 1) })));
+      onIssue = this.guarded(() => this.setState((s) => ({ hasIssue: !s.hasIssue, issueCount: s.issueCount + (s.hasIssue ? -1 : 1) })));
+    }
     const onFollow = this.guarded(() => this.setState((s) => ({ follow: !s.follow })));
     const onSave = this.guarded(() => this.setState((s) => ({ save: !s.save })));
 
     return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '22px 0' } },
-      this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(st.boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea - ' + st.boostCount),
-      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(st.hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too - ' + st.issueCount),
+      this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea - ' + boostCount),
+      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too - ' + issueCount),
       this.h('button', { type: 'button', onClick: onFollow, style: this.actionButtonStyle(st.follow, { background: '#8ee05e', color: '#0f2a16', border: '1.5px solid #8ee05e' }) }, st.follow ? 'Following' : 'Follow topic'),
       this.h('button', { type: 'button', onClick: onSave, style: this.actionButtonStyle(st.save, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, st.save ? 'Saved' : 'Save'),
       this.h('button', { type: 'button', onClick: this.guarded(() => {}), style: { marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 500, color: '#8a7a6f', background: 'transparent', border: 'none', cursor: 'pointer' } }, this.icon('flag', 15), 'Report')
@@ -430,7 +463,30 @@ class Component extends DCLogic {
           },
         }, this.icon('boost', 15), count)
       ),
-      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#26352c', margin: 0 } }, r.body)
+      this.replyBody(r)
+    );
+  }
+
+  replyActionStyle(color) {
+    return { display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 13, fontWeight: 600, color: color || '#5a7060', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' };
+  }
+
+  replyBody(r) {
+    if (this.state.editingId === r.id) {
+      return this.h('div', null,
+        this.h('textarea', { value: this.state.editText, onInput: (e) => this.setState({ editText: e.target.value }), rows: 3, style: { width: '100%', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16, lineHeight: 1.6, color: '#08100d', background: '#f6fcf0', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 12, padding: '12px 14px', resize: 'vertical' } }),
+        this.h('div', { style: { display: 'flex', gap: 8, marginTop: 10 } },
+          this.h('button', { type: 'button', onClick: () => this.saveEdit(), style: { minHeight: 40, padding: '0 16px', fontSize: 14, fontWeight: 600, color: '#eafbe1', background: '#16361e', border: 'none', borderRadius: 10, cursor: 'pointer' } }, 'Save'),
+          this.h('button', { type: 'button', onClick: () => this.cancelEdit(), style: { minHeight: 40, padding: '0 16px', fontSize: 14, fontWeight: 600, color: '#16361e', background: 'transparent', border: '1.5px solid rgba(22,54,30,0.22)', borderRadius: 10, cursor: 'pointer' } }, 'Cancel')
+        )
+      );
+    }
+    return this.h(React.Fragment, null,
+      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#26352c', margin: 0 } }, r.body),
+      r.mine ? this.h('div', { style: { display: 'flex', gap: 16, marginTop: 12 } },
+        this.h('button', { type: 'button', onClick: () => this.startEdit(r), style: this.replyActionStyle() }, 'Edit'),
+        this.h('button', { type: 'button', onClick: () => this.removeReply(r), style: this.replyActionStyle('#c43a18') }, 'Delete')
+      ) : null
     );
   }
 

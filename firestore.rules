@@ -40,5 +40,11 @@ service cloud.firestore {
       allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
       allow update, delete: if signedIn() && resource.data.authorUid == request.auth.uid;
     }
+
+    // Shared per-thread reaction counts ("Boost idea" / "I have this issue too").
+    match /threadStats/{threadId} {
+      allow read: if true;
+      allow write: if signedIn();
+    }
   }
 }

@@ -237,5 +237,56 @@
         });
       });
     },
+    // Edit / delete a reply (rules already restrict these to the author).
+    editReply: function (replyId, body) {
+      return ready.then(function (ctx) {
+        if (!ctx || !ctx.auth.currentUser) throw new Error('Sign in to edit');
+        return ctx.db.collection('replies').doc(replyId).update({ body: String(body || '').trim() });
+      });
+    },
+    deleteReply: function (replyId) {
+      return ready.then(function (ctx) {
+        if (!ctx || !ctx.auth.currentUser) throw new Error('Sign in to delete');
+        return ctx.db.collection('replies').doc(replyId).delete();
+      });
+    },
+
+    // ── Thread reactions (shared "Boost idea" / "I have this issue too") ──────
+    // Counts live in threadStats/{threadId} as arrays of user ids, so everyone
+    // sees the same totals in real time. Works for the demo thread and posts.
+    watchThreadStats: function (threadId, cb) {
+      var unsub = function () {};
+      ready.then(function (ctx) {
+        if (!ctx) { cb(null); return; }
+        unsub = ctx.db.collection('threadStats').doc(threadId).onSnapshot(function (snap) {
+          var d = snap.exists ? snap.data() : {};
+          cb({ boosts: d.boosts || [], issues: d.issues || [] });
+        }, function (err) { console.error('[AK] watchThreadStats:', err); cb(null); });
+      });
+      return function () { unsub(); };
+    },
+    // field is 'boosts' or 'issues'. Toggles the current user in/out of it.
+    toggleThreadReaction: function (threadId, field) {
+      return ready.then(function (ctx) {
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to react');
+        var ref = ctx.db.collection('threadStats').doc(threadId);
+        var FV = ctx.fb.firestore.FieldValue;
+        return ctx.db.runTransaction(function (tx) {
+          return tx.get(ref).then(function (snap) {
+            var arr = (snap.exists && snap.data()[field]) || [];
+            var has = arr.indexOf(u.uid) !== -1;
+            var patch = {};
+            if (snap.exists) {
+              patch[field] = has ? FV.arrayRemove(u.uid) : FV.arrayUnion(u.uid);
+              tx.update(ref, patch);
+            } else {
+              patch[field] = [u.uid];
+              tx.set(ref, patch);
+            }
+          });
+        });
+      });
+    },
   };
 })();
