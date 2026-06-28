@@ -18,10 +18,12 @@
 
   // 1) PASTE your Firebase web config here (Project settings → Your apps → SDK).
   var CONFIG = {
-    apiKey: 'PASTE_API_KEY',
-    authDomain: 'PASTE_PROJECT.firebaseapp.com',
-    projectId: 'PASTE_PROJECT',
-    appId: 'PASTE_APP_ID',
+    apiKey: 'AIzaSyDKI_BWvdGcsxDiRiUp8YVMVMfOJ5eWDH0',
+    authDomain: 'akkerbooster-12aec.firebaseapp.com',
+    projectId: 'akkerbooster-12aec',
+    storageBucket: 'akkerbooster-12aec.firebasestorage.app',
+    messagingSenderId: '1078604042938',
+    appId: '1:1078604042938:web:13c92c5e263d7de5972883',
   };
 
   // 2) Your 4 testers: the email they sign in with → the name shown on the site.
