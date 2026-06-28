@@ -105,8 +105,11 @@ class Component extends DCLogic {
     if (this._onKey) document.removeEventListener('keydown', this._onKey, true);
   }
 
-  avatar(initials, size) {
+  avatar(initials, size, photo) {
     size = size || 32;
+    if (photo) {
+      return this.h('img', { src: photo, alt: initials || '', style: { flex: '0 0 auto', width: size, height: size, borderRadius: '50%', objectFit: 'cover', display: 'block' } });
+    }
     return this.h('span', { style: { flex: '0 0 auto', width: size, height: size, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size > 36 ? 16 : 13, fontWeight: 600 } }, initials || '?');
   }
 
@@ -141,10 +144,10 @@ class Component extends DCLogic {
           type: 'button', 'aria-haspopup': 'menu', 'aria-expanded': open, className: 'ak-acct-trigger',
           onClick: () => this.setState((s) => ({ menuOpen: !s.menuOpen })),
           style: { display: 'inline-flex', alignItems: 'center', gap: 9, minHeight: 46, padding: '0 12px 0 6px', cursor: 'pointer', whiteSpace: 'nowrap', background: open ? 'rgba(255,255,255,0.75)' : 'transparent', border: '1.5px solid rgba(22,54,30,0.2)', borderRadius: 999, fontFamily: "'Ubuntu',Arial,sans-serif", transition: 'background .12s ease,border-color .12s ease' },
-        }, this.avatar(me.initials), this.h('span', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, me.name), this.chevron(open)),
+        }, this.avatar(me.initials, 32, me.photo), this.h('span', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, me.name), this.chevron(open)),
         open ? this.h('div', { role: 'menu', style: { position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: 250, background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 16, boxShadow: '0 18px 44px -16px rgba(16,40,22,0.40)', padding: 8, zIndex: 60 } },
           this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 11, padding: '8px 12px 12px', borderBottom: '1px solid rgba(22,54,30,0.10)', marginBottom: 6 } },
-            this.avatar(me.initials, 40),
+            this.avatar(me.initials, 40, me.photo),
             this.h('div', { style: { minWidth: 0 } },
               this.h('div', { style: { fontSize: 15, fontWeight: 700, color: '#16361e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, me.name),
               this.h('div', { style: { fontSize: 13, color: '#5a7060', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, me.email || '')

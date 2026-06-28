@@ -136,7 +136,24 @@
   function shapeUser(u) {
     if (!u) return null;
     var name = TESTERS[u.email] || u.email;
-    return { uid: u.uid, email: u.email, name: name, initials: initials(name) };
+    return {
+      uid: u.uid,
+      email: u.email,
+      name: name,
+      initials: initials(name),
+      // Firebase Auth records when the account was created — used for the real
+      // "Member since" line on the profile (no more hardcoded date).
+      created: (u.metadata && u.metadata.creationTime) || null,
+    };
+  }
+
+  // Persist the cached session so the header can paint the signed-in state (and
+  // now the chosen display name + photo) on the very first frame of any page.
+  function persistMe(value) {
+    try {
+      if (value) window.localStorage.setItem('ak_me', JSON.stringify(value));
+      else window.localStorage.removeItem('ak_me');
+    } catch (e) {}
   }
 
   window.AK = {
@@ -156,11 +173,20 @@
         if (!ctx) { cb(null); return; }
         ctx.auth.onAuthStateChanged(function (u) {
           me = shapeUser(u);
-          try {
-            if (me) window.localStorage.setItem('ak_me', JSON.stringify(me));
-            else window.localStorage.removeItem('ak_me');
-          } catch (e) {}
+          persistMe(me);
           cb(me);
+          // Then enrich with the saved profile (custom display name + photo) and
+          // re-emit, so the header avatar/name match what the member chose.
+          if (u) {
+            ctx.db.collection('profiles').doc(u.uid).get().then(function (d) {
+              if (!d.exists || !me || me.uid !== u.uid) return;
+              var p = d.data() || {};
+              if (p.name) { me.name = p.name; me.initials = initials(p.name); }
+              if (p.photo) me.photo = p.photo;
+              persistMe(me);
+              cb(me);
+            }).catch(function () {});
+          }
         });
       });
       return function () {};
@@ -172,8 +198,90 @@
       });
     },
     signOut: function () {
-      try { window.localStorage.removeItem('ak_me'); } catch (e) {}
+      persistMe(null);
       return ready.then(function (ctx) { return ctx && ctx.auth.signOut(); });
+    },
+
+    // ── Profiles ──────────────────────────────────────────────────────────────
+    // One profile doc per member at profiles/{uid}. Holds everything the
+    // profile/edit pages render: display name, role, farm, bio, region, crops,
+    // experience and an inline photo. Public read, owner-gated write (see rules).
+    getProfile: function (uid) {
+      return ready.then(function (ctx) {
+        if (!ctx) return null;
+        var id = uid || (ctx.auth.currentUser && ctx.auth.currentUser.uid);
+        if (!id) return null;
+        return ctx.db.collection('profiles').doc(id).get().then(function (d) {
+          return d.exists ? Object.assign({ uid: id }, d.data()) : null;
+        });
+      });
+    },
+    // Save the signed-in member's own profile (merge, so a partial save keeps the
+    // rest). Also syncs the cached session immediately so the header updates
+    // without waiting for the next auth tick.
+    saveProfile: function (data) {
+      return ready.then(function (ctx) {
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to edit your profile');
+        var who = shapeUser(u);
+        var doc = {
+          name: String((data && data.name) || who.name).trim(),
+          role: String((data && data.role) || '').trim(),
+          farm: String((data && data.farm) || '').trim(),
+          bio: String((data && data.bio) || '').trim(),
+          regionId: String((data && data.regionId) || '').trim(),
+          experience: String((data && data.experience) || '').trim(),
+          crops: data && Array.isArray(data.crops) ? data.crops : [],
+          updatedAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
+        };
+        // Only touch the photo when a new one was supplied (a data URL).
+        if (data && typeof data.photo === 'string' && data.photo) doc.photo = data.photo;
+        return ctx.db.collection('profiles').doc(u.uid).set(doc, { merge: true }).then(function () {
+          me = shapeUser(u);
+          me.name = doc.name || me.name;
+          me.initials = initials(me.name);
+          if (doc.photo) me.photo = doc.photo;
+          persistMe(me);
+          return true;
+        });
+      });
+    },
+
+    // Real activity for a member, derived from their topics + replies. Powers the
+    // profile stat tiles and the "Recent contributions" list (no fake numbers).
+    getUserActivity: function (uid) {
+      var empty = { threadsStarted: 0, replies: 0, recent: [] };
+      return ready.then(function (ctx) {
+        if (!ctx) return empty;
+        var id = uid || (ctx.auth.currentUser && ctx.auth.currentUser.uid);
+        if (!id) return empty;
+        var toMs = function (ts) { return ts && ts.toMillis ? ts.toMillis() : 0; };
+        return Promise.all([
+          ctx.db.collection('topics').where('authorUid', '==', id).get(),
+          ctx.db.collection('replies').where('authorUid', '==', id).get(),
+        ]).then(function (res) {
+          var recent = [], threadsStarted = 0, replies = 0;
+          res[0].forEach(function (d) {
+            var t = d.data() || {};
+            if (t.deleted) return; // soft-deleted topics don't count
+            threadsStarted++;
+            recent.push({ type: 'Started', title: t.title || '(untitled)', threadId: d.id, createdAt: toMs(t.createdAt) });
+          });
+          res[1].forEach(function (d) {
+            var r = d.data() || {};
+            replies++;
+            var body = String(r.body || '').replace(/\s+/g, ' ').trim();
+            recent.push({
+              type: 'Reply',
+              title: body.length > 80 ? body.slice(0, 80) + '…' : (body || 'Reply'),
+              threadId: r.threadId || '',
+              createdAt: toMs(r.createdAt),
+            });
+          });
+          recent.sort(function (a, b) { return b.createdAt - a.createdAt; });
+          return { threadsStarted: threadsStarted, replies: replies, recent: recent.slice(0, 6) };
+        }).catch(function (e) { console.error('[AK] getUserActivity:', e); return empty; });
+      });
     },
 
     // ── Replies (comments) ──────────────────────────────────────────────────

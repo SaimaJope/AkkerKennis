@@ -55,6 +55,13 @@ service cloud.firestore {
       allow update, delete: if signedIn() && resource.data.authorUid == request.auth.uid;
     }
 
+    // Member profiles, one doc per user keyed by uid. Public read (so anyone can
+    // see who they're talking to); each member may only write their own doc.
+    match /profiles/{uid} {
+      allow read: if true;
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+
     // Shared per-thread reaction counts ("Boost idea" / "I have this issue too").
     match /threadStats/{threadId} {
       allow read: if true;

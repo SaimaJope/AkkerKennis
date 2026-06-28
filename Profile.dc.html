@@ -31,27 +31,27 @@
   <section style="max-width:1120px;margin:0 auto;padding:clamp(28px,3vw,44px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
     <!-- PROFILE HEADER -->
     <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:24px;padding:clamp(24px,3vw,38px);display:flex;align-items:center;gap:26px;flex-wrap:wrap;margin-bottom:18px;">
-      <span style="flex:0 0 auto;width:96px;height:96px;border-radius:50%;background:#16361e;color:#bff0a6;display:flex;align-items:center;justify-content:center;font-family:'Ubuntu',Arial,sans-serif;font-size:38px;">{{ meInitials }}</span>
+      <span style="flex:0 0 auto;width:96px;height:96px;border-radius:50%;overflow:hidden;background:#16361e;color:#bff0a6;display:flex;align-items:center;justify-content:center;font-family:'Ubuntu',Arial,sans-serif;font-size:38px;">{{ avatarEl }}</span>
       <div style="flex:1 1 280px;min-width:0;">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;">
           <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.6vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">{{ meName }}</h1>
         </div>
-        <p style="font-size:18px;color:#33473b;margin:0 0 14px;">{{ meEmail }}</p>
+        <sc-if value="{{ hasRoleFarm }}" hint-placeholder-val="{{ true }}"><p style="font-size:16px;font-weight:600;color:#16361e;margin:0 0 4px;">{{ roleFarm }}</p></sc-if>
+        <p style="font-size:16px;color:#5a7060;margin:0 0 14px;">{{ meEmail }}</p>
         <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:#5a7060;">
           <span style="display:inline-flex;align-items:center;gap:6px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
-            Active in Drenthe
+            Active in {{ provinceName }}
           </span>
           <span style="display:inline-flex;align-items:center;gap:6px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 3v4M16 3v4"></path></svg>
-            Member since March 2024
+            Member since {{ memberSince }}
           </span>
         </div>
       </div>
       <div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;flex:0 0 auto;align-self:center;">
-        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:700;color:#eafbe1;background:#16361e;border:none;border-radius:11px;cursor:pointer;white-space:nowrap;">Create profile</a>
-        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;cursor:pointer;white-space:nowrap;">Edit profile</a>
-        <button type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;cursor:pointer;white-space:nowrap;">Change picture</button>
+        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:700;color:#eafbe1;background:#16361e;border:none;border-radius:11px;cursor:pointer;white-space:nowrap;">Edit profile</a>
+        <a href="CreateProfile.dc.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:15px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.22);border-radius:11px;cursor:pointer;white-space:nowrap;">Change picture</a>
       </div>
     </div>
 
@@ -71,8 +71,26 @@
       <div style="display:flex;flex-direction:column;gap:18px;">
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(22px,2.5vw,30px);">
           <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:0 0 14px;">About me</h2>
-          <p style="font-size:16px;line-height:1.7;color:#33473b;margin:0;">Third-generation arable farmer near Emmen, working roughly 140 hectares of sandy and reclaimed peat soils. Mostly seed potatoes, sugar beet, and winter wheat. I am interested in practical soil-health measures, reducing inputs without losing yield, and sharing honest results - including the trials that did not work.</p>
+          <p style="{{ bioStyle }}">{{ meBio }}</p>
         </div>
+
+        <sc-if value="{{ hasFocus }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(22px,2.5vw,30px);">
+          <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:0 0 14px;">Farming focus</h2>
+          <sc-if value="{{ hasCrops }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:13px;font-weight:700;color:#5a7060;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px;">Main crops</div>
+            <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px;">
+              <sc-for list="{{ crops }}" as="c" hint-placeholder-count="3">
+                <span style="display:inline-flex;align-items:center;min-height:34px;padding:0 13px;font-size:14px;font-weight:700;color:#16361e;background:#e3fbd8;border:1px solid rgba(22,54,30,0.16);border-radius:999px;">{{ c }}</span>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ hasExperience }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:13px;font-weight:700;color:#5a7060;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">Experience</div>
+            <div style="font-size:16px;color:#16361e;">{{ experienceLabel }}</div>
+          </sc-if>
+        </div>
+        </sc-if>
 
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:clamp(22px,2.5vw,30px);">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -82,15 +100,14 @@
           <div style="display:flex;flex-direction:column;">
             <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
               <sc-if value="{{ a.notFirst }}" hint-placeholder-val="{{ false }}"><div style="height:1px;background:rgba(22,54,30,0.10);"></div></sc-if>
-              <a href="Thread.dc.html" style="text-decoration:none;display:flex;align-items:center;gap:14px;padding:15px 0;transition:opacity .15s ease;" style-hover="opacity:0.7;">
+              <a href="{{ a.href }}" style="text-decoration:none;display:flex;align-items:center;gap:14px;padding:15px 0;transition:opacity .15s ease;" style-hover="opacity:0.7;">
                 <span style="{{ a.tagStyle }}">{{ a.type }}</span>
                 <span style="flex:1 1 auto;font-family:'Ubuntu',Arial,sans-serif;font-size:17px;color:#16361e;line-height:1.3;">{{ a.title }}</span>
-                <span style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#fe4c24;white-space:nowrap;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fe4c24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l6 7h-4v9h-4v-9H6z"></path></svg>
-                  {{ a.boosts }}
-                </span>
               </a>
             </sc-for>
+            <sc-if value="{{ noActivity }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size:15px;color:#5a7060;margin:6px 0;">No contributions yet. Start a topic or reply to one and it will show up here.</p>
+            </sc-if>
           </div>
         </div>
       </div>
@@ -100,8 +117,8 @@
         <!-- REGION MAP -->
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;padding:24px;">
           <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:22px;color:#16361e;margin:0 0 4px;">Your region</h2>
-          <p style="font-size:14px;color:#5a7060;margin:0 0 16px;">Tap a province to set where you farm. Your region helps surface relevant local discussions.</p>
-          <dc-import name="NLMap" selected="{{ provinceId }}" interactive="true" onSelect="{{ onSelectProvince }}" hint-size="100%,300px"></dc-import>
+          <p style="font-size:14px;color:#5a7060;margin:0 0 16px;">Where you farm. Update it any time from Edit profile.</p>
+          <dc-import name="NLMap" selected="{{ provinceId }}" interactive="false" hint-size="100%,300px"></dc-import>
           <div style="display:flex;align-items:center;gap:9px;margin-top:16px;padding:12px 16px;border-radius:12px;background:#e3fbd8;border:1px solid rgba(22,54,30,0.12);">
             <span style="width:11px;height:11px;border-radius:50%;background:#8ee05e;display:inline-block;flex:0 0 auto;"></span>
             <span style="font-size:15px;font-weight:600;color:#16361e;">Active in {{ provinceName }}</span>
@@ -127,7 +144,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { province: 'drenthe', me: null };
+  state = { province: 'drenthe', me: null, profile: null, activity: null };
 
   componentDidMount() {
     try { const s = window.localStorage.getItem('ak_me'); if (s) this.setState({ me: JSON.parse(s) }); } catch (e) {}
@@ -138,6 +155,14 @@ class Component extends DCLogic {
         window.AK.onAuth((u) => {
           if (!u) { window.location.href = 'SignIn.dc.html'; return; }
           this.setState({ me: u });
+          if (this._loaded) return;
+          this._loaded = true;
+          window.AK.getProfile(u.uid)
+            .then((p) => { if (p) this.setState({ profile: p, province: p.regionId || this.state.province }); })
+            .catch(() => {});
+          window.AK.getUserActivity(u.uid)
+            .then((a) => this.setState({ activity: a }))
+            .catch(() => {});
         });
         return;
       }
@@ -152,13 +177,30 @@ class Component extends DCLogic {
     zuidholland: 'Zuid-Holland', zeeland: 'Zeeland', noordbrabant: 'Noord-Brabant', limburg: 'Limburg',
   };
 
+  EXPERIENCE = {
+    first: 'First season farming', '2-5': '2-5 years', '6-15': '6-15 years', '16+': '16+ years',
+  };
+
+  h(type, props, ...children) {
+    return React.createElement(type, props, ...children);
+  }
+
+  memberSince() {
+    const iso = this.state.me && this.state.me.created;
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  }
+
   renderVals() {
+    const me = this.state.me;
+    const p = this.state.profile || {};
+    const act = this.state.activity;
+
     const stats = [
-      { value: '248', label: 'Contributions' },
-      { value: '14', label: 'Threads started' },
-      { value: '187', label: 'Replies' },
-      { value: '96', label: 'Boosted ideas' },
-      { value: '23', label: 'Saved topics' },
+      { value: String((act && act.threadsStarted) || 0), label: 'Threads started' },
+      { value: String((act && act.replies) || 0), label: 'Replies' },
     ];
 
     const tag = (kind) => {
@@ -167,32 +209,57 @@ class Component extends DCLogic {
         ? base + 'background:#16361e;color:#bff0a6;'
         : base + 'background:#e3fbd8;color:#16361e;border:1px solid rgba(22,54,30,0.16);';
     };
-    const activity = [
-      { type: 'Started', title: 'Cover crops to improve soil structure', boosts: 18 },
-      { type: 'Reply', title: 'Re: Best timing for fungicide in potatoes?', boosts: 9 },
-      { type: 'Started', title: 'Lifting seed potatoes in a wet autumn', boosts: 24 },
-      { type: 'Reply', title: 'Re: Managing nitrogen leaching on sandy soils', boosts: 7 },
-    ].map((a, i) => ({ ...a, notFirst: i > 0, tagStyle: tag(a.type) }));
+    const recent = (act && act.recent) || [];
+    const activity = recent.map((a, i) => ({
+      type: a.type,
+      title: a.title,
+      href: a.threadId ? 'Thread.dc.html?id=' + encodeURIComponent(a.threadId) : '#',
+      notFirst: i > 0,
+      tagStyle: tag(a.type),
+    }));
 
     const rowBase = 'display:flex;align-items:center;justify-content:space-between;text-decoration:none;font-family:\'Ubuntu\',Arial,sans-serif;font-size:15px;font-weight:600;padding:14px 16px;border-radius:11px;transition:background .15s ease;';
     const settings = [
-      { label: 'Create profile', href: 'CreateProfile.dc.html', danger: false },
       { label: 'Edit profile', href: 'CreateProfile.dc.html', danger: false },
-      { label: 'Change profile picture', href: '#', danger: false },
+      { label: 'Change profile picture', href: 'CreateProfile.dc.html', danger: false },
       { label: 'Change password', href: '#', danger: false },
       { label: 'Download my data', href: '#', danger: false },
       { label: 'Delete account', href: 'DeleteAccount.dc.html', danger: true },
     ].map((o) => ({ ...o, style: rowBase + (o.danger ? 'color:#c43a18;' : 'color:#16361e;') }));
 
-    const me = this.state.me;
+    const name = p.name || (me && me.name) || '…';
+    const photo = p.photo || (me && me.photo) || '';
+    const avatarEl = photo
+      ? this.h('img', { src: photo, alt: '', style: { width: '100%', height: '100%', objectFit: 'cover' } })
+      : ((me && me.initials) || '?');
+
+    const role = (p.role || '').trim();
+    const farm = (p.farm || '').trim();
+    const roleFarm = [role, farm].filter(Boolean).join(' · ');
+    const crops = Array.isArray(p.crops) ? p.crops : [];
+    const bio = (p.bio || '').trim();
+    const hasExperience = !!p.experience && p.experience !== '';
+
     return {
-      stats, activity, settings,
-      meInitials: (me && me.initials) || '?',
-      meName: (me && me.name) || '…',
+      stats,
+      activity,
+      noActivity: !!act && activity.length === 0,
+      settings,
+      avatarEl,
+      meName: name,
       meEmail: (me && me.email) || '',
+      roleFarm,
+      hasRoleFarm: !!roleFarm,
+      meBio: bio || 'No bio yet — add a short introduction from Edit profile so other farmers know your soil, crops and what you want to exchange.',
+      bioStyle: 'font-size:16px;line-height:1.7;margin:0;' + (bio ? 'color:#33473b;' : 'color:#7d9384;font-style:italic;'),
+      crops,
+      hasCrops: crops.length > 0,
+      experienceLabel: this.EXPERIENCE[p.experience] || p.experience || '',
+      hasExperience,
+      hasFocus: crops.length > 0 || hasExperience,
+      memberSince: this.memberSince(),
       provinceId: this.state.province,
       provinceName: this.NAMES[this.state.province] || '-',
-      onSelectProvince: (id) => this.setState({ province: id }),
     };
   }
 }
