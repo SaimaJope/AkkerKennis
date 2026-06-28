@@ -61,6 +61,51 @@
     return (a + b).toUpperCase() || a.toUpperCase();
   }
 
+  // ── Image processing (no Firebase Storage — that needs a paid plan) ─────────
+  // Shrink a chosen photo in the browser and return a JPEG data URL we can store
+  // inline. Firestore caps a document near 1 MiB, so we step quality/size down
+  // until the result fits under `maxBytes`.
+  function loadImageEl(file) {
+    return new Promise(function (res, rej) {
+      var reader = new FileReader();
+      reader.onerror = function () { rej(new Error('Could not read the file')); };
+      reader.onload = function () {
+        var img = new Image();
+        img.onerror = function () { rej(new Error('Could not load the image')); };
+        img.onload = function () { res(img); };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  function encodeImage(img, maxDim, quality) {
+    var w = img.width, h = img.height;
+    var scale = Math.min(1, maxDim / Math.max(w, h, 1));
+    var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+    var canvas = document.createElement('canvas');
+    canvas.width = cw; canvas.height = ch;
+    var c = canvas.getContext('2d');
+    c.fillStyle = '#ffffff';
+    c.fillRect(0, 0, cw, ch); // flatten any transparency (PNG screenshots)
+    c.drawImage(img, 0, 0, cw, ch);
+    return canvas.toDataURL('image/jpeg', quality);
+  }
+  function processImage(file, maxBytes) {
+    if (!file) return Promise.reject(new Error('No file selected'));
+    if (file.type && file.type.indexOf('image/') !== 0) return Promise.reject(new Error('Only image files are allowed'));
+    return loadImageEl(file).then(function (img) {
+      var attempts = [[1280, 0.62], [1024, 0.55], [820, 0.5], [640, 0.45]];
+      var best = null;
+      for (var i = 0; i < attempts.length; i++) {
+        var url = encodeImage(img, attempts[i][0], attempts[i][1]);
+        best = url;
+        if (url.length <= maxBytes) return url;
+      }
+      if (best && best.length <= maxBytes * 1.25) return best;
+      throw new Error('This photo is too large — try a smaller or simpler image');
+    });
+  }
+
   // Resolve the SDK once. Returns { auth, db, fb } or null if not configured.
   var ready = (function () {
     if (!configured()) {
@@ -70,11 +115,10 @@
     return loadScript(SDK + 'firebase-app-compat.js')
       .then(function () { return loadScript(SDK + 'firebase-auth-compat.js'); })
       .then(function () { return loadScript(SDK + 'firebase-firestore-compat.js'); })
-      .then(function () { return loadScript(SDK + 'firebase-storage-compat.js'); })
       .then(function () {
         var fb = window.firebase;
         fb.initializeApp(CONFIG);
-        return { auth: fb.auth(), db: fb.firestore(), storage: fb.storage(), fb: fb };
+        return { auth: fb.auth(), db: fb.firestore(), fb: fb };
       })
       .catch(function (e) {
         console.error('[AK] Firebase failed to initialise:', e);
@@ -168,21 +212,15 @@
       });
     },
 
-    // ── Media (Firebase Storage) ──────────────────────────────────────────────
-    // Upload one image file, resolve to its public download URL. Owner-scoped
-    // path so the storage rules can restrict writes to the uploader.
+    // ── Media ─────────────────────────────────────────────────────────────────
+    // Shrink an image in the browser and resolve to an inline JPEG data URL,
+    // stored on the topic/reply doc. No Firebase Storage (and so no paid plan).
+    // `folder` is accepted for call-site compatibility but unused here.
     uploadImage: function (file, folder) {
       return ready.then(function (ctx) {
-        if (!ctx) throw new Error('Backend not configured');
-        var u = ctx.auth.currentUser;
-        if (!u) throw new Error('Sign in to upload');
-        if (!file) throw new Error('No file selected');
-        if (file.type && file.type.indexOf('image/') !== 0) throw new Error('Only image files are allowed');
-        if (file.size > 8 * 1024 * 1024) throw new Error('Image is larger than 8 MB');
-        var safe = String(file.name || 'image').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-60);
-        var path = (folder || 'uploads') + '/' + u.uid + '/' + Date.now() + '_' + safe;
-        var ref = ctx.storage.ref().child(path);
-        return ref.put(file).then(function (snap) { return snap.ref.getDownloadURL(); });
+        var u = ctx && ctx.auth.currentUser;
+        if (!u) throw new Error('Sign in to add photos');
+        return processImage(file, 300 * 1024);
       });
     },
     // ── Topics (posts) ──────────────────────────────────────────────────────

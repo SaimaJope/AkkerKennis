@@ -61,16 +61,11 @@ var CONFIG = {
 That's the backend live. Refresh the site, go to **Sign in**, log in as a tester — you can now
 reply and upvote on a thread, and the other testers see it in real time.
 
-## 4b. Enable Storage (for photos on posts & replies)
+## 4b. Photos
 
-Posts, replies, events and projects can carry photos — essential for field Q&A. Turn on Storage:
-
-1. Console → **Storage** → **Get started** → accept the default bucket → pick the same region
-   as Firestore (e.g. `europe-west`).
-2. Open the **Rules** tab there, paste the entire contents of **`storage.rules`**, click **Publish**.
-
-Images are public-read (so guests see them) but a signed-in user can only write into their own
-folder — enforced by both `storage.rules` and the per-user path in `AK.uploadImage()`.
+Photos on posts and replies are **shrunk in the browser and stored inline** in Firestore — no
+Firebase Storage and no billing needed. There is nothing to set up here: `AK.uploadImage()`
+resizes each photo client-side and keeps it well under Firestore's per-document size limit.
 
 ## 5. (Optional) Seed the starter comments
 

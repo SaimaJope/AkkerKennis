@@ -188,7 +188,7 @@ class Component extends DCLogic {
   // ── Images ────────────────────────────────────────────────────────────────
   onPickImages(fileList) {
     const files = Array.prototype.slice.call(fileList || []);
-    const room = 6 - this.state.images.length;
+    const room = 3 - this.state.images.length;
     files.slice(0, Math.max(0, room)).forEach((file) => {
       const id = ++this._imgSeq;
       this.setState((s) => ({ images: s.images.concat([{ id, name: file.name, uploading: true, url: '', error: '' }]) }));
@@ -236,13 +236,15 @@ class Component extends DCLogic {
     if (!st.body.trim()) bodyErr = 'Add a description so people can help.';
     if (titleErr || bodyErr) { this.setState({ titleErr, bodyErr, error: '' }); return; }
     if (this.anyUploading()) { this.setState({ error: 'Hang on — your photos are still uploading.' }); return; }
+    const urls = this.uploadedUrls();
+    if (urls.reduce((n, u) => n + u.length, 0) > 950000) { this.setState({ error: 'Your photos are too large together — remove one and try again.' }); return; }
 
     this.setState({ busy: true, error: '', titleErr: '', bodyErr: '' });
     const summary = st.summary.trim() || this.smartSummary(st.body);
     window.AK.addTopic({
       title: st.title, body: st.body, summary, tried: st.tried,
       category: st.category, crop: st.crop, region: st.region, regionId: this.REGION_IDS[st.region] || '',
-      type: st.type, images: this.uploadedUrls(), tags: st.tags, seekingProject: st.seekingProject,
+      type: st.type, images: urls, tags: st.tags, seekingProject: st.seekingProject,
     })
       .then((id) => { this.clearDraft(); window.location.href = 'Thread.dc.html?id=' + encodeURIComponent(id); })
       .catch((e) => { console.error(e); this.setState({ busy: false, error: (e && e.message) || 'Could not publish. Try again.' }); });
@@ -273,13 +275,13 @@ class Component extends DCLogic {
       im.error ? this.h('div', { style: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 11, color: '#c43a18', background: '#fde9e3', padding: 6 } }, im.error) : null,
       this.h('button', { type: 'button', onClick: () => this.removeImage(im.id), 'aria-label': 'Remove photo', style: { position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: 999, border: 'none', background: 'rgba(8,16,13,0.6)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, lineHeight: 1, padding: 0 } }, '×')
     ));
-    const addBtn = imgs.length < 6 ? this.h('label', { key: 'add', style: { width: 96, height: 96, borderRadius: 12, border: '1.5px dashed rgba(22,54,30,0.3)', background: '#f6fcf0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, cursor: 'pointer', flex: '0 0 auto', color: '#16361e' } },
+    const addBtn = imgs.length < 3 ? this.h('label', { key: 'add', style: { width: 96, height: 96, borderRadius: 12, border: '1.5px dashed rgba(22,54,30,0.3)', background: '#f6fcf0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, cursor: 'pointer', flex: '0 0 auto', color: '#16361e' } },
       this.h('svg', { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round' }, this.h('path', { d: 'M12 5v14M5 12h14' })),
       this.h('span', { style: { fontSize: 12, fontWeight: 600 } }, 'Add'),
       this.h('input', { type: 'file', accept: 'image/*', multiple: true, onChange: (e) => { this.onPickImages(e.target.files); e.target.value = ''; }, style: { display: 'none' } })
     ) : null;
     return this.h('div', null,
-      this.labelEl('Photos', '(optional — up to 6)'),
+      this.labelEl('Photos', '(optional — up to 3)'),
       this.h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 10 } }, ...thumbs, addBtn),
       this.h('span', { style: { display: 'block', fontSize: 13, color: '#8aa090', marginTop: 8 } }, 'A clear field photo — the leaf, the pest, the crop, the machine — gets far better answers.')
     );
