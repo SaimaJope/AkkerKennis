@@ -62,15 +62,21 @@ class Component extends DCLogic {
     let topicId = '';
     try { topicId = new URLSearchParams(window.location.search).get('id') || ''; } catch (e) {}
 
-    // Sample challenge from demo-data.js — render entirely client-side (no
-    // backend reads/writes). Replies and reaction counts are static examples.
+    // Sample challenge from demo-data.js — the post itself (title/body) is a
+    // client-side example, but boosting, reacting and commenting are REAL: they
+    // use the live replies/threadStats collections keyed by the demo id, so they
+    // work and persist just like a normal challenge. The sample's seed counts
+    // are shown as a baseline on top of the real ones (see actionBarEl).
     if (window.AK_DEMO && window.AK_DEMO.isDemoId(topicId)) {
       const d = window.AK_DEMO.byId(topicId);
-      this.setState({
-        configured, topicId, isDemo: true, topic: d, topicLoading: false,
-        remoteReplies: (d && d.replies) || [], threadStats: { boosts: [], issues: [] },
+      this.setState({ configured, topicId, isDemo: true, topic: d, topicLoading: false });
+      if (!configured) { this.setState({ remoteReplies: [] }); return; }
+      window.AK.onAuth((u) => this.setState({ me: u, loggedIn: !!u, prompt: u ? false : this.state.prompt }));
+      this._unsub = window.AK.watchReplies(topicId, (rows, err) => {
+        if (err) this.setState({ repliesError: err });
+        else this.setState({ remoteReplies: rows, repliesError: '' });
       });
-      if (configured) window.AK.onAuth((u) => this.setState({ me: u, loggedIn: !!u }));
+      this._unsubStats = window.AK.watchThreadStats(topicId, (stats) => { if (stats) this.setState({ threadStats: stats }); });
       return;
     }
 
@@ -167,7 +173,6 @@ class Component extends DCLogic {
   buildReplies() {
     const st = this.state;
     const uid = st.me && st.me.uid;
-    const demo = st.isDemo;
     return (st.remoteReplies || []).map((r) => ({
       id: r.id,
       uid: r.authorUid,
@@ -177,12 +182,12 @@ class Component extends DCLogic {
       meta: r.authorName + ' · ' + this.fmtTime(r.createdAt),
       body: r.body,
       images: r.images || [],
-      count: (typeof r.voteCount === 'number' ? r.voteCount : (r.votes ? r.votes.length : 0)),
-      voted: !demo && !!(uid && r.votes.indexOf(uid) !== -1),
-      mine: !demo && !!(uid && r.authorUid === uid),
+      count: r.votes.length,
+      voted: !!(uid && r.votes.indexOf(uid) !== -1),
+      mine: !!(uid && r.authorUid === uid),
       edited: r.edited,
       originalBody: r.originalBody,
-      onVote: demo ? (() => {}) : this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
+      onVote: this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
     }));
   }
 
@@ -333,17 +338,20 @@ class Component extends DCLogic {
 
   actionBarEl(t) {
     const st = this.state;
-    const demo = st.isDemo;
     const uid = st.me && st.me.uid;
     const b = st.threadStats.boosts || [];
     const i = st.threadStats.issues || [];
-    const bCount = demo ? (t.boosts || 0) : b.length;
-    const iCount = demo ? (t.issues || 0) : i.length;
-    const boosted = !demo && !!(uid && b.indexOf(uid) !== -1);
-    const hasIssue = !demo && !!(uid && i.indexOf(uid) !== -1);
-    const onBoost = demo ? (() => {}) : this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'boosts').catch((e) => console.error(e)));
-    const onIssue = demo ? (() => {}) : this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'issues').catch((e) => console.error(e)));
-    const deleteBtn = !demo && this.isMine(t) && !t.deleted
+    // On a demo challenge the sample's seed counts sit on top of the real
+    // (shared) reactions, so the post looks populated while boosting still works.
+    const baseB = (st.isDemo && t) ? (t.boosts || 0) : 0;
+    const baseI = (st.isDemo && t) ? (t.issues || 0) : 0;
+    const bCount = b.length + baseB;
+    const iCount = i.length + baseI;
+    const boosted = !!(uid && b.indexOf(uid) !== -1);
+    const hasIssue = !!(uid && i.indexOf(uid) !== -1);
+    const onBoost = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'boosts').catch((e) => console.error(e)));
+    const onIssue = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'issues').catch((e) => console.error(e)));
+    const deleteBtn = this.isMine(t) && !t.deleted
       ? this.h('button', { type: 'button', onClick: () => this.deleteTopic(), style: { display: 'inline-flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, borderRadius: 11, padding: '11px 16px', cursor: 'pointer', background: '#ffffff', color: '#8aa090', border: '1.5px solid rgba(22,54,30,0.15)', marginLeft: 'auto' } },
         this.h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13' })), 'Delete challenge')
       : null;
@@ -543,18 +551,7 @@ class Component extends DCLogic {
   sampleBannerEl() {
     return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, background: '#16361e', color: '#dbeede', borderRadius: 14, padding: '12px 16px', marginBottom: 22, fontSize: 14, lineHeight: 1.5 } },
       this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: '#8ee05e', display: 'inline-block', flex: '0 0 auto' } }),
-      'Sample challenge — added to show how AkkerBooster works. The replies and reaction counts here are examples.'
-    );
-  }
-
-  demoNoticeEl() {
-    return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: 'clamp(26px,3vw,38px)', textAlign: 'center' } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'This is a sample discussion'),
-      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, 'It was added to show how Challenges work. Browse the live discussions or start your own.'),
-      this.h('div', { style: { display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' } },
-        this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#16361e', background: 'transparent', border: '1.5px solid rgba(22,54,30,0.3)', borderRadius: 12 } }, 'Browse challenges'),
-        this.h('a', { href: 'CreatePost.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'Start a challenge')
-      )
+      'Sample challenge — added to show how AkkerBooster works. The post is an example, but you can boost it, react, and comment for real.'
     );
   }
 
@@ -570,11 +567,11 @@ class Component extends DCLogic {
         this.renderTopic(t),
         st.isDemo ? null : this.ownerBarEl(t),
         t.deleted ? null : this.actionBarEl(t),
-        st.isDemo ? null : this.promptEl(),
+        this.promptEl(),
         t.deleted ? null : this.h('div', { style: { height: 24 } }),
         t.deleted ? null : this.projectPanelEl(t),
         this.repliesSectionEl(),
-        st.isDemo ? this.demoNoticeEl() : this.replyGateEl()
+        this.replyGateEl()
       ),
       this.sidebarEl(t)
     );
