@@ -224,7 +224,11 @@
         var id = uid || (ctx.auth.currentUser && ctx.auth.currentUser.uid);
         if (!id) return null;
         return ctx.db.collection('profiles').doc(id).get().then(function (d) {
-          return d.exists ? Object.assign({ uid: id }, d.data()) : null;
+          if (!d.exists) return null;
+          var data = d.data() || {};
+          return Object.assign({ uid: id }, data, {
+            createdAt: (data.createdAt && data.createdAt.toMillis) ? data.createdAt.toMillis() : 0,
+          });
         });
       });
     },
@@ -246,13 +250,26 @@
           crops: data && Array.isArray(data.crops) ? data.crops : [],
           updatedAt: ctx.fb.firestore.FieldValue.serverTimestamp(),
         };
-        // Only touch the photo when a new one was supplied (a data URL).
-        if (data && typeof data.photo === 'string' && data.photo) doc.photo = data.photo;
-        return ctx.db.collection('profiles').doc(u.uid).set(doc, { merge: true }).then(function () {
+        // Touch the photo only when a new one was supplied (a data URL) or the
+        // member explicitly asked to remove their current one (then drop the
+        // field so the avatar falls back to initials everywhere).
+        var removePhoto = !!(data && data.removePhoto);
+        if (removePhoto) doc.photo = ctx.fb.firestore.FieldValue.delete();
+        else if (data && typeof data.photo === 'string' && data.photo) doc.photo = data.photo;
+        var ref = ctx.db.collection('profiles').doc(u.uid);
+        // Stamp createdAt once, the first time a profile is written — it powers
+        // the "Member since" line on other people's public profiles.
+        return ref.get().then(function (snap) {
+          if (!snap.exists || !(snap.data() && snap.data().createdAt)) {
+            doc.createdAt = ctx.fb.firestore.FieldValue.serverTimestamp();
+          }
+          return ref.set(doc, { merge: true });
+        }).then(function () {
           me = shapeUser(u);
           me.name = doc.name || me.name;
           me.initials = initials(me.name);
-          if (doc.photo) me.photo = doc.photo;
+          if (removePhoto) delete me.photo;
+          else if (typeof doc.photo === 'string' && doc.photo) me.photo = doc.photo;
           persistMe(me);
           return true;
         });
@@ -262,7 +279,7 @@
     // Real activity for a member, derived from their topics + replies. Powers the
     // profile stat tiles and the "Recent contributions" list (no fake numbers).
     getUserActivity: function (uid) {
-      var empty = { threadsStarted: 0, replies: 0, recent: [] };
+      var empty = { threadsStarted: 0, replies: 0, recent: [], name: '', initials: '' };
       return ready.then(function (ctx) {
         if (!ctx) return empty;
         var id = uid || (ctx.auth.currentUser && ctx.auth.currentUser.uid);
@@ -273,25 +290,35 @@
           ctx.db.collection('replies').where('authorUid', '==', id).get(),
         ]).then(function (res) {
           var recent = [], threadsStarted = 0, replies = 0;
+          // Track the name on the member's most recent post, as a display-name
+          // fallback for members who have posted but never set up a profile.
+          var nameCand = '', nameTs = -1;
+          var noteName = function (n, ts) {
+            if (n && n !== '[deleted]' && ts > nameTs) { nameCand = n; nameTs = ts; }
+          };
           res[0].forEach(function (d) {
             var t = d.data() || {};
             if (t.deleted) return; // soft-deleted topics don't count
             threadsStarted++;
-            recent.push({ type: 'Started', title: t.title || '(untitled)', threadId: d.id, createdAt: toMs(t.createdAt) });
+            var ts = toMs(t.createdAt);
+            noteName(t.authorName, ts);
+            recent.push({ type: 'Started', title: t.title || '(untitled)', threadId: d.id, createdAt: ts });
           });
           res[1].forEach(function (d) {
             var r = d.data() || {};
             replies++;
+            var ts = toMs(r.createdAt);
+            noteName(r.authorName, ts);
             var body = String(r.body || '').replace(/\s+/g, ' ').trim();
             recent.push({
               type: 'Reply',
               title: body.length > 80 ? body.slice(0, 80) + '…' : (body || 'Reply'),
               threadId: r.threadId || '',
-              createdAt: toMs(r.createdAt),
+              createdAt: ts,
             });
           });
           recent.sort(function (a, b) { return b.createdAt - a.createdAt; });
-          return { threadsStarted: threadsStarted, replies: replies, recent: recent.slice(0, 6) };
+          return { threadsStarted: threadsStarted, replies: replies, recent: recent.slice(0, 6), name: nameCand, initials: initials(nameCand) };
         }).catch(function (e) { console.error('[AK] getUserActivity:', e); return empty; });
       });
     },

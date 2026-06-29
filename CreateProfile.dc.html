@@ -54,6 +54,7 @@
               {{ uploadLabel }}
               <input type="file" accept="image/*" onchange="{{ onPhoto }}" style="display:none;" />
             </label>
+            {{ removePhotoEl }}
           </div>
 
           <div>
@@ -143,6 +144,7 @@ class Component extends DCLogic {
     province: 'drenthe',
     experience: '6-15',
     photo: '',
+    photoRemoved: false,
     photoBusy: false,
     saving: false,
     error: '',
@@ -230,6 +232,7 @@ class Component extends DCLogic {
       name: st.name, role: st.role, farm: st.farm, bio: st.bio,
       regionId: st.province, experience: st.experience, crops: st.crops,
       photo: st.photo || undefined,
+      removePhoto: st.photoRemoved && !st.photo,
     })
       .then(() => { window.location.href = 'Profile.dc.html'; })
       .catch((e) => this.setState({ saving: false, error: (e && e.message) || 'Could not save your profile' }));
@@ -241,8 +244,14 @@ class Component extends DCLogic {
     if (!file) return;
     this.setState({ photoBusy: true, error: '' });
     window.AK.uploadImage(file)
-      .then((url) => this.setState({ photo: url, photoBusy: false }))
+      .then((url) => this.setState({ photo: url, photoRemoved: false, photoBusy: false }))
       .catch((err) => this.setState({ photoBusy: false, error: (err && err.message) || 'Could not load that photo' }));
+  }
+
+  // Drop the current photo locally; the deletion persists on the next Save
+  // (saveProfile removes the stored field, so the avatar falls back to initials).
+  removePhoto() {
+    this.setState({ photo: '', photoRemoved: true, error: '' });
   }
 
   addCrop(name) {
@@ -345,6 +354,14 @@ class Component extends DCLogic {
     const avatarEl = st.photo
       ? this.h('img', { src: st.photo, alt: '', style: { width: '100%', height: '100%', objectFit: 'cover' } })
       : this.initials();
+    // Only offer "Remove photo" while one is actually set, and not mid-upload.
+    const removePhotoEl = (st.photo && !st.photoBusy)
+      ? this.h('button', {
+          type: 'button',
+          onClick: () => this.removePhoto(),
+          style: { border: 'none', background: 'transparent', color: '#c43a18', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: '2px 6px', fontFamily: 'inherit' },
+        }, 'Remove photo')
+      : null;
     const saveStyle = 'display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 28px;font-size:16px;font-weight:700;color:#eafbe1;background:#16361e;border:none;border-radius:13px;cursor:pointer;'
       + (st.saving ? 'opacity:0.6;pointer-events:none;' : '');
     return {
@@ -356,6 +373,7 @@ class Component extends DCLogic {
       provinceName: this.NAMES[st.province] || '-',
       experience: st.experience,
       avatarEl,
+      removePhotoEl,
       cropsField: this.cropsFieldEl(),
       uploadLabel: st.photoBusy ? 'Processing…' : (st.photo ? 'Change photo' : 'Upload photo'),
       saveLabel: st.saving ? 'Saving…' : 'Save profile',
