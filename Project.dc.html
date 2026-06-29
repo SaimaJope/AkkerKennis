@@ -76,7 +76,7 @@ class Component extends DCLogic {
     if (this._unsubStats) this._unsubStats();
   }
 
-  statusLabel(status) { return status === 'past' ? 'Past project' : 'Ongoing project'; }
+  statusLabel(status) { return status === 'past' ? 'Past topic' : 'Ongoing topic'; }
 
   guarded(fn) {
     return () => { if (!this.state.loggedIn) { this.setState({ prompt: true }); return; } fn(); };
@@ -293,11 +293,11 @@ class Component extends DCLogic {
 
   notFoundEl() {
     return this.h('div', null,
-      this.backLink('All projects'),
+      this.backLink('All topics'),
       this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
-        this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Project not found'),
-        this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This project may have been removed. Browse the current projects instead.'),
-        this.h('a', { href: 'Projects.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all projects')
+        this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Topic not found'),
+        this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This topic may have been removed. Browse the current topics instead.'),
+        this.h('a', { href: 'Projects.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all topics')
       )
     );
   }
@@ -310,7 +310,7 @@ class Component extends DCLogic {
     const onInterested = this.guarded(() => window.AK.toggleThreadReaction(st.projectId, 'boosts').catch((e) => console.error(e)));
 
     const detailsCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: 22 } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Project details'),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Topic details'),
       this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 13 } },
         this.detailRow('Status', this.statusLabel(pr.status), pr.status === 'past' ? '#16361e' : '#fe4c24'),
         this.detailRow('Region', pr.region),
@@ -322,7 +322,7 @@ class Component extends DCLogic {
     );
 
     const managerCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: 22 } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Project manager'),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Topic manager'),
       this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13 } },
         this.h('span', { style: { flex: '0 0 auto', width: 52, height: 52, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20 } }, pr.managerInitials || ''),
         this.h('div', null,
@@ -354,13 +354,13 @@ class Component extends DCLogic {
           this.h('span', { style: { fontSize: 13, color: '#5a7060' } }, pr.timeline)
         ) : null
       ),
-      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(30px,3.8vw,44px)', lineHeight: 1.12, color: '#16361e', margin: '0 0 18px', letterSpacing: '-0.4px' } }, pr.title || 'Untitled project'),
+      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(30px,3.8vw,44px)', lineHeight: 1.12, color: '#16361e', margin: '0 0 18px', letterSpacing: '-0.4px' } }, pr.title || 'Untitled topic'),
       this.tagsEl(pr.tags),
       this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 20, padding: 'clamp(24px,3vw,36px)' } },
         this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 21, color: '#16361e', margin: '0 0 14px' } }, 'Overview'),
         ...overviewParas,
         this.h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 10, margin: '24px 0 6px' } },
-          this.factTile('Project manager', pr.manager),
+          this.factTile('Topic manager', pr.manager),
           this.factTile('Proposed by', pr.originator),
           this.factTile('Financed by', pr.funder),
           this.factTile('Region', pr.region)
@@ -372,11 +372,11 @@ class Component extends DCLogic {
           this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: '#8ee05e', display: 'inline-block' } }),
           this.h('span', { style: { fontSize: 12, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: '#bff0a6' } }, isPast ? 'Stay in touch' : 'Get involved')
         ),
-        this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#ffffff', margin: '0 0 10px', lineHeight: 1.2 } }, isPast ? 'Follow up on this project' : 'Join this project on WhatsApp'),
-        this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#aecdb4', margin: '0 0 22px', maxWidth: 560 } }, isPast ? 'This project is complete, but the working group still answers questions and shares the results in its WhatsApp group.' : 'The project is coordinated in a dedicated WhatsApp group. Join to follow progress, share field data, and take part in the trial.'),
+        this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#ffffff', margin: '0 0 10px', lineHeight: 1.2 } }, isPast ? 'Follow up on this topic' : 'Join this topic on WhatsApp'),
+        this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#aecdb4', margin: '0 0 22px', maxWidth: 560 } }, isPast ? 'This topic is complete, but the working group still answers questions and shares the results in its WhatsApp group.' : 'The topic is coordinated in a dedicated WhatsApp group. Join to follow progress, share field data, and take part in the trial.'),
         this.h('a', { href: pr.whatsappUrl, target: '_blank', rel: 'noreferrer', className: 'ak-whatsapp', style: { display: 'inline-flex', alignItems: 'center', gap: 9, justifyContent: 'center', minHeight: 50, padding: '0 24px', textDecoration: 'none', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 15, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', borderRadius: 12, transition: 'background .15s ease' } },
           this.h('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'currentColor', 'aria-hidden': true }, this.h('path', { d: 'M12.04 2c-5.46 0-9.9 4.43-9.9 9.9 0 1.74.46 3.45 1.33 4.95L2.05 22l5.3-1.38a9.9 9.9 0 0 0 4.69 1.19c5.46 0 9.9-4.43 9.9-9.9S17.5 2 12.04 2zm0 18.06c-1.5 0-2.97-.4-4.25-1.16l-.3-.18-3.15.82.84-3.07-.2-.32a8.16 8.16 0 0 1-1.25-4.35 8.23 8.23 0 1 1 8.26 8.24zm4.5-6.16c-.25-.13-1.47-.72-1.7-.8-.23-.09-.4-.13-.56.12-.16.25-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.42l-.48-.01c-.16 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.16 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z' })),
-          isPast ? "Open this project's WhatsApp group" : "Join this project's WhatsApp group"
+          isPast ? "Open this topic's WhatsApp group" : "Join this topic's WhatsApp group"
         )
       ) : null,
       this.repliesSectionEl()
@@ -385,11 +385,11 @@ class Component extends DCLogic {
 
   bodyEl() {
     const st = this.state;
-    if (st.prLoading) return this.h('div', null, this.backLink('All projects'), this.h('div', { style: { padding: '30px 0', fontSize: 16, color: '#5a7060' } }, 'Loading project…'));
+    if (st.prLoading) return this.h('div', null, this.backLink('All topics'), this.h('div', { style: { padding: '30px 0', fontSize: 16, color: '#5a7060' } }, 'Loading topic…'));
     const pr = st.pr;
     if (!pr) return this.notFoundEl();
     return this.h('div', null,
-      this.backLink('All projects'),
+      this.backLink('All topics'),
       this.h('div', { className: 'ak-detail-grid', style: { display: 'grid', gridTemplateColumns: '1fr 312px', gap: 32, alignItems: 'start' } },
         this.mainEl(pr),
         this.sidebarEl(pr)

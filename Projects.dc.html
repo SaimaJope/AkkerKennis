@@ -35,17 +35,19 @@
 
   <section style="max-width:1200px;margin:0 auto;padding:clamp(32px,4vw,56px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
     <div style="margin-bottom:32px;max-width:700px;">
-      <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.4vw,52px);color:#16361e;margin:0 0 10px;letter-spacing:-0.4px;">Projects</h1>
-      <p style="font-size:18px;line-height:1.6;color:#33473b;margin:0;">Member-led pilots and collaborative trials that turn useful topics into practical field work. Open a project to see who runs it, who funds it, join the discussion, and take part.</p>
+      <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.4vw,52px);color:#16361e;margin:0 0 10px;letter-spacing:-0.4px;">Topics</h1>
+      <p style="font-size:18px;line-height:1.6;color:#33473b;margin:0;">Member-led pilots and collaborative trials that turn useful challenges into practical field work. Open a topic to see who runs it, who funds it, join the discussion, and take part.</p>
     </div>
 
     <div class="ak-projects-grid" style="display:grid;grid-template-columns:268px 1fr;gap:28px;align-items:start;">
       <!-- SIDEBAR -->
       <aside style="display:flex;flex-direction:column;gap:20px;">
+        <sc-if value="{{ canCreate }}" hint-placeholder-val="{{ true }}">
         <a href="CreateProject.dc.html" class="ak-new-project" style="display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;text-decoration:none;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border-radius:14px;transition:background .18s ease;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eafbe1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
-          New project
+          New topic
         </a>
+        </sc-if>
 
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:20px;">
           <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 14px;">Status</h3>
@@ -95,7 +97,7 @@
       <div>
         <div style="position:relative;margin-bottom:22px;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-          <input type="text" value="{{ query }}" onInput="{{ onQuery }}" placeholder="Search projects, managers, funders..." style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.16);border-radius:14px;padding:16px 18px 16px 50px;" />
+          <input type="text" value="{{ query }}" onInput="{{ onQuery }}" placeholder="Search topics, managers, funders..." style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.16);border-radius:14px;padding:16px 18px 16px 50px;" />
         </div>
 
         {{ bodyEl }}
@@ -108,7 +110,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { region: 'all', regionMode: 'map', status: 'all', query: '', remoteProjects: null, projectsError: '', configured: false };
+  state = { region: 'all', regionMode: 'map', status: 'all', query: '', remoteProjects: null, projectsError: '', configured: false, me: null };
 
   h(type, props, ...children) {
     return React.createElement(type, props, ...children);
@@ -118,6 +120,7 @@ class Component extends DCLogic {
     const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
     this.setState({ configured });
     if (configured) {
+      window.AK.onAuth((u) => this.setState({ me: u }));
       this._unsub = window.AK.watchProjects((rows, err) => {
         if (err) this.setState({ projectsError: err });
         else this.setState({ remoteProjects: rows || [], projectsError: '' });
@@ -126,6 +129,8 @@ class Component extends DCLogic {
       this.setState({ remoteProjects: [] });
     }
   }
+
+  isAdmin() { return !!(this.state.me && this.state.me.isAdmin); }
 
   componentWillUnmount() {
     if (this._unsub) this._unsub();
@@ -175,7 +180,7 @@ class Component extends DCLogic {
         project.funder ? this.h('span', null, this.h('strong', { style: { color: '#16361e' } }, 'Funded by: '), project.funder) : null
       ),
       this.h('span', { className: 'ak-project-open', style: { display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 15, fontWeight: 700, color: '#16361e', transition: 'gap .15s ease' } },
-        'View project details',
+        'View topic details',
         this.h('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: '#16361e', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M9 18l6-6-6-6' }))
       )
     );
@@ -185,7 +190,7 @@ class Component extends DCLogic {
     return this.h('section', { key: title, style: { marginBottom: 36 } },
       this.h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', marginBottom: 16 } },
         this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(24px,3vw,32px)', color: '#16361e', margin: 0 } }, title),
-        this.h('span', { style: { fontSize: 14, fontWeight: 700, color: '#5a7060' } }, projects.length + (projects.length === 1 ? ' project' : ' projects'))
+        this.h('span', { style: { fontSize: 14, fontWeight: 700, color: '#5a7060' } }, projects.length + (projects.length === 1 ? ' topic' : ' topics'))
       ),
       projects.length
         ? this.h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(330px,1fr))', gap: 18 } }, ...projects.map((project) => this.projectCard(project)))
@@ -194,19 +199,22 @@ class Component extends DCLogic {
   }
 
   firstRunEmptyEl() {
+    const admin = this.isAdmin();
     return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No projects yet'),
-      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, 'Turn a promising topic into practical field work — start the first member-led project.'),
-      this.h('a', { href: 'CreateProject.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No topics yet'),
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, admin
+        ? 'Turn a promising challenge into practical field work — start the first member-led topic.'
+        : 'Member-led topics are published by the AkkerBooster team. Check back soon — the first ones are on the way.'),
+      admin ? this.h('a', { href: 'CreateProject.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } },
         this.h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: '#eafbe1', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, this.h('path', { d: 'M12 5v14M5 12h14' })),
-        'Start the first project')
+        'Start the first topic') : null
     );
   }
 
   errorEl(msg) {
     return this.h('div', { style: { background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 18, padding: '24px 26px' } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20, color: '#c43a18', margin: '0 0 6px' } }, 'Projects can’t load from the database'),
-      this.h('p', { style: { fontSize: 15, lineHeight: 1.55, color: '#8a3b22', margin: '0 0 8px' } }, 'Create the Firestore database and publish the security rules (see SETUP_FIREBASE.md). Once published, projects appear here instantly.'),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20, color: '#c43a18', margin: '0 0 6px' } }, 'Topics can’t load from the database'),
+      this.h('p', { style: { fontSize: 15, lineHeight: 1.55, color: '#8a3b22', margin: '0 0 8px' } }, 'Create the Firestore database and publish the security rules (see SETUP_FIREBASE.md). Once published, topics appear here instantly.'),
       this.h('div', { style: { fontSize: 13, fontFamily: 'Ubuntu Mono, monospace', color: '#8a3b22', opacity: 0.8 } }, 'Details: ' + msg)
     );
   }
@@ -214,7 +222,7 @@ class Component extends DCLogic {
   bodyEl() {
     const st = this.state;
     if (st.configured && st.projectsError) return this.errorEl(st.projectsError);
-    if (st.remoteProjects === null) return this.h('div', { style: { padding: '40px 4px', fontSize: 16, color: '#5a7060' } }, 'Loading projects…');
+    if (st.remoteProjects === null) return this.h('div', { style: { padding: '40px 4px', fontSize: 16, color: '#5a7060' } }, 'Loading topics…');
     if (this.projects().length === 0) return this.firstRunEmptyEl();
 
     const list = this.filtered();
@@ -222,8 +230,8 @@ class Component extends DCLogic {
     const past = list.filter((p) => p.status === 'past');
 
     const sections = [];
-    if (st.status === 'all' || st.status === 'ongoing') sections.push(this.sectionEl('Ongoing projects', ongoing, 'No ongoing projects match your filters.'));
-    if (st.status === 'all' || st.status === 'past') sections.push(this.sectionEl('Past projects', past, 'No past projects match your filters.'));
+    if (st.status === 'all' || st.status === 'ongoing') sections.push(this.sectionEl('Ongoing topics', ongoing, 'No ongoing topics match your filters.'));
+    if (st.status === 'all' || st.status === 'past') sections.push(this.sectionEl('Past topics', past, 'No past topics match your filters.'));
     return this.h(React.Fragment, null, ...sections);
   }
 
@@ -244,13 +252,14 @@ class Component extends DCLogic {
         onClick: () => this.setState({ status: id }),
       };
     };
-    const statusList = [mkStatus('all', 'All projects', counts.all), mkStatus('ongoing', 'Ongoing', counts.ongoing), mkStatus('past', 'Past', counts.past)];
+    const statusList = [mkStatus('all', 'All topics', counts.all), mkStatus('ongoing', 'Ongoing', counts.ongoing), mkStatus('past', 'Past', counts.past)];
 
     const mapMode = st.regionMode === 'map';
     const modeBase = "font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;border:none;border-radius:999px;padding:6px 10px;cursor:pointer;line-height:1;";
 
     return {
       bodyEl: this.bodyEl(),
+      canCreate: this.isAdmin(),
       statusList,
       regionOpts: this.REGIONS,
       region: st.region,
@@ -260,7 +269,7 @@ class Component extends DCLogic {
       regionTextVisible: !mapMode,
       mapToggleStyle: modeBase + (mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
       textToggleStyle: modeBase + (!mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
-      regionHint: regionSelected ? 'Showing projects in ' + selectedRegionName + '.' : 'Tap a province to filter projects.',
+      regionHint: regionSelected ? 'Showing topics in ' + selectedRegionName + '.' : 'Tap a province to filter topics.',
       allRegionsLabel: regionSelected ? 'Clear region: ' + selectedRegionName : 'All regions',
       allRegionsStyle: "width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:14px;font-weight:600;color:#16361e;background:" + (regionSelected ? '#ffffff' : '#e3fbd8') + ";border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:11px 13px;cursor:pointer;text-align:center;",
       showMapRegion: () => this.setState({ regionMode: 'map' }),

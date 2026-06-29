@@ -40,7 +40,7 @@
       <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-weight:700;font-size:clamp(40px,5.4vw,68px);line-height:1.04;letter-spacing:-0.5px;color:#16361e;margin:0 0 22px;">Share field knowledge.<br />Grow better together.</h1>
       <p style="font-size:19px;line-height:1.6;color:#33473b;max-width:520px;margin:0 0 34px;">AkkerBooster is the knowledge-sharing platform for arable farmers in the Netherlands. Exchange practical knowledge, solve challenges, and shape the future of our fields.</p>
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
-        <a href="Explore.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#eafbe1;background:#16361e;border:1.5px solid #16361e;border-radius:999px;transition:transform .18s ease,background .18s ease;" style-hover="background:#0f2716;transform:translateY(-1px);">Topics</a>
+        <a href="Explore.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#eafbe1;background:#16361e;border:1.5px solid #16361e;border-radius:999px;transition:transform .18s ease,background .18s ease;" style-hover="background:#0f2716;transform:translateY(-1px);">Challenges</a>
         <a href="{{ heroCtaHref }}" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;text-decoration:none;font-size:17px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.30);border-radius:999px;transition:border-color .18s ease,background .18s ease;" style-hover="background:rgba(255,255,255,0.55);border-color:#16361e;">{{ heroCtaLabel }}</a>
       </div>
     </div>
@@ -77,8 +77,8 @@
   <!-- BROWSE BY TOPIC -->
   <section style="max-width:1200px;margin:0 auto;padding:clamp(40px,5vw,72px) clamp(20px,4vw,40px);">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:32px;">
-      <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(28px,3.4vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">Browse by topic</h2>
-      <a href="Explore.dc.html" style="text-decoration:none;font-size:16px;font-weight:600;color:#16361e;border-bottom:2px solid #8ee05e;padding-bottom:2px;">View all topics</a>
+      <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(28px,3.4vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">Browse by category</h2>
+      <a href="Explore.dc.html" style="text-decoration:none;font-size:16px;font-weight:600;color:#16361e;border-bottom:2px solid #8ee05e;padding-bottom:2px;">View all challenges</a>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
       <sc-for list="{{ cats }}" as="c" hint-placeholder-count="8">
@@ -116,8 +116,8 @@
   <!-- RECENT TOPICS -->
   <section style="max-width:1000px;margin:0 auto;padding:clamp(44px,5vw,80px) clamp(20px,4vw,40px);">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:24px;">
-      <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(28px,3.4vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">Recent topics</h2>
-      <a href="Explore.dc.html" style="text-decoration:none;font-size:16px;font-weight:600;color:#16361e;border-bottom:2px solid #8ee05e;padding-bottom:2px;">View all topics</a>
+      <h2 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(28px,3.4vw,40px);color:#16361e;margin:0;letter-spacing:-0.3px;">Recent challenges</h2>
+      <a href="Explore.dc.html" style="text-decoration:none;font-size:16px;font-weight:600;color:#16361e;border-bottom:2px solid #8ee05e;padding-bottom:2px;">View all challenges</a>
     </div>
     <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:20px;overflow:hidden;">
       <sc-for list="{{ trending }}" as="r" hint-placeholder-count="3">
@@ -266,7 +266,7 @@ class Component extends DCLogic {
     ];
     const cats = CAT_DEFS.map((c) => {
       const n = catCounts[c.name] || 0;
-      return { name: c.name, count: n + (n === 1 ? ' topic' : ' topics'), iconEl: this.icon(c.icon) };
+      return { name: c.name, count: n + (n === 1 ? ' challenge' : ' challenges'), iconEl: this.icon(c.icon) };
     });
 
     // Recent topics list
@@ -283,7 +283,7 @@ class Component extends DCLogic {
       }));
     } else {
       trending = [{
-        t: loading ? 'Loading…' : 'No topics yet',
+        t: loading ? 'Loading…' : 'No challenges yet',
         meta: loading ? '' : 'Be the first to post — it takes a minute.',
         href: loading ? 'Explore.dc.html' : 'CreatePost.dc.html',
         ordinal: '01', notFirst: false, rightEl: null,
@@ -308,7 +308,7 @@ class Component extends DCLogic {
     return {
       recentHref, recentTitle, recentMetaEl, activeRegionLabel, activeRegionId: activeId, cats, steps, trending, values,
       heroCtaHref: me ? 'CreatePost.dc.html' : 'SignUp.dc.html',
-      heroCtaLabel: me ? 'Start a topic' : 'Create account',
+      heroCtaLabel: me ? 'Start a challenge' : 'Create account',
     };
   }
 }

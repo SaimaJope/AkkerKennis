@@ -40,6 +40,12 @@
     <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(30px,3.8vw,44px);color:#16361e;margin:0 0 8px;letter-spacing:-0.4px;">Create an event</h1>
     <p style="font-size:17px;color:#33473b;margin:0 0 30px;max-width:560px;">Workshops, field days, expeditions and meetups. Give farmers the practical details — what, when, where — and link a WhatsApp group so they can join and ask questions.</p>
 
+    <sc-if value="{{ adminBlocked }}" hint-placeholder-val="{{ false }}">
+      {{ adminNoticeEl }}
+    </sc-if>
+
+    <sc-if value="{{ canCreate }}" hint-placeholder-val="{{ true }}">
+
     <!-- EVENT TYPE -->
     <div style="margin-bottom:24px;">
       <span style="display:block;font-size:14px;font-weight:600;color:#16361e;margin-bottom:10px;">Event type</span>
@@ -145,6 +151,7 @@
       <button type="button" onClick="{{ onPublish }}" style="{{ publishStyle }}" style-hover="background:#0f2716;">{{ publishLabel }}</button>
       <a href="Events.dc.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 26px;text-decoration:none;font-size:16px;font-weight:600;color:#16361e;background:transparent;border:1.5px solid rgba(22,54,30,0.24);border-radius:14px;cursor:pointer;">Cancel</a>
     </div>
+    </sc-if>
   </section>
 
   <dc-import name="Footer" hint-size="100%,320px"></dc-import>
@@ -179,6 +186,7 @@ class Component extends DCLogic {
     if (st.busy) return;
     if (!st.configured) { this.setState({ error: 'Backend not configured yet (see SETUP_FIREBASE.md).' }); return; }
     if (!st.me) { window.location.href = 'SignIn.dc.html'; return; }
+    if (!st.me.isAdmin) { this.setState({ error: 'Only site administrators can create events.' }); return; }
     if (!st.title.trim()) { this.setState({ error: 'Give your event a title.' }); return; }
     if (!st.date.trim()) { this.setState({ error: 'Add a date so farmers know when it is.' }); return; }
     if (!st.location.trim()) { this.setState({ error: 'Add a location.' }); return; }
@@ -223,9 +231,21 @@ class Component extends DCLogic {
     });
 
     const st = this.state;
+    const signedIn = st.configured && !!st.me;
+    const admin = !!(st.me && st.me.isAdmin);
+    const adminBlocked = signedIn && !admin;
     const notSignedIn = st.configured && !st.me;
     return {
       types,
+      // Only administrators may create Events. Show the form to admins (and, when
+      // not signed in, let publish route through sign-in); block everyone else.
+      canCreate: !adminBlocked,
+      adminBlocked,
+      adminNoticeEl: this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.16)', borderRadius: 18, padding: 'clamp(24px,3vw,34px)', marginBottom: 8 } },
+        this.h('h2', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'Events are created by administrators'),
+        this.h('p', { style: { fontSize: 16, lineHeight: 1.6, color: '#5a7060', margin: '0 0 22px' } }, 'Workshops, field days and meetups are scheduled by the AkkerBooster team. You can still browse every event, join the discussion, and sign up.'),
+        this.h('a', { href: 'Events.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'Browse events')
+      ),
       title: st.title, date: st.date, time: st.time, location: st.location, region: st.region,
       organiser: st.organiser, organiserRole: st.organiserRole, host: st.host, capacity: st.capacity,
       cost: st.cost, summary: st.summary, description: st.description, agenda: st.agenda,

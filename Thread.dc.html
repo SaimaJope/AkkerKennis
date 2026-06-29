@@ -14,6 +14,7 @@
 <script src="./gate.js"></script>
 <script src="./theme.js"></script>
 <script src="./firebase.js"></script>
+<script src="./demo-data.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -26,6 +27,7 @@
   textarea{font-family:'Ubuntu',Arial,sans-serif;}
   .forum-reply-vote:hover{border-color:#fe4c24;}
   .ak-gallery-img:hover{opacity:0.92;}
+  .ak-author-link:hover{text-decoration:underline!important;}
 </style>
 </helmet>
 
@@ -37,7 +39,7 @@
   <section style="max-width:1120px;margin:0 auto;padding:clamp(24px,3vw,36px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
     <a href="Explore.dc.html" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:15px;font-weight:600;color:#16361e;margin-bottom:22px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16361e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
-      All topics
+      All challenges
     </a>
 
     {{ bodyEl }}
@@ -48,7 +50,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { configured: false, me: null, loggedIn: false, topicId: '', topic: null, topicLoading: true, remoteReplies: null, repliesError: '', postError: '', posting: false, replyText: '', replyImages: [], threadStats: { boosts: [], issues: [] }, editingId: null, editText: '', showOriginal: {}, prompt: false };
+  state = { configured: false, me: null, loggedIn: false, topicId: '', isDemo: false, topic: null, topicLoading: true, remoteReplies: null, repliesError: '', postError: '', posting: false, replyText: '', replyImages: [], threadStats: { boosts: [], issues: [] }, editingId: null, editText: '', showOriginal: {}, prompt: false };
 
   h(type, props, ...children) {
     return React.createElement(type, props, ...children);
@@ -59,6 +61,19 @@ class Component extends DCLogic {
     const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
     let topicId = '';
     try { topicId = new URLSearchParams(window.location.search).get('id') || ''; } catch (e) {}
+
+    // Sample challenge from demo-data.js — render entirely client-side (no
+    // backend reads/writes). Replies and reaction counts are static examples.
+    if (window.AK_DEMO && window.AK_DEMO.isDemoId(topicId)) {
+      const d = window.AK_DEMO.byId(topicId);
+      this.setState({
+        configured, topicId, isDemo: true, topic: d, topicLoading: false,
+        remoteReplies: (d && d.replies) || [], threadStats: { boosts: [], issues: [] },
+      });
+      if (configured) window.AK.onAuth((u) => this.setState({ me: u, loggedIn: !!u }));
+      return;
+    }
+
     this.setState({ configured, topicId });
     if (!configured) { this.setState({ topicLoading: false }); return; }
 
@@ -89,6 +104,32 @@ class Component extends DCLogic {
     let n = 0;
     for (let i = 0; i < String(seed).length; i++) n = (n + String(seed).charCodeAt(i)) % palette.length;
     return palette[n];
+  }
+
+  // Link to a member's public profile when we know their uid (and the post
+  // isn't a [deleted] tombstone). Returns null when not linkable.
+  profileHref(uid, name) {
+    if (!uid || name === '[deleted]') return null;
+    return 'Profile.dc.html?id=' + encodeURIComponent(uid);
+  }
+
+  // An avatar that becomes a clickable link to the author's profile when possible.
+  authorAvatar(uid, name, initials, size, bg) {
+    const style = { flex: '0 0 auto', width: size, height: size, borderRadius: '50%', background: bg || '#16361e', color: bg ? '#fff' : '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: size >= 52 ? 20 : (size >= 46 ? 18 : 16), textDecoration: 'none', overflow: 'hidden' };
+    const href = this.profileHref(uid, name);
+    return href
+      ? this.h('a', { href: href, 'aria-label': 'View ' + (name || 'member') + '’s profile', style: style }, initials || '?')
+      : this.h('span', { style: style }, initials || '?');
+  }
+
+  // The author's name, linked to their profile when possible.
+  authorNameEl(uid, name, fontSize) {
+    const label = name || 'Member';
+    const style = { fontSize: fontSize || 16, fontWeight: 600, color: '#16361e' };
+    const href = this.profileHref(uid, name);
+    return href
+      ? this.h('a', { href: href, className: 'ak-author-link', style: Object.assign({ textDecoration: 'none' }, style) }, label)
+      : this.h('div', { style: style }, label);
   }
 
   fmtTime(ms) {
@@ -126,20 +167,22 @@ class Component extends DCLogic {
   buildReplies() {
     const st = this.state;
     const uid = st.me && st.me.uid;
+    const demo = st.isDemo;
     return (st.remoteReplies || []).map((r) => ({
       id: r.id,
+      uid: r.authorUid,
       name: r.authorName,
       initials: r.authorInitials,
       avatarBg: this.avatarBg(r.authorUid || r.authorName),
       meta: r.authorName + ' · ' + this.fmtTime(r.createdAt),
       body: r.body,
       images: r.images || [],
-      count: r.votes.length,
-      voted: !!(uid && r.votes.indexOf(uid) !== -1),
-      mine: !!(uid && r.authorUid === uid),
+      count: (typeof r.voteCount === 'number' ? r.voteCount : (r.votes ? r.votes.length : 0)),
+      voted: !demo && !!(uid && r.votes.indexOf(uid) !== -1),
+      mine: !demo && !!(uid && r.authorUid === uid),
       edited: r.edited,
       originalBody: r.originalBody,
-      onVote: this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
+      onVote: demo ? (() => {}) : this.guarded(() => { window.AK.toggleReplyVote(r.id).catch((e) => console.error(e)); }),
     }));
   }
 
@@ -203,7 +246,7 @@ class Component extends DCLogic {
 
   reloadTopic() { window.AK.getTopic(this.state.topicId).then((t) => this.setState({ topic: t })).catch((e) => console.error(e)); }
   deleteTopic() {
-    if (!window.confirm('Delete this topic? The title and photos are removed; the comments stay. It disappears from the site after 24 hours unless you archive it.')) return;
+    if (!window.confirm('Delete this challenge? The title and photos are removed; the comments stay. It disappears from the site after 24 hours unless you archive it.')) return;
     window.AK.softDeleteTopic(this.state.topicId).then(() => this.reloadTopic()).catch((e) => { console.error(e); window.alert((e && e.message) || 'Could not delete.'); });
   }
   archiveTopic() {
@@ -221,7 +264,7 @@ class Component extends DCLogic {
         this.h('div', { style: { fontSize: 14, color: '#8aa090' } }, 'Posted ' + this.fmtTopicDate(t.createdAt))
       ));
     const bodyCard = this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 20, padding: 'clamp(24px,3vw,36px)' } },
-      this.h('p', { style: { fontSize: 16, lineHeight: 1.7, color: '#8aa090', margin: 0 } }, 'This topic was deleted by its author. The comments below are kept.'));
+      this.h('p', { style: { fontSize: 16, lineHeight: 1.7, color: '#8aa090', margin: 0 } }, 'This challenge was deleted by its author. The comments below are kept.'));
     return this.h(React.Fragment, null, badge, title, author, bodyCard);
   }
 
@@ -232,15 +275,15 @@ class Component extends DCLogic {
     }
     const hrs = this.hoursLeft(t);
     return this.h('div', { style: { margin: '18px 0', padding: '16px 18px', background: '#16361e', borderRadius: 14, color: '#dbeede' } },
-      this.h('div', { style: { fontSize: 14, lineHeight: 1.55, marginBottom: 12 } }, 'You deleted this topic. It and its comments will be removed from the site ' + (hrs > 0 ? ('in about ' + hrs + ' hour' + (hrs === 1 ? '' : 's')) : 'shortly') + ' — unless you archive it.'),
+      this.h('div', { style: { fontSize: 14, lineHeight: 1.55, marginBottom: 12 } }, 'You deleted this challenge. It and its comments will be removed from the site ' + (hrs > 0 ? ('in about ' + hrs + ' hour' + (hrs === 1 ? '' : 's')) : 'shortly') + ' — unless you archive it.'),
       this.h('button', { type: 'button', onClick: () => this.archiveTopic(), style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 44, padding: '0 20px', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', border: 'none', borderRadius: 11, cursor: 'pointer' } }, 'Archive to keep the discussion'));
   }
 
   removedEl() {
     return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
-      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Topic removed'),
-      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This topic was deleted by its author and is no longer available.'),
-      this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all topics'));
+      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Challenge removed'),
+      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This challenge was deleted by its author and is no longer available.'),
+      this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all challenges'));
   }
 
   renderTopic(t) {
@@ -252,11 +295,11 @@ class Component extends DCLogic {
       t.region ? dot : null,
       t.region ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#5a7060' } }, this.icon('pin', 13), t.region) : null
     );
-    const title = this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(30px,3.8vw,44px)', lineHeight: 1.12, color: '#16361e', margin: '0 0 18px', letterSpacing: '-0.4px', overflowWrap: 'anywhere' } }, t.title || 'Untitled topic');
+    const title = this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 'clamp(30px,3.8vw,44px)', lineHeight: 1.12, color: '#16361e', margin: '0 0 18px', letterSpacing: '-0.4px', overflowWrap: 'anywhere' } }, t.title || 'Untitled challenge');
     const author = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13, marginBottom: 20 } },
-      this.h('span', { style: { flex: '0 0 auto', width: 46, height: 46, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 18 } }, t.authorInitials || '?'),
+      this.authorAvatar(t.authorUid, t.authorName, t.authorInitials, 46),
       this.h('div', null,
-        this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#16361e' } }, t.authorName || 'Member'),
+        this.authorNameEl(t.authorUid, t.authorName, 16),
         this.h('div', { style: { fontSize: 14, color: '#5a7060' } }, (t.region ? t.region + ' · ' : '') + 'Posted ' + this.fmtTopicDate(t.createdAt))
       )
     );
@@ -277,9 +320,9 @@ class Component extends DCLogic {
 
   notFoundEl() {
     return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
-      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Topic not found'),
-      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This topic may have been removed. Browse the current discussions instead.'),
-      this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all topics')
+      this.h('h1', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 26, color: '#16361e', margin: '0 0 8px' } }, 'Challenge not found'),
+      this.h('p', { style: { fontSize: 16, color: '#5a7060', margin: '0 0 22px' } }, 'This challenge may have been removed. Browse the current discussions instead.'),
+      this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 48, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'View all challenges')
     );
   }
 
@@ -290,20 +333,23 @@ class Component extends DCLogic {
 
   actionBarEl(t) {
     const st = this.state;
+    const demo = st.isDemo;
     const uid = st.me && st.me.uid;
     const b = st.threadStats.boosts || [];
     const i = st.threadStats.issues || [];
-    const boosted = !!(uid && b.indexOf(uid) !== -1);
-    const hasIssue = !!(uid && i.indexOf(uid) !== -1);
-    const onBoost = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'boosts').catch((e) => console.error(e)));
-    const onIssue = this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'issues').catch((e) => console.error(e)));
-    const deleteBtn = this.isMine(t) && !t.deleted
+    const bCount = demo ? (t.boosts || 0) : b.length;
+    const iCount = demo ? (t.issues || 0) : i.length;
+    const boosted = !demo && !!(uid && b.indexOf(uid) !== -1);
+    const hasIssue = !demo && !!(uid && i.indexOf(uid) !== -1);
+    const onBoost = demo ? (() => {}) : this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'boosts').catch((e) => console.error(e)));
+    const onIssue = demo ? (() => {}) : this.guarded(() => window.AK.toggleThreadReaction(st.topicId, 'issues').catch((e) => console.error(e)));
+    const deleteBtn = !demo && this.isMine(t) && !t.deleted
       ? this.h('button', { type: 'button', onClick: () => this.deleteTopic(), style: { display: 'inline-flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, borderRadius: 11, padding: '11px 16px', cursor: 'pointer', background: '#ffffff', color: '#8aa090', border: '1.5px solid rgba(22,54,30,0.15)', marginLeft: 'auto' } },
-        this.h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13' })), 'Delete topic')
+        this.h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, this.h('path', { d: 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13' })), 'Delete challenge')
       : null;
     return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '22px 0' } },
-      this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea · ' + b.length),
-      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too · ' + i.length),
+      this.h('button', { type: 'button', onClick: onBoost, style: this.actionButtonStyle(boosted, { background: '#fe4c24', color: '#fff', border: '1.5px solid #fe4c24' }) }, this.icon('boost', 17), 'Boost idea · ' + bCount),
+      this.h('button', { type: 'button', onClick: onIssue, style: this.actionButtonStyle(hasIssue, { background: '#16361e', color: '#eafbe1', border: '1.5px solid #16361e' }) }, this.icon('shield', 16), 'I have this issue too · ' + iCount),
       deleteBtn
     );
   }
@@ -321,11 +367,11 @@ class Component extends DCLogic {
     return this.h('div', { style: { background: '#16361e', borderRadius: 22, padding: 'clamp(24px,3vw,34px)', margin: '8px 0 36px', color: '#dbeede' } },
       this.h('div', { style: { display: 'inline-flex', alignItems: 'center', gap: 9, padding: '6px 13px', borderRadius: 999, background: 'rgba(142,224,94,0.18)', marginBottom: 16 } },
         this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: '#8ee05e', display: 'inline-block' } }),
-        this.h('span', { style: { fontSize: 12, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: '#bff0a6' } }, 'Project candidate')
+        this.h('span', { style: { fontSize: 12, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: '#bff0a6' } }, 'Topic candidate')
       ),
       this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 24, color: '#ffffff', margin: '0 0 10px', lineHeight: 1.2 } }, 'The author flagged this as a possible pilot or working group.'),
-      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#aecdb4', margin: '0 0 22px', maxWidth: 560 } }, 'If enough farmers want to take it further, it can become a member-led project — with a manager, funding, and a WhatsApp group on the Projects page.'),
-      this.h('a', { href: 'Projects.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 24px', textDecoration: 'none', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 15, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', borderRadius: 12 } }, 'See member projects')
+      this.h('p', { style: { fontSize: 16, lineHeight: 1.65, color: '#aecdb4', margin: '0 0 22px', maxWidth: 560 } }, 'If enough farmers want to take it further, it can become a member-led topic — with a manager, funding, and a WhatsApp group on the Topics page.'),
+      this.h('a', { href: 'Projects.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 24px', textDecoration: 'none', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 15, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', borderRadius: 12 } }, 'See member topics')
     );
   }
 
@@ -368,9 +414,9 @@ class Component extends DCLogic {
   replyCard(r) {
     return this.h('div', { key: r.id, style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: '22px 24px' } },
       this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 } },
-        this.h('span', { style: { flex: '0 0 auto', width: 40, height: 40, borderRadius: '50%', background: r.avatarBg, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 16 } }, r.initials),
+        this.authorAvatar(r.uid, r.name, r.initials, 40, r.avatarBg),
         this.h('div', { style: { flex: '1 1 auto' } },
-          this.h('div', { style: { fontSize: 15, fontWeight: 600, color: '#16361e' } }, r.name),
+          this.authorNameEl(r.uid, r.name, 15),
           this.h('div', { style: { fontSize: 13, color: '#5a7060' } }, r.meta)
         ),
         this.h('button', { type: 'button', onClick: r.onVote, 'aria-pressed': r.voted, className: 'forum-reply-vote', style: { display: 'inline-flex', alignItems: 'center', gap: 6, flex: '0 0 auto', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 14, fontWeight: 600, borderRadius: 999, padding: '7px 13px', cursor: 'pointer', transition: 'all .15s ease', background: r.voted ? '#fe4c24' : '#ffffff', color: r.voted ? '#ffffff' : '#fe4c24', border: '1.5px solid ' + (r.voted ? '#fe4c24' : 'rgba(254,76,36,0.4)') } }, this.icon('boost', 15), r.count)
@@ -471,16 +517,16 @@ class Component extends DCLogic {
     const authorCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: 22 } },
       this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Posted by'),
       this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 13 } },
-        this.h('span', { style: { flex: '0 0 auto', width: 52, height: 52, borderRadius: '50%', background: '#16361e', color: '#bff0a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20 } }, t.authorInitials || '?'),
+        this.authorAvatar(t.authorUid, t.authorName, t.authorInitials, 52),
         this.h('div', null,
-          this.h('div', { style: { fontSize: 16, fontWeight: 600, color: '#16361e' } }, t.authorName || 'Member'),
+          this.authorNameEl(t.authorUid, t.authorName, 16),
           this.h('div', { style: { fontSize: 14, color: '#5a7060' } }, t.region ? ('Arable farmer · ' + t.region) : 'AkkerBooster member')
         )
       )
     );
 
     const detailsCard = this.h('div', { style: { background: '#ffffff', border: '1px solid rgba(22,54,30,0.13)', borderRadius: 18, padding: 22 } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Topic details'),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#5a7060', margin: '0 0 16px' } }, 'Challenge details'),
       this.h('div', { style: { display: 'flex', flexDirection: 'column', gap: 13 } },
         detailRow('Type', t.type),
         detailRow('Category', t.category),
@@ -494,22 +540,41 @@ class Component extends DCLogic {
     return this.h('aside', { className: 'ak-detail-side', style: { display: 'flex', flexDirection: 'column', gap: 18 } }, authorCard, detailsCard);
   }
 
+  sampleBannerEl() {
+    return this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, background: '#16361e', color: '#dbeede', borderRadius: 14, padding: '12px 16px', marginBottom: 22, fontSize: 14, lineHeight: 1.5 } },
+      this.h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: '#8ee05e', display: 'inline-block', flex: '0 0 auto' } }),
+      'Sample challenge — added to show how AkkerBooster works. The replies and reaction counts here are examples.'
+    );
+  }
+
+  demoNoticeEl() {
+    return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: 'clamp(26px,3vw,38px)', textAlign: 'center' } },
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'This is a sample discussion'),
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, 'It was added to show how Challenges work. Browse the live discussions or start your own.'),
+      this.h('div', { style: { display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' } },
+        this.h('a', { href: 'Explore.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#16361e', background: 'transparent', border: '1.5px solid rgba(22,54,30,0.3)', borderRadius: 12 } }, 'Browse challenges'),
+        this.h('a', { href: 'CreatePost.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 50, padding: '0 26px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } }, 'Start a challenge')
+      )
+    );
+  }
+
   bodyEl() {
     const st = this.state;
-    if (st.topicLoading) return this.h('div', { style: { padding: '30px 0', fontSize: 16, color: '#5a7060' } }, 'Loading topic…');
+    if (st.topicLoading) return this.h('div', { style: { padding: '30px 0', fontSize: 16, color: '#5a7060' } }, 'Loading challenge…');
     const t = st.topic;
     if (!t) return this.notFoundEl();
     if (this.topicHidden(t)) return this.removedEl();
     return this.h('div', { className: 'ak-detail-grid', style: { display: 'grid', gridTemplateColumns: '1fr 312px', gap: 32, alignItems: 'start' } },
       this.h('div', null,
+        st.isDemo ? this.sampleBannerEl() : null,
         this.renderTopic(t),
-        this.ownerBarEl(t),
+        st.isDemo ? null : this.ownerBarEl(t),
         t.deleted ? null : this.actionBarEl(t),
-        this.promptEl(),
+        st.isDemo ? null : this.promptEl(),
         t.deleted ? null : this.h('div', { style: { height: 24 } }),
         t.deleted ? null : this.projectPanelEl(t),
         this.repliesSectionEl(),
-        this.replyGateEl()
+        st.isDemo ? this.demoNoticeEl() : this.replyGateEl()
       ),
       this.sidebarEl(t)
     );

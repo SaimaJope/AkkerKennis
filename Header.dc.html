@@ -44,7 +44,7 @@
         <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
       </a>
       <a href="Explore.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
-        Topics
+        Challenges
         <sc-if value="{{ isExplore }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
       </a>
       <a href="Events.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
@@ -52,7 +52,7 @@
         <sc-if value="{{ isEvents }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
       </a>
       <a href="Projects.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
-        Projects
+        Topics
         <sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:#8ee05e;"></span></sc-if>
       </a>
       <a href="About.dc.html" style="position:relative;text-decoration:none;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;font-weight:500;color:#16361e;padding:8px 0;">
@@ -153,7 +153,7 @@ class Component extends DCLogic {
               this.h('div', { style: { fontSize: 13, color: '#5a7060', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, me.email || '')
             )
           ),
-          this.menuItem('New topic', 'CreatePost.dc.html', this.ic('plus')),
+          this.menuItem('New challenge', 'CreatePost.dc.html', this.ic('plus')),
           this.menuItem('Your profile', 'Profile.dc.html', this.ic('user')),
           this.menuItem('Account settings', 'Account.dc.html', this.ic('gear')),
           this.h('div', { style: { height: 1, background: 'rgba(22,54,30,0.10)', margin: '6px 4px' } }),

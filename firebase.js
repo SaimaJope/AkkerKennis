@@ -37,6 +37,18 @@
     'sanne@akkerbooster.test': 'Sanne Mulder',
   };
 
+  // 3) Site administrators. Only these accounts may CREATE Events and Topics
+  //    (the member-led pilots, formerly "Projects"). Everyone else is a regular
+  //    user: they can still read everything and post Challenges. Keep this in
+  //    sync with the isAdmin() allowlist in firestore.rules. Emails lower-case.
+  var ADMINS = [
+    'jope@tlu.ee',
+    'piet@akkerbooster.test',
+  ];
+  function isAdminEmail(email) {
+    return !!email && ADMINS.indexOf(String(email).toLowerCase()) !== -1;
+  }
+
   var SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 
   function loadScript(src) {
@@ -141,6 +153,8 @@
       email: u.email,
       name: name,
       initials: initials(name),
+      // Site administrator? Gates Event + Topic creation across the UI.
+      isAdmin: isAdminEmail(u.email),
       // Firebase Auth records when the account was created — used for the real
       // "Member since" line on the profile (no more hardcoded date).
       created: (u.metadata && u.metadata.creationTime) || null,
@@ -160,6 +174,11 @@
     ready: ready,
     isConfigured: configured,
     me: function () { return me; },
+    // True when the current (or given) user is a site administrator. Admin-only
+    // actions: creating Events and Topics. Pages also read `user.isAdmin` from
+    // the object handed to onAuth, which is cached for a flash-free first paint.
+    isAdmin: function () { return !!(me && me.isAdmin); },
+    isAdminEmail: isAdminEmail,
     // Last known signed-in user, read synchronously from localStorage. Lets the
     // header render the logged-in state on the very first paint (no logged-out
     // flash) while Firebase restores the real session in the background.
@@ -520,6 +539,7 @@
       return ready.then(function (ctx) {
         var u = ctx && ctx.auth.currentUser;
         if (!u) throw new Error('Sign in to add an event');
+        if (!isAdminEmail(u.email)) throw new Error('Only site administrators can create events.');
         var who = shapeUser(u);
         return ctx.db.collection('events').add({
           title: String(data.title || '').trim(),
@@ -578,7 +598,8 @@
     addProject: function (data) {
       return ready.then(function (ctx) {
         var u = ctx && ctx.auth.currentUser;
-        if (!u) throw new Error('Sign in to add a project');
+        if (!u) throw new Error('Sign in to add a topic');
+        if (!isAdminEmail(u.email)) throw new Error('Only site administrators can create topics.');
         var who = shapeUser(u);
         return ctx.db.collection('projects').add({
           title: String(data.title || '').trim(),

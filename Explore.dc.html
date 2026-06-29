@@ -14,6 +14,7 @@
 <script src="./gate.js"></script>
 <script src="./theme.js"></script>
 <script src="./firebase.js"></script>
+<script src="./demo-data.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -34,7 +35,7 @@
 
   <section style="max-width:1200px;margin:0 auto;padding:clamp(32px,4vw,56px) clamp(20px,4vw,40px) clamp(48px,5vw,80px);">
     <div style="margin-bottom:32px;">
-      <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.4vw,52px);color:#16361e;margin:0 0 10px;letter-spacing:-0.4px;">Topics</h1>
+      <h1 style="font-family:'Ubuntu',Arial,sans-serif;font-size:clamp(34px,4.4vw,52px);color:#16361e;margin:0 0 10px;letter-spacing:-0.4px;">Challenges</h1>
       <p style="font-size:18px;color:#33473b;margin:0;max-width:560px;">Browse practical discussions from arable farmers across the Netherlands. Filter by category, region, or what the community is talking about right now.</p>
     </div>
 
@@ -43,7 +44,7 @@
       <aside style="display:flex;flex-direction:column;gap:20px;">
         <a href="CreatePost.dc.html" class="ak-new-topic" style="display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;text-decoration:none;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border-radius:14px;transition:background .18s ease;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eafbe1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
-          New topic
+          New challenge
         </a>
 
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:20px;">
@@ -94,7 +95,7 @@
       <div>
         <div style="position:relative;margin-bottom:18px;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5a7060" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-          <input type="text" value="{{ query }}" onInput="{{ onQuery }}" placeholder="Search topics, crops, methods..." style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.16);border-radius:14px;padding:16px 18px 16px 50px;" />
+          <input type="text" value="{{ query }}" onInput="{{ onQuery }}" placeholder="Search challenges, crops, methods..." style="width:100%;font-family:'Ubuntu',Arial,sans-serif;font-size:16px;color:#08100d;background:#ffffff;border:1px solid rgba(22,54,30,0.16);border-radius:14px;padding:16px 18px 16px 50px;" />
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
@@ -158,6 +159,11 @@ class Component extends DCLogic {
 
   topics() { return this.state.remoteTopics || []; }
 
+  // Temporary demo posts (client-side only, from demo-data.js). They sit
+  // alongside any live posts so the Challenges board shows the site as it works.
+  demoTopics() { return (window.AK_DEMO && window.AK_DEMO.challenges) || []; }
+  mergedTopics() { return this.topics().concat(this.demoTopics()); }
+
   fmtActivity(ms) {
     if (!ms) return 'just now';
     const h = Math.max(0, (Date.now() - ms) / 3600000);
@@ -177,7 +183,7 @@ class Component extends DCLogic {
         this.h('span', { style: { display: 'inline-flex', fontSize: 12, fontWeight: 700, letterSpacing: 0.3, padding: '5px 11px', borderRadius: 999, background: '#eef3ec', color: '#8aa090', border: '1px solid rgba(22,54,30,0.12)' } }, 'Deleted')
       ),
       this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20, lineHeight: 1.25, color: '#8aa090', margin: '0 0 6px', fontStyle: 'italic' } }, '[deleted]'),
-      this.h('p', { style: { fontSize: 14, color: '#8aa090', margin: 0 } }, 'This topic was deleted by its author — the discussion is still available.')
+      this.h('p', { style: { fontSize: 14, color: '#8aa090', margin: 0 } }, 'This challenge was deleted by its author — the discussion is still available.')
     );
   }
 
@@ -189,7 +195,7 @@ class Component extends DCLogic {
       this.h('span', { style: { fontSize: 13, fontWeight: 600, color: '#5a7060' } }, t.category),
       (t.regionName && t.regionName !== '—') ? dot : null,
       (t.regionName && t.regionName !== '—') ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#5a7060' } }, this.pin(), t.regionName) : null,
-      t.seekingProject ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', borderRadius: 999, padding: '4px 10px' } }, 'Could become a project') : null
+      t.seekingProject ? this.h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#0f2a16', background: '#8ee05e', borderRadius: 999, padding: '4px 10px' } }, 'Could become a topic') : null
     );
 
     const footer = this.h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } },
@@ -213,24 +219,24 @@ class Component extends DCLogic {
 
   firstRunEmptyEl() {
     return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No topics yet'),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No challenges yet'),
       this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, 'Be the first to ask a question or share what worked on your farm.'),
       this.h('a', { href: 'CreatePost.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } },
         this.h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: '#eafbe1', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, this.h('path', { d: 'M12 5v14M5 12h14' })),
-        'Start the first topic')
+        'Start the first challenge')
     );
   }
 
   noMatchEl() {
     return this.h('div', { style: { background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No topics found'),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No challenges found'),
       this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: 0 } }, 'Try a different category, region, or search term.')
     );
   }
 
   errorEl(msg) {
     return this.h('div', { style: { background: '#fde9e3', border: '1px solid rgba(254,76,36,0.28)', borderRadius: 18, padding: '24px 26px' } },
-      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20, color: '#c43a18', margin: '0 0 6px' } }, 'Topics can’t load from the database'),
+      this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 20, color: '#c43a18', margin: '0 0 6px' } }, 'Challenges can’t load from the database'),
       this.h('p', { style: { fontSize: 15, lineHeight: 1.55, color: '#8a3b22', margin: '0 0 8px' } }, 'Create the Firestore database and publish the security rules (see SETUP_FIREBASE.md).'),
       this.h('div', { style: { fontSize: 13, fontFamily: 'Ubuntu Mono, monospace', color: '#8a3b22', opacity: 0.8 } }, 'Details: ' + msg)
     );
@@ -238,9 +244,12 @@ class Component extends DCLogic {
 
   buildTopicsEl(list) {
     const st = this.state;
-    if (st.configured && st.topicsError) return this.errorEl(st.topicsError);
-    if (st.remoteTopics === null) return this.h('div', { style: { padding: '40px 4px', fontSize: 16, color: '#5a7060' } }, 'Loading topics…');
-    if (this.topics().length === 0) return this.firstRunEmptyEl();
+    const merged = this.mergedTopics();
+    // Surface the live-load error only when there is genuinely nothing to show
+    // (with demo posts present the board still works, so we keep showing it).
+    if (st.configured && st.topicsError && merged.length === 0) return this.errorEl(st.topicsError);
+    if (st.remoteTopics === null && this.demoTopics().length === 0) return this.h('div', { style: { padding: '40px 4px', fontSize: 16, color: '#5a7060' } }, 'Loading challenges…');
+    if (merged.length === 0) return this.firstRunEmptyEl();
     if (list.length === 0) return this.noMatchEl();
     return this.h(React.Fragment, null, ...list.map((t) => this.topicCard(t)));
   }
@@ -248,7 +257,7 @@ class Component extends DCLogic {
   renderVals() {
     const st = this.state;
     const DAY = 86400000;
-    const source = this.topics()
+    const source = this.mergedTopics()
       .filter((r) => !(r.deleted && !r.archived && r.deletedAt && (Date.now() - r.deletedAt > DAY)))
       .map((r) => ({
         id: r.id, title: r.title, summary: r.summary,
@@ -283,7 +292,7 @@ class Component extends DCLogic {
         onClick: () => this.setState({ category: id }),
       };
     };
-    const catList = [mkCat('all', 'All topics', source.length)].concat(this.CATS.map((c) => mkCat(c, c, catCounts[c] || 0)));
+    const catList = [mkCat('all', 'All challenges', source.length)].concat(this.CATS.map((c) => mkCat(c, c, catCounts[c] || 0)));
 
     const sortBase = 'font-family:\'Ubuntu\',Arial,sans-serif;font-size:14px;font-weight:600;border:none;border-radius:999px;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:background .15s ease;';
     const mkSort = (id, name) => {
@@ -308,7 +317,7 @@ class Component extends DCLogic {
       regionTextVisible: !mapMode,
       mapToggleStyle: modeBase + (mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
       textToggleStyle: modeBase + (!mapMode ? 'background:#16361e;color:#eafbe1;' : 'background:transparent;color:#16361e;'),
-      regionHint: regionSelected ? 'Showing topics in ' + selectedRegionName + '.' : 'Tap a province to filter topics.',
+      regionHint: regionSelected ? 'Showing challenges in ' + selectedRegionName + '.' : 'Tap a province to filter challenges.',
       allRegionsLabel: regionSelected ? 'Clear region: ' + selectedRegionName : 'All regions',
       allRegionsStyle: 'width:100%;font-family:\'Ubuntu\',Arial,sans-serif;font-size:14px;font-weight:600;color:#16361e;background:' + (regionSelected ? '#ffffff' : '#e3fbd8') + ';border:1px solid rgba(22,54,30,0.18);border-radius:12px;padding:11px 13px;cursor:pointer;text-align:center;',
       showMapRegion: () => this.setState({ regionMode: 'map' }),
@@ -318,7 +327,7 @@ class Component extends DCLogic {
       query: st.query,
       onRegion: (e) => this.setState({ region: e.target.value }),
       onQuery: (e) => this.setState({ query: e.target.value }),
-      resultLabel: (st.remoteTopics === null ? '' : list.length + (list.length === 1 ? ' topic' : ' topics')),
+      resultLabel: ((st.remoteTopics === null && this.demoTopics().length === 0) ? '' : list.length + (list.length === 1 ? ' challenge' : ' challenges')),
     };
   }
 }

@@ -42,10 +42,12 @@
     <div class="ak-events-grid" style="display:grid;grid-template-columns:268px 1fr;gap:28px;align-items:start;">
       <!-- SIDEBAR -->
       <aside style="display:flex;flex-direction:column;gap:20px;">
+        <sc-if value="{{ canCreate }}" hint-placeholder-val="{{ true }}">
         <a href="CreateEvent.dc.html" class="ak-new-event" style="display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;text-decoration:none;font-size:16px;font-weight:600;color:#eafbe1;background:#16361e;border-radius:14px;transition:background .18s ease;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eafbe1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
           New event
         </a>
+        </sc-if>
 
         <div style="background:#ffffff;border:1px solid rgba(22,54,30,0.13);border-radius:18px;padding:20px;">
           <h3 style="font-family:'Ubuntu',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a7060;margin:0 0 14px;">Type</h3>
@@ -114,7 +116,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { region: 'all', regionMode: 'map', type: 'all', query: '', remoteEvents: null, eventsError: '', configured: false };
+  state = { region: 'all', regionMode: 'map', type: 'all', query: '', remoteEvents: null, eventsError: '', configured: false, me: null };
 
   h(type, props, ...children) {
     return React.createElement(type, props, ...children);
@@ -124,6 +126,7 @@ class Component extends DCLogic {
     const configured = !!(window.AK && window.AK.isConfigured && window.AK.isConfigured());
     this.setState({ configured });
     if (configured) {
+      window.AK.onAuth((u) => this.setState({ me: u }));
       this._unsub = window.AK.watchEvents((rows, err) => {
         if (err) this.setState({ eventsError: err });
         else this.setState({ remoteEvents: rows || [], eventsError: '' });
@@ -132,6 +135,8 @@ class Component extends DCLogic {
       this.setState({ remoteEvents: [] });
     }
   }
+
+  isAdmin() { return !!(this.state.me && this.state.me.isAdmin); }
 
   componentWillUnmount() {
     if (this._unsub) this._unsub();
@@ -194,12 +199,15 @@ class Component extends DCLogic {
         this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: 0 } }, 'Try another region or type, or clear the filters to see every event.')
       );
     }
+    const admin = this.isAdmin();
     return this.h('div', { style: { gridColumn: '1 / -1', background: '#ffffff', border: '1px dashed rgba(22,54,30,0.22)', borderRadius: 18, padding: '52px 26px', textAlign: 'center' } },
       this.h('h3', { style: { fontFamily: "'Ubuntu',Arial,sans-serif", fontSize: 22, color: '#16361e', margin: '0 0 8px' } }, 'No events scheduled yet'),
-      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, 'Be the first to put a workshop, field day or meetup on the calendar.'),
-      this.h('a', { href: 'CreateEvent.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } },
+      this.h('p', { style: { fontSize: 15, color: '#5a7060', margin: '0 0 22px' } }, admin
+        ? 'Be the first to put a workshop, field day or meetup on the calendar.'
+        : 'Events are scheduled by the AkkerBooster team. Check back soon for workshops, field days and meetups.'),
+      admin ? this.h('a', { href: 'CreateEvent.dc.html', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, padding: '0 24px', textDecoration: 'none', fontSize: 15, fontWeight: 700, color: '#eafbe1', background: '#16361e', borderRadius: 12 } },
         this.h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: '#eafbe1', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, this.h('path', { d: 'M12 5v14M5 12h14' })),
-        'Create the first event')
+        'Create the first event') : null
     );
   }
 
@@ -246,6 +254,7 @@ class Component extends DCLogic {
 
     return {
       eventsEl,
+      canCreate: this.isAdmin(),
       typeList,
       resultLabel: (st.remoteEvents === null ? '' : (list.length + (list.length === 1 ? ' event' : ' events') + (regionSelected ? ' in ' + selectedRegionName : ''))),
       regionOpts: this.REGIONS,
