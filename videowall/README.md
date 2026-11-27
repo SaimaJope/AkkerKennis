@@ -2,7 +2,10 @@
 
 Play an MP4 as your Windows desktop wallpaper — no re-encoding, GPU-decoded, auto-pauses when hidden.
 
-## Setup
+## Easiest
+Drag a video onto `wallpaper.bat`. It installs Python and mpv (via winget) the first time, then re-drag the video.
+
+## Manual setup
 1. Install Python 3.8+ (no pip packages needed).
 2. Download an mpv Windows build from https://mpv.io/installation/ and put `mpv.exe` next to `videowall.py` (or in `mpv\`, or on PATH).
 
